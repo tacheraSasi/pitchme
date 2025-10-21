@@ -6,21 +6,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView>
-      <ThemedView >
+    <ThemedView style={{ flex: 1 }}>
+      <SafeAreaView>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">PitchMe</ThemedText>
         </ThemedView>
-      </ThemedView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: "row",
-    justifyContent:"center",
-    margin:10,
+    justifyContent: "center",
+    margin: 10,
     alignItems: "center",
     gap: 8,
   },
