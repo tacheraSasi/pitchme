@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { NotesList } from "@/components/NotesList";
 
 export default function HomeScreen() {
   return (
@@ -11,6 +12,7 @@ export default function HomeScreen() {
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">PitchMe</ThemedText>
         </ThemedView>
+        <NotesList/>
       </SafeAreaView>
     </ThemedView>
   );
