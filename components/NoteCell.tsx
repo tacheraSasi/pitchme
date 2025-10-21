@@ -40,11 +40,9 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     pad: {
       borderRadius: 18,
-      backgroundColor: colorScheme === "dark" ? Colors.dark.background : Colors.light.background,
+      backgroundColor: "#f4f4f4",
       alignItems: "center",
       justifyContent: "center",
-      borderWidth: 1,
-      borderColor: colorScheme === "dark" ? Colors.dark.border : Colors.light.border,
     },
     padPressed: {
       backgroundColor: Colors[colorScheme].tint,
@@ -57,6 +55,6 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     text: {
       fontWeight: "600",
       fontSize: 18,
-      color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
+      color: "#1a1a1a",
     },
-  });
+});
