@@ -30,18 +30,13 @@ export const NoteCell = ({ note, onPress }: NoteCellProps) => {
 
 const styles = StyleSheet.create({
   pad: {
-    width: 90,
-    height: 90,
-    margin: 10,
-    borderRadius: 20,
+    width: 116,
+    height: 116,
+    margin: 6,
+    borderRadius: 18,
     backgroundColor: "#f4f4f4",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
   },
   padPressed: {
     backgroundColor: "#d1e8ff",
