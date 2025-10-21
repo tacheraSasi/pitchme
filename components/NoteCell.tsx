@@ -5,10 +5,11 @@ import { useState } from "react";
 
 export interface NoteCellProps {
   note: Note;
+  size?: number;
   onPress?: (note: Note) => void;
 }
 
-export const NoteCell = ({ note, onPress }: NoteCellProps) => {
+export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
   const [pressed, setPressed] = useState(false);
 
   return (
@@ -19,7 +20,11 @@ export const NoteCell = ({ note, onPress }: NoteCellProps) => {
         console.log(`Pressed note: ${note}`);
         onPress?.(note);
       }}
-      style={[styles.pad, pressed && styles.padPressed]}
+      style={[
+        styles.pad,
+        { width: size, height: size },
+        pressed && styles.padPressed,
+      ]}
     >
       <View style={styles.innerPad}>
         <ThemedText style={styles.text}>{note}</ThemedText>
@@ -30,9 +35,6 @@ export const NoteCell = ({ note, onPress }: NoteCellProps) => {
 
 const styles = StyleSheet.create({
   pad: {
-    width: 116,
-    height: 116,
-    margin: 6,
     borderRadius: 18,
     backgroundColor: "#f4f4f4",
     alignItems: "center",

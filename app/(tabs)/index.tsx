@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,7 +11,7 @@ export default function HomeScreen() {
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">PitchMe</ThemedText>
         </ThemedView>
-        <NotesList/>
+        <NotesList />
       </SafeAreaView>
     </ThemedView>
   );
@@ -22,8 +21,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    margin: 10,
+    marginVertical: 16,
     alignItems: "center",
-    gap: 8,
   },
 });
