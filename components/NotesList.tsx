@@ -110,7 +110,7 @@ export const NotesList = () => {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    maxHeight: 400, // Limit height to make it scrollable
+    // maxHeight: 400, // Limit height to make it scrollable
   },
   container: {
     flexDirection: "row",
