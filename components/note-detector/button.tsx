@@ -19,7 +19,7 @@ export default function NoteDetectorButton({ bottomSheetRef }: NoteDetectorButto
           style={styles.openModalButton}
           onPress={() => bottomSheetRef.current?.expand()}
         >
-          <Entypo name="plus" size={28} color="white" />
+          <Entypo name="modern-mic" size={28} color="white" />
           <ThemedText style={styles.openModalButtonText}>
             Sing or Hum a Note
           </ThemedText>

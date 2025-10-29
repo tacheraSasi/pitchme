@@ -1,3 +1,4 @@
+import NoteDetectorBottomSheet from "@/components/note-detector/bottom-sheet";
 import NoteDetectorButton from "@/components/note-detector/button";
 import { NotesList } from "@/components/NotesList";
 import { ThemedText } from "@/components/themed-text";
@@ -18,10 +19,11 @@ export default function HomeScreen() {
           <ThemedView style={styles.titleContainer}>
             <ThemedText type="title">PitchMe</ThemedText>
           </ThemedView>
+          <NoteDetectorButton bottomSheetRef={bottomSheetRef} />
           <NotesList />
         </SafeAreaView>
       </ThemedView>
-      <NoteDetectorButton bottomSheetRef={bottomSheetRef} />
+      <NoteDetectorBottomSheet bottomSheetRef={bottomSheetRef} />
     </GestureHandlerRootView>
   );
 }
