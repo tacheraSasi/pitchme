@@ -1,3 +1,4 @@
+import { StatusBarPresets } from "@/components/themed-status-bar";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
@@ -19,7 +20,6 @@ export default function SettingsScreen() {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 
-  // Get settings from Zustand store
   const {
     notifications,
     hapticFeedback,
@@ -28,7 +28,6 @@ export default function SettingsScreen() {
     themeMode,
   } = useSettingsStore();
 
-  // Get individual action functions from store
   const cycleTheme = useCycleTheme();
   const setAutoPlay = useSetAutoPlay();
   const cycleRecordingQuality = useCycleRecordingQuality();
@@ -74,6 +73,7 @@ export default function SettingsScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      {StatusBarPresets.modal()}
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
