@@ -112,10 +112,10 @@ export default function RecordScreen() {
             >
               <Entypo name="plus" size={28} color="white" />
               <ThemedText style={styles.openModalButtonText}>
-                Start Recording
+                Capture the Sound
               </ThemedText>
               <ThemedText style={styles.openModalSubtext}>
-                Tap to record notes or ideas
+                Let your creativity flow into sound
               </ThemedText>
             </Pressable>
           </ThemedView>
@@ -253,4 +253,4 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#444444" : "#e0e0e0",
     },
-});
+  });
