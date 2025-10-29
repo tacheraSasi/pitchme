@@ -91,21 +91,23 @@ export const useNotifications = () =>
 export const useHapticFeedback = () =>
   useSettingsStore((state) => state.hapticFeedback);
 
-export const useThemeActions = () =>
-  useSettingsStore((state) => ({
-    setThemeMode: state.setThemeMode,
-    cycleTheme: state.cycleTheme,
-  }));
+// NOTE: We export individual action selectors to avoid object recreation
+export const useSetThemeMode = () =>
+  useSettingsStore((state) => state.setThemeMode);
+export const useCycleTheme = () =>
+  useSettingsStore((state) => state.cycleTheme);
 
-export const useAudioActions = () =>
-  useSettingsStore((state) => ({
-    setAutoPlay: state.setAutoPlay,
-    setRecordingQuality: state.setRecordingQuality,
-    cycleRecordingQuality: state.cycleRecordingQuality,
-  }));
+export const useSetAutoPlay = () =>
+  useSettingsStore((state) => state.setAutoPlay);
+export const useSetRecordingQuality = () =>
+  useSettingsStore((state) => state.setRecordingQuality);
+export const useCycleRecordingQuality = () =>
+  useSettingsStore((state) => state.cycleRecordingQuality);
 
-export const useInterfaceActions = () =>
-  useSettingsStore((state) => ({
-    setNotifications: state.setNotifications,
-    setHapticFeedback: state.setHapticFeedback,
-  }));
+export const useSetNotifications = () =>
+  useSettingsStore((state) => state.setNotifications);
+export const useSetHapticFeedback = () =>
+  useSettingsStore((state) => state.setHapticFeedback);
+
+export const useResetSettings = () =>
+  useSettingsStore((state) => state.resetSettings);

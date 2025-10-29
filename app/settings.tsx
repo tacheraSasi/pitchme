@@ -3,10 +3,12 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-  useAudioActions,
-  useInterfaceActions,
+  useCycleRecordingQuality,
+  useCycleTheme,
+  useSetAutoPlay,
+  useSetHapticFeedback,
+  useSetNotifications,
   useSettingsStore,
-  useThemeActions,
 } from "@/stores/settingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -17,6 +19,7 @@ export default function SettingsScreen() {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 
+  // Get settings from Zustand store
   const {
     notifications,
     hapticFeedback,
@@ -25,9 +28,12 @@ export default function SettingsScreen() {
     themeMode,
   } = useSettingsStore();
 
-  const { cycleTheme } = useThemeActions();
-  const { setAutoPlay, cycleRecordingQuality } = useAudioActions();
-  const { setNotifications, setHapticFeedback } = useInterfaceActions();
+  // Get individual action functions from store
+  const cycleTheme = useCycleTheme();
+  const setAutoPlay = useSetAutoPlay();
+  const cycleRecordingQuality = useCycleRecordingQuality();
+  const setNotifications = useSetNotifications();
+  const setHapticFeedback = useSetHapticFeedback();
 
   const SettingItem = ({
     icon,
