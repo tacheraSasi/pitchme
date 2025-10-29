@@ -2,7 +2,6 @@ import NoteDetectorBottomSheet from "@/components/note-detector/bottom-sheet";
 import NoteDetectorButton from "@/components/note-detector/button";
 import { NotesList } from "@/components/NotesList";
 import TabsHeader from "@/components/tabs-header";
-import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRef } from "react";
@@ -16,7 +15,7 @@ export default function HomeScreen() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <ThemedView style={{ flex: 1 }}>
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
           <TabsHeader title="PitchMe"/>
           <NoteDetectorButton bottomSheetRef={bottomSheetRef} />
           <NotesList />
