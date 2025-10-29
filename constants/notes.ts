@@ -21,7 +21,7 @@ export function getNote(note:Note){
     )
 }
 
-const noteAssets: Record<Note, any> = {
+export const noteAssets: Record<Note, any> = {
   [Note.C]: require("../assets/notes/C.m4a"),
   [Note.CSharp]: require("../assets/notes/CSharp.m4a"),
   [Note.D]: require("../assets/notes/D.m4a"),
