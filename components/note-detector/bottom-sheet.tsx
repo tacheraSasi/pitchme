@@ -1,3 +1,4 @@
+import NoteDetector from "@/components/note-detector/detector";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
@@ -28,48 +29,6 @@ const NoteDetectorBottomSheet = ({
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
   }, []);
-
-  const handleRecordNote = () => {
-    if (isRecordingNote) {
-      setIsRecordingNote(false);
-      setRecordingProgress(0);
-      Alert.alert("Recording Stopped", "Your custom note has been saved!");
-    } else {
-      setIsRecordingNote(true);
-      Alert.alert("Recording Started", "Recording your custom note...");
-      // Simulate recording progress
-      const interval = setInterval(() => {
-        setRecordingProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 500);
-    }
-  };
-
-  const handleRecordIdea = () => {
-    if (isRecordingIdea) {
-      setIsRecordingIdea(false);
-      setRecordingProgress(0);
-      Alert.alert("Recording Stopped", "Your music idea has been saved!");
-    } else {
-      setIsRecordingIdea(true);
-      Alert.alert("Recording Started", "Recording your music idea...");
-      // Simulate recording progress
-      const interval = setInterval(() => {
-        setRecordingProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 500);
-    }
-  };
 
   const closeModal = () => {
     bottomSheetRef.current?.close();
@@ -111,6 +70,7 @@ const NoteDetectorBottomSheet = ({
             />
           </Pressable>
         </ThemedView>
+        <NoteDetector/>
       </BottomSheetView>
     </BottomSheet>
   );
