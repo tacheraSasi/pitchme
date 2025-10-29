@@ -16,6 +16,9 @@ export default function SettingsScreen() {
   const [hapticFeedback, setHapticFeedback] = useState(true);
   const [autoPlay, setAutoPlay] = useState(false);
   const [recordingQuality, setRecordingQuality] = useState("high");
+  const [themeMode, setThemeMode] = useState<"system" | "light" | "dark">(
+    "system"
+  );
 
   const SettingItem = ({
     icon,
@@ -117,6 +120,46 @@ export default function SettingsScreen() {
               }}
               thumbColor={notifications ? "#f4f3f4" : "#f4f3f4"}
             />
+          }
+        />
+
+        <SettingItem
+          icon="palette"
+          title="Theme"
+          subtitle={`Current: ${
+            themeMode.charAt(0).toUpperCase() + themeMode.slice(1)
+          }`}
+          onPress={() => {
+            const themes: ("system" | "light" | "dark")[] = [
+              "system",
+              "light",
+              "dark",
+            ];
+            const currentIndex = themes.indexOf(themeMode);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            setThemeMode(themes[nextIndex]);
+          }}
+          rightElement={
+            <View style={styles.themeIndicator}>
+              <MaterialIcons
+                name={
+                  themeMode === "system"
+                    ? "brightness-auto"
+                    : themeMode === "light"
+                    ? "brightness-high"
+                    : "brightness-2"
+                }
+                size={20}
+                color={Colors[colorScheme ?? "light"].text}
+                opacity={0.7}
+              />
+              <Entypo
+                name="chevron-right"
+                size={20}
+                color={Colors[colorScheme ?? "light"].text}
+                opacity={0.5}
+              />
+            </View>
           }
         />
 
@@ -253,6 +296,11 @@ const getStyles = (colorScheme: "light" | "dark") =>
     settingRight: {
       alignItems: "center",
       justifyContent: "center",
+    },
+    themeIndicator: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
     },
     footer: {
       alignItems: "center",
