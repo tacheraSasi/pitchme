@@ -3,8 +3,10 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useState } from "react";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { useCallback, useRef, useState } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RecordedIdea {
@@ -67,6 +69,13 @@ export default function RecordScreen() {
   const [isRecordingIdea, setIsRecordingIdea] = useState(false);
 
   const styles = getStyles(colorScheme ?? "light");
+  // ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
 
   const handleRecordNote = () => {
     if (isRecordingNote) {
@@ -115,79 +124,87 @@ export default function RecordScreen() {
   );
 
   return (
-    <ThemedView style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Record Studio</ThemedText>
-        </ThemedView>
+    <GestureHandlerRootView style={styles.container}>
+      <ThemedView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <ThemedView style={styles.titleContainer}>
+            <ThemedText type="title">Record Studio</ThemedText>
+          </ThemedView>
 
-        <ThemedView style={styles.recordingSection}>
-          <View style={styles.recordingButtons}>
-            <Pressable
-              style={[
-                styles.recordButton,
-                isRecordingNote && styles.recordingButton,
-              ]}
-              onPress={handleRecordNote}
-            >
-              <Entypo
-                name={isRecordingNote ? "controller-stop" : "mic"}
-                size={24}
-                color="white"
-              />
-              <ThemedText style={styles.buttonText}>
-                {isRecordingNote ? "Stop" : "Note"}
-              </ThemedText>
-            </Pressable>
+          <ThemedView style={styles.recordingSection}>
+            <View style={styles.recordingButtons}>
+              <Pressable
+                style={[
+                  styles.recordButton,
+                  isRecordingNote && styles.recordingButton,
+                ]}
+                onPress={handleRecordNote}
+              >
+                <Entypo
+                  name={isRecordingNote ? "controller-stop" : "mic"}
+                  size={24}
+                  color="white"
+                />
+                <ThemedText style={styles.buttonText}>
+                  {isRecordingNote ? "Stop" : "Note"}
+                </ThemedText>
+              </Pressable>
 
-            <Pressable
-              style={[
-                styles.recordButton,
-                styles.ideaButton,
-                isRecordingIdea && styles.recordingButton,
-              ]}
-              onPress={handleRecordIdea}
-            >
-              <Entypo
-                name={isRecordingIdea ? "controller-stop" : "sound-mix"}
-                size={24}
-                color="white"
-              />
-              <ThemedText style={styles.buttonText}>
-                {isRecordingIdea ? "Stop" : "Idea"}
-              </ThemedText>
-            </Pressable>
-          </View>
-
-          {/* Recording Status */}
-          {(isRecordingNote || isRecordingIdea) && (
-            <View style={styles.statusContainer}>
-              <View style={styles.recordingIndicator} />
-              <ThemedText style={styles.recordingText}>Recording...</ThemedText>
+              <Pressable
+                style={[
+                  styles.recordButton,
+                  styles.ideaButton,
+                  isRecordingIdea && styles.recordingButton,
+                ]}
+                onPress={handleRecordIdea}
+              >
+                <Entypo
+                  name={isRecordingIdea ? "controller-stop" : "sound-mix"}
+                  size={24}
+                  color="white"
+                />
+                <ThemedText style={styles.buttonText}>
+                  {isRecordingIdea ? "Stop" : "Idea"}
+                </ThemedText>
+              </Pressable>
             </View>
-          )}
-        </ThemedView>
 
-        <ThemedView style={styles.listContainer}>
-          <ThemedText style={styles.listTitle}>
-            Your Recordings ({RECORDED_IDEAS.length})
-          </ThemedText>
-          <FlatList
-            data={RECORDED_IDEAS}
-            renderItem={renderRecordedIdea}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.listContent}
-            style={{ flex: 1 }}
-          />
-        </ThemedView>
-      </SafeAreaView>
-    </ThemedView>
+            {/* Recording Status */}
+            {(isRecordingNote || isRecordingIdea) && (
+              <View style={styles.statusContainer}>
+                <View style={styles.recordingIndicator} />
+                <ThemedText style={styles.recordingText}>
+                  Recording...
+                </ThemedText>
+              </View>
+            )}
+          </ThemedView>
+
+          <ThemedView style={styles.listContainer}>
+            <ThemedText style={styles.listTitle}>
+              Your Recordings ({RECORDED_IDEAS.length})
+            </ThemedText>
+            <FlatList
+              data={RECORDED_IDEAS}
+              renderItem={renderRecordedIdea}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.listContent}
+              style={{ flex: 1 }}
+            />
+          </ThemedView>
+        </SafeAreaView>
+      </ThemedView>
+    </GestureHandlerRootView>
   );
 }
 
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: "grey",
+    },
     titleContainer: {
       flexDirection: "row",
       justifyContent: "center",
