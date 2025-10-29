@@ -1,11 +1,12 @@
+import RecordModal from "@/components/record-modal";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { useCallback, useRef, useState } from "react";
-import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
+import { useRef } from "react";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -65,37 +66,10 @@ const RECORDED_IDEAS: RecordedIdea[] = [
 
 export default function RecordScreen() {
   const colorScheme = useColorScheme();
-  const [isRecordingNote, setIsRecordingNote] = useState(false);
-  const [isRecordingIdea, setIsRecordingIdea] = useState(false);
-
   const styles = getStyles(colorScheme ?? "light");
+
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
-
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
-
-  const handleRecordNote = () => {
-    if (isRecordingNote) {
-      setIsRecordingNote(false);
-      Alert.alert("Recording Stopped", "Your custom note has been saved!");
-    } else {
-      setIsRecordingNote(true);
-      Alert.alert("Recording Started", "Recording your custom note...");
-    }
-  };
-
-  const handleRecordIdea = () => {
-    if (isRecordingIdea) {
-      setIsRecordingIdea(false);
-      Alert.alert("Recording Stopped", "Your music idea has been saved!");
-    } else {
-      setIsRecordingIdea(true);
-      Alert.alert("Recording Started", "Recording your music idea...");
-    }
-  };
 
   const renderRecordedIdea = ({ item }: { item: RecordedIdea }) => (
     <Pressable style={styles.ideaItem}>
@@ -132,52 +106,18 @@ export default function RecordScreen() {
           </ThemedView>
 
           <ThemedView style={styles.recordingSection}>
-            <View style={styles.recordingButtons}>
-              <Pressable
-                style={[
-                  styles.recordButton,
-                  isRecordingNote && styles.recordingButton,
-                ]}
-                onPress={handleRecordNote}
-              >
-                <Entypo
-                  name={isRecordingNote ? "controller-stop" : "mic"}
-                  size={24}
-                  color="white"
-                />
-                <ThemedText style={styles.buttonText}>
-                  {isRecordingNote ? "Stop" : "Note"}
-                </ThemedText>
-              </Pressable>
-
-              <Pressable
-                style={[
-                  styles.recordButton,
-                  styles.ideaButton,
-                  isRecordingIdea && styles.recordingButton,
-                ]}
-                onPress={handleRecordIdea}
-              >
-                <Entypo
-                  name={isRecordingIdea ? "controller-stop" : "sound-mix"}
-                  size={24}
-                  color="white"
-                />
-                <ThemedText style={styles.buttonText}>
-                  {isRecordingIdea ? "Stop" : "Idea"}
-                </ThemedText>
-              </Pressable>
-            </View>
-
-            {/* Recording Status */}
-            {(isRecordingNote || isRecordingIdea) && (
-              <View style={styles.statusContainer}>
-                <View style={styles.recordingIndicator} />
-                <ThemedText style={styles.recordingText}>
-                  Recording...
-                </ThemedText>
-              </View>
-            )}
+            <Pressable
+              style={styles.openModalButton}
+              onPress={() => bottomSheetRef.current?.expand()}
+            >
+              <Entypo name="plus" size={28} color="white" />
+              <ThemedText style={styles.openModalButtonText}>
+                Start Recording
+              </ThemedText>
+              <ThemedText style={styles.openModalSubtext}>
+                Tap to record notes or ideas
+              </ThemedText>
+            </Pressable>
           </ThemedView>
 
           <ThemedView style={styles.listContainer}>
@@ -194,6 +134,8 @@ export default function RecordScreen() {
             />
           </ThemedView>
         </SafeAreaView>
+
+        <RecordModal bottomSheetRef={bottomSheetRef} />
       </ThemedView>
     </GestureHandlerRootView>
   );
@@ -215,53 +157,30 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       paddingHorizontal: 16,
       marginBottom: 24,
     },
-    recordingButtons: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      gap: 16,
-      marginBottom: 16,
-    },
-    recordButton: {
-      flex: 1,
-      flexDirection: "row",
+    openModalButton: {
+      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 16,
-      paddingHorizontal: 24,
-      borderRadius: 12,
+      paddingVertical: 24,
+      paddingHorizontal: 32,
+      borderRadius: 16,
       gap: 8,
       backgroundColor:
         colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
+      marginHorizontal: 20,
     },
-    ideaButton: {
-      backgroundColor: colorScheme === "dark" ? "#E85A4F" : "#FF6B6B",
-    },
-    recordingButton: {
-      backgroundColor: "#FF4444",
-    },
-    buttonText: {
+    openModalButtonText: {
       color: "white",
-      fontSize: 14,
+      fontSize: 18,
       fontWeight: "600",
+      textAlign: "center",
     },
-    statusContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: 8,
-      gap: 8,
+    openModalSubtext: {
+      color: "rgba(255, 255, 255, 0.8)",
+      fontSize: 14,
+      textAlign: "center",
     },
-    recordingIndicator: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: "#FF4444",
-    },
-    recordingText: {
-      fontSize: 12,
-      fontWeight: "500",
-      color: "#FF4444",
-    },
+
     listContainer: {
       flex: 1,
       paddingHorizontal: 16,
@@ -334,4 +253,4 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#444444" : "#e0e0e0",
     },
-  });
+});
