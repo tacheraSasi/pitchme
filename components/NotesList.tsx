@@ -32,7 +32,7 @@ export const NotesList = () => {
     (note: Note) => {
       try {
         console.log("Playing note:", note);
-        
+
         if (currentPlayerRef.current) {
           currentPlayerRef.current.pause();
           currentPlayerRef.current.seekTo(0);
@@ -57,10 +57,10 @@ export const NotesList = () => {
         if (player) {
           console.log("Player found for note:", note);
           currentPlayerRef.current = player;
-          
+
           // Check player status
-          console.log("Player status:", player.status);
-          
+          console.log("Player status:", player.currentStatus);
+
           player.seekTo(0);
           const playResult = player.play();
           console.log("Play result:", playResult);
