@@ -4,7 +4,6 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { useState } from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { Colors } from "@/constants/theme";
-import { getNotePath } from "@/utils/notes";
 
 export interface NoteCellProps {
   note: Note;
@@ -14,7 +13,6 @@ export interface NoteCellProps {
 
 export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
   const [pressed, setPressed] = useState(false);
-
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = getStyles(colorScheme ?? "light");
   return (
@@ -22,8 +20,7 @@ export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       onPress={() => {
-        const notePath = getNotePath(note);
-        console.log(`Pressed note: ${note} ${notePath}`);
+        console.log(`Pressed note: ${note}`);
         onPress?.(note);
       }}
       style={[
@@ -38,6 +35,7 @@ export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
     </Pressable>
   );
 };
+
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     pad: {
@@ -59,4 +57,4 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 18,
       color: "#1a1a1a",
     },
-});
+  });
