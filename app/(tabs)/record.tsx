@@ -116,7 +116,7 @@ export default function RecordScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Record Studio</ThemedText>
         </ThemedView>
@@ -169,13 +169,16 @@ export default function RecordScreen() {
         </ThemedView>
 
         <ThemedView style={styles.listContainer}>
-          <ThemedText style={styles.listTitle}>Your Recordings</ThemedText>
+          <ThemedText style={styles.listTitle}>
+            Your Recordings ({RECORDED_IDEAS.length})
+          </ThemedText>
           <FlatList
             data={RECORDED_IDEAS}
             renderItem={renderRecordedIdea}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
+            style={{ flex: 1 }}
           />
         </ThemedView>
       </SafeAreaView>
@@ -260,10 +263,9 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       padding: 16,
       marginBottom: 12,
       borderRadius: 12,
-      backgroundColor:
-        colorScheme === "dark" ? Colors.dark.background : "#f8f9fa",
+      backgroundColor: colorScheme === "dark" ? "#2c2c2c" : "#f8f9fa",
       borderWidth: 1,
-      borderColor: colorScheme === "dark" ? "#333" : "#e9ecef",
+      borderColor: colorScheme === "dark" ? "#444" : "#e9ecef",
     },
     ideaIconContainer: {
       width: 40,
