@@ -1,12 +1,17 @@
 import { NoteCell } from "@/components/NoteCell";
+import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { NOTES, Note, noteAssets } from "@/constants/notes";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { useAudioPlayer } from "expo-audio";
 import { useCallback, useRef } from "react";
 import { ScrollView, StyleSheet, useWindowDimensions } from "react-native";
 
 export const NotesList = () => {
   const { width } = useWindowDimensions();
+    const colorScheme = useColorScheme();
+    const styles = getStyles(colorScheme ?? "light");
 
   const playerC = useAudioPlayer(noteAssets[Note.C]);
   const playerCSharp = useAudioPlayer(noteAssets[Note.CSharp]);
@@ -89,6 +94,7 @@ export const NotesList = () => {
 
   return (
     <ThemedView style={styles.wrapper}>
+      <ThemedText style={styles.listTitle}>Notes</ThemedText>
       <ScrollView
         contentContainerStyle={[styles.container, { gap: 12 }]}
         showsVerticalScrollIndicator={false}
@@ -108,17 +114,27 @@ export const NotesList = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    minHeight: 300, // Ensure minimum height
-  },
-  container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 10,
-    paddingBottom: 20, // Extra padding at bottom
-  },
-});
+const getStyles = (colorScheme: "light" | "dark" = "light") => {
+  const styles = StyleSheet.create({
+    wrapper: {
+      flex: 1,
+      minHeight: 300, // Ensure minimum height
+    },
+    listTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      marginBottom: 16,
+      paddingHorizontal: 14,
+      color: Colors[colorScheme].text,
+    },
+    container: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      paddingHorizontal: 8,
+      paddingVertical: 10,
+      paddingBottom: 20, // Extra padding at bottom
+    },
+  });
+  return styles;
+};

@@ -20,7 +20,7 @@ interface RecordedIdea {
 }
 
 // Dummy data for recorded ideas
-const RECORDED_IDEAS: RecordedIdea[] = [
+export const RECORDED_IDEAS: RecordedIdea[] = [
   {
     id: "1",
     title: "Melody for chorus",
