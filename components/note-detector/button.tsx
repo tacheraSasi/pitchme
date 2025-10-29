@@ -55,7 +55,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 28,
+      paddingVertical: 16,
       paddingHorizontal: 32,
       borderRadius: 20,
       gap: 12,
