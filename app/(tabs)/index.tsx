@@ -1,23 +1,36 @@
-import { StyleSheet } from "react-native";
+import NoteDetectorButton from "@/components/note-detector/button";
+import { NotesList } from "@/components/NotesList";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { useRef } from "react";
+import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { NotesList } from "@/components/NotesList";
 
 export default function HomeScreen() {
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
   return (
-    <ThemedView style={{ flex: 1 }}>
-      <SafeAreaView>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">PitchMe</ThemedText>
-        </ThemedView>
-        <NotesList />
-      </SafeAreaView>
-    </ThemedView>
+    <GestureHandlerRootView style={styles.container}>
+      <ThemedView style={{ flex: 1 }}>
+        <SafeAreaView>
+          <ThemedView style={styles.titleContainer}>
+            <ThemedText type="title">PitchMe</ThemedText>
+          </ThemedView>
+          <NotesList />
+        </SafeAreaView>
+      </ThemedView>
+      <NoteDetectorButton bottomSheetRef={bottomSheetRef} />
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // backgroundColor: "grey",
+  },
   titleContainer: {
     flexDirection: "row",
     justifyContent: "center",
