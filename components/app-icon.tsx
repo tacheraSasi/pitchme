@@ -1,9 +1,9 @@
-import { ThemedView } from "@/components/themed-view";
+import { ThemedView } from "@/components/themed/themed-view";
 import React from "react";
 import { Image, StyleSheet } from "react-native";
 
 interface AppIconProps {
-    backgroundColor?: string;
+  backgroundColor?: string;
 }
 const iconSource = require("../assets/images/icon.png");
 const AppIcon = ({ backgroundColor }: AppIconProps) => {

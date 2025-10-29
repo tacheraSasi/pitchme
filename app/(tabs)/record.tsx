@@ -1,7 +1,7 @@
 import RecordModal from "@/components/record-modal";
 import TabsHeader from "@/components/tabs-header";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { ThemedText } from "@/components/themed/themed-text";
+import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -110,7 +110,7 @@ export default function RecordScreen() {
               onPress={() => bottomSheetRef.current?.expand()}
             >
               <ThemedView style={styles.iconContainer}>
-              <Entypo name="plus" size={28} color="white" />
+                <Entypo name="plus" size={28} color="white" />
               </ThemedView>
               <ThemedText style={styles.openModalButtonText}>
                 Capture the Sound

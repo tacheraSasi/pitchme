@@ -2,7 +2,7 @@ import NoteDetectorBottomSheet from "@/components/note-detector/bottom-sheet";
 import NoteDetectorButton from "@/components/note-detector/button";
 import { NotesList } from "@/components/NotesList";
 import TabsHeader from "@/components/tabs-header";
-import { ThemedView } from "@/components/themed-view";
+import { ThemedView } from "@/components/themed/themed-view";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRef } from "react";
 import { StyleSheet } from "react-native";

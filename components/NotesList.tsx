@@ -1,6 +1,6 @@
 import { NoteCell } from "@/components/NoteCell";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { ThemedText } from "@/components/themed/themed-text";
+import { ThemedView } from "@/components/themed/themed-view";
 import { NOTES, Note, noteAssets } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";

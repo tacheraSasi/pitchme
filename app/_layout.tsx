@@ -6,7 +6,7 @@ import {
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 
-import { ThemedStatusBar } from "@/components/themed-status-bar";
+import { ThemedStatusBar } from "@/components/themed/themed-status-bar";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export const unstable_settings = {

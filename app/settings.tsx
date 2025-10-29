@@ -1,6 +1,6 @@
-import { StatusBarPresets } from "@/components/themed-status-bar";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { StatusBarPresets } from "@/components/themed/themed-status-bar";
+import { ThemedText } from "@/components/themed/themed-text";
+import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
