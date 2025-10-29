@@ -26,9 +26,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="record"
         options={{
-          title: "Explore",
+          title: "Record",
           tabBarIcon: ({ color }) => (
             <Entypo name="mic" size={24} color={color} />
           ),
