@@ -1,17 +1,18 @@
+import AppIcon from "@/components/app-icon";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import React from "react";
 import { StyleSheet } from "react-native";
 
 interface TabsHeaderProps {
-  title:string
+  title: string;
 }
 const TabsHeader = ({ title }: TabsHeaderProps) => {
   return (
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">{title}</ThemedText>
-      </ThemedView>
-   
+    <ThemedView style={styles.titleContainer}>
+      <AppIcon/>
+      <ThemedText type="title">{title}</ThemedText>
+    </ThemedView>
   );
 };
 const styles = StyleSheet.create({
