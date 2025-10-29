@@ -213,10 +213,11 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       paddingHorizontal: 24,
       borderRadius: 12,
       gap: 8,
-      backgroundColor: Colors[colorScheme].tint,
+      backgroundColor:
+        colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
     },
     ideaButton: {
-      backgroundColor: "#FF6B6B",
+      backgroundColor: colorScheme === "dark" ? "#E85A4F" : "#FF6B6B",
     },
     recordingButton: {
       backgroundColor: "#FF4444",
@@ -253,6 +254,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontWeight: "600",
       marginBottom: 16,
       paddingHorizontal: 4,
+      color: Colors[colorScheme].text,
     },
     listContent: {
       paddingBottom: 20,
@@ -263,15 +265,16 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       padding: 16,
       marginBottom: 12,
       borderRadius: 12,
-      backgroundColor: colorScheme === "dark" ? "#2c2c2c" : "#f8f9fa",
+      backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#f8f9fa",
       borderWidth: 1,
-      borderColor: colorScheme === "dark" ? "#444" : "#e9ecef",
+      borderColor: colorScheme === "dark" ? "#333333" : "#e9ecef",
     },
     ideaIconContainer: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: Colors[colorScheme].tint,
+      backgroundColor:
+        colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
       alignItems: "center",
       justifyContent: "center",
       marginRight: 12,
@@ -287,6 +290,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 16,
       fontWeight: "600",
       marginBottom: 4,
+      color: Colors[colorScheme].text,
     },
     ideaMetadata: {
       flexDirection: "row",
@@ -296,17 +300,21 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 12,
       opacity: 0.7,
       fontWeight: "500",
+      color: Colors[colorScheme].text,
     },
     ideaDate: {
       fontSize: 12,
       opacity: 0.6,
+      color: Colors[colorScheme].text,
     },
     playButton: {
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: colorScheme === "dark" ? "#333" : "#f0f0f0",
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f0f0f0",
       alignItems: "center",
       justifyContent: "center",
+      borderWidth: 1,
+      borderColor: colorScheme === "dark" ? "#444444" : "#e0e0e0",
     },
   });

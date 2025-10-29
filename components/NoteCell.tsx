@@ -50,6 +50,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderColor: colorScheme === "dark" ? "#444" : "#e0e0e0",
     },
     padPressed: {
+      color: Colors[colorScheme].background,
       backgroundColor: Colors[colorScheme].tint,
       transform: [{ scale: 0.96 }],
     },
