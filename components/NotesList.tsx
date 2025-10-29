@@ -93,6 +93,7 @@ export const NotesList = () => {
         contentContainerStyle={[styles.container, { gap: 12 }]}
         showsVerticalScrollIndicator={false}
         bounces={true}
+        style={{ flex: 1 }}
       >
         {NOTES.map((note) => (
           <NoteCell
@@ -110,7 +111,7 @@ export const NotesList = () => {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    // maxHeight: 400, // Limit height to make it scrollable
+    minHeight: 300, // Ensure minimum height
   },
   container: {
     flexDirection: "row",

@@ -10,13 +10,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
-
   const bottomSheetRef = useRef<BottomSheet>(null);
   return (
     <GestureHandlerRootView style={styles.container}>
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <TabsHeader title="PitchMe"/>
+          <TabsHeader title="PitchMe" />
           <NoteDetectorButton bottomSheetRef={bottomSheetRef} />
           <NotesList />
         </SafeAreaView>
