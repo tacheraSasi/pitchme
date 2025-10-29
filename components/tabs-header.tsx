@@ -51,6 +51,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       alignItems: "center",
       paddingHorizontal: 24,
       paddingVertical: 12,
+      marginBottom: 10,
       borderBottomWidth: 1,
       borderBottomColor: colorScheme === "dark" ? "#333333" : "#f0f0f0",
       backgroundColor:
