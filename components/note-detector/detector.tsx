@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Button, Text, StyleSheet } from "react-native";
+import { View, Button, Text, StyleSheet, Pressable } from "react-native";
 import {
   useAudioRecorder,
   useAudioRecorderState,
@@ -10,6 +10,7 @@ import {
 } from "expo-audio";
 import { ThemedView } from "@/components/themed/themed-view";
 import { ThemedText } from "@/components/themed/themed-text";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function NoteDetector() {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
@@ -53,6 +54,9 @@ export default function NoteDetector() {
         title={recorderState.isRecording ? "Stop Recording" : "Start Recording"}
         onPress={recorderState.isRecording ? stopRecording : startRecording}
       />
+      <Pressable style={styles.iconContainer}>
+        <MaterialIcons name="mic" style={styles.micIcon}/>
+      </Pressable>
       <ThemedText>{recorder.uri ? `File path: ${recorder.uri}` : ""}</ThemedText>
       {/* <Text>
         {waveform
@@ -69,4 +73,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10,
   },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+  micIcon: {},
 });

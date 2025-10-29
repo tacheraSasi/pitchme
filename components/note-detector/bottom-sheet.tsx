@@ -16,9 +16,6 @@ const NoteDetectorBottomSheet = ({
   bottomSheetRef,
 }: NoteDetectorBottomSheetProps) => {
   const colorScheme = useColorScheme();
-  const [isRecordingNote, setIsRecordingNote] = useState(false);
-  const [isRecordingIdea, setIsRecordingIdea] = useState(false);
-  const [recordingProgress, setRecordingProgress] = useState(0);
 
   const styles = getStyles(colorScheme ?? "light");
 
@@ -79,7 +76,7 @@ const NoteDetectorBottomSheet = ({
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     bottomSheetBackground: {
-      backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#ffffff",
+      backgroundColor:   Colors[colorScheme].background,
     },
     handleIndicator: {
       backgroundColor: colorScheme === "dark" ? "#444444" : "#cccccc",
