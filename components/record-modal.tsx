@@ -77,6 +77,7 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
   return (
     <BottomSheet
       ref={bottomSheetRef}
+      index={-1}
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
