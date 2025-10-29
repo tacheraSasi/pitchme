@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
-import { Button, StyleSheet, Pressable } from "react-native";
+import { ThemedText } from "@/components/themed/themed-text";
+import { ThemedView } from "@/components/themed/themed-view";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
-  useAudioRecorder,
-  useAudioRecorderState,
+  AudioModule,
   RecordingPresets,
   setAudioModeAsync,
-  AudioModule,
+  useAudioRecorder,
+  useAudioRecorderState,
 } from "expo-audio";
-import { ThemedView } from "@/components/themed/themed-view";
-import { ThemedText } from "@/components/themed/themed-text";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import React, { useEffect } from "react";
+import { Button, Pressable, StyleSheet } from "react-native";
 
 export default function NoteDetector() {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
@@ -45,9 +45,11 @@ export default function NoteDetector() {
         onPress={recorderState.isRecording ? stopRecording : startRecording}
       />
       <Pressable style={styles.iconContainer}>
-        <MaterialIcons name="mic" style={styles.micIcon}/>
+        <MaterialIcons name="mic" style={styles.micIcon} />
       </Pressable>
-      <ThemedText>{recorder.uri ? `File path: ${recorder.uri}` : ""}</ThemedText>
+      <ThemedText>
+        {recorder.uri ? `File path: ${recorder.uri}` : ""}
+      </ThemedText>
     </ThemedView>
   );
 }
