@@ -3,7 +3,7 @@ import SettingsIcon from "@/components/settings/icon";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
 interface TabsHeaderProps {
   title: string;
@@ -11,9 +11,13 @@ interface TabsHeaderProps {
 const TabsHeader = ({ title }: TabsHeaderProps) => {
   return (
     <ThemedView style={styles.titleContainer}>
-      <AppIcon/>
+      <AppIcon />
       <ThemedText type="title">{title}</ThemedText>
-      <SettingsIcon/>
+      <Pressable onPress={()=>{
+        console.log("opening settings")
+      }}>
+        <SettingsIcon />
+      </Pressable>
     </ThemedView>
   );
 };

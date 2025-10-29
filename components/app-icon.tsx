@@ -13,8 +13,11 @@ const AppIcon = () => {
 
 const styles = StyleSheet.create({
   logo: {
-    width: 26,
-    height: 26,
+    width: 32,
+    height: 32,
+    // borderColor: "white",
+    // borderWidth: 1,
+    // borderRadius: 12,
     // marginBottom: 30,
     resizeMode: "contain",
   },
