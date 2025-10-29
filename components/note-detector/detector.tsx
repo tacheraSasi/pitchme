@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
-import { View, Button, Text, StyleSheet, Pressable } from "react-native";
+import { Button, StyleSheet, Pressable } from "react-native";
 import {
   useAudioRecorder,
   useAudioRecorderState,
-  useAudioSampleListener,
   RecordingPresets,
   setAudioModeAsync,
   AudioModule,
@@ -15,14 +14,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 export default function NoteDetector() {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
-
-  // Store waveform data
-  const [waveform, setWaveform] = React.useState(null);
-
-//   useAudioSampleListener(recorder, (sample) => {
-//     // sample.channels[0].frames contains waveform data
-//     setWaveform(sample.channels[0].frames);
-//   });
 
   useEffect(() => {
     (async () => {
@@ -44,7 +35,6 @@ export default function NoteDetector() {
 
   const stopRecording = async () => {
     await recorder.stop();
-    // recorder.uri now contains the file path
     alert(`Recording saved at: ${recorder.uri}`);
   };
 
@@ -58,11 +48,6 @@ export default function NoteDetector() {
         <MaterialIcons name="mic" style={styles.micIcon}/>
       </Pressable>
       <ThemedText>{recorder.uri ? `File path: ${recorder.uri}` : ""}</ThemedText>
-      {/* <Text>
-        {waveform
-          ? `Waveform sample: ${JSON.stringify(waveform.slice(0, 10))}`
-          : ""}
-      </Text> */}
     </ThemedView>
   );
 }
