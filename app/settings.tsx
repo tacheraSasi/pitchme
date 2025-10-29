@@ -2,23 +2,32 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import {
+  useAudioActions,
+  useInterfaceActions,
+  useSettingsStore,
+  useThemeActions,
+} from "@/stores/settingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Link } from "expo-router";
-import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 
-  const [notifications, setNotifications] = useState(true);
-  const [hapticFeedback, setHapticFeedback] = useState(true);
-  const [autoPlay, setAutoPlay] = useState(false);
-  const [recordingQuality, setRecordingQuality] = useState("high");
-  const [themeMode, setThemeMode] = useState<"system" | "light" | "dark">(
-    "system"
-  );
+  const {
+    notifications,
+    hapticFeedback,
+    autoPlay,
+    recordingQuality,
+    themeMode,
+  } = useSettingsStore();
+
+  const { cycleTheme } = useThemeActions();
+  const { setAutoPlay, cycleRecordingQuality } = useAudioActions();
+  const { setNotifications, setHapticFeedback } = useInterfaceActions();
 
   const SettingItem = ({
     icon,
@@ -89,16 +98,7 @@ export default function SettingsScreen() {
           subtitle={`Current: ${
             themeMode.charAt(0).toUpperCase() + themeMode.slice(1)
           }`}
-          onPress={() => {
-            const themes: ("system" | "light" | "dark")[] = [
-              "system",
-              "light",
-              "dark",
-            ];
-            const currentIndex = themes.indexOf(themeMode);
-            const nextIndex = (currentIndex + 1) % themes.length;
-            setThemeMode(themes[nextIndex]);
-          }}
+          onPress={cycleTheme}
           rightElement={
             <View style={styles.themeIndicator}>
               <MaterialIcons
@@ -166,12 +166,7 @@ export default function SettingsScreen() {
           subtitle={`Current: ${
             recordingQuality.charAt(0).toUpperCase() + recordingQuality.slice(1)
           }`}
-          onPress={() => {
-            const qualities = ["low", "medium", "high"];
-            const currentIndex = qualities.indexOf(recordingQuality);
-            const nextIndex = (currentIndex + 1) % qualities.length;
-            setRecordingQuality(qualities[nextIndex]);
-          }}
+          onPress={cycleRecordingQuality}
           rightElement={
             <Entypo
               name="chevron-right"
