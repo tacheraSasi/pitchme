@@ -6,7 +6,6 @@ import { StyleSheet, useWindowDimensions } from "react-native";
 export const NotesList = () => {
   const { width } = useWindowDimensions();
 
-  // Responsive column count
   const columns = width < 400 ? 2 : 3;
   const itemSize = (width - (columns + 1) * 12) / columns;
 

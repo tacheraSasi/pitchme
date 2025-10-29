@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { useState } from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { Colors } from "@/constants/theme";
+import { getNotePath } from "@/utils/notes";
 
 export interface NoteCellProps {
   note: Note;
@@ -21,7 +22,8 @@ export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       onPress={() => {
-        console.log(`Pressed note: ${note}`);
+        const notePath = getNotePath(note);
+        console.log(`Pressed note: ${note} ${notePath}`);
         onPress?.(note);
       }}
       style={[
