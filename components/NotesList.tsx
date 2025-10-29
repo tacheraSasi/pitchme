@@ -3,7 +3,7 @@ import { ThemedView } from "@/components/themed-view";
 import { NOTES, Note, noteAssets } from "@/constants/notes";
 import { useAudioPlayer } from "expo-audio";
 import { useCallback, useRef } from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { ScrollView, StyleSheet, useWindowDimensions } from "react-native";
 
 export const NotesList = () => {
   const { width } = useWindowDimensions();
@@ -88,25 +88,36 @@ export const NotesList = () => {
   );
 
   return (
-    <ThemedView style={[styles.container, { gap: 12 }]}>
-      {NOTES.map((note) => (
-        <NoteCell
-          key={note}
-          note={note}
-          size={itemSize}
-          onPress={handleNotePress}
-        />
-      ))}
+    <ThemedView style={styles.wrapper}>
+      <ScrollView
+        contentContainerStyle={[styles.container, { gap: 12 }]}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
+        {NOTES.map((note) => (
+          <NoteCell
+            key={note}
+            note={note}
+            size={itemSize}
+            onPress={handleNotePress}
+          />
+        ))}
+      </ScrollView>
     </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    maxHeight: 400, // Limit height to make it scrollable
+  },
   container: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
     paddingHorizontal: 8,
     paddingVertical: 10,
+    paddingBottom: 20, // Extra padding at bottom
   },
 });

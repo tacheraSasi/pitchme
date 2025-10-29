@@ -19,12 +19,14 @@ export default function NoteDetectorButton({ bottomSheetRef }: NoteDetectorButto
           style={styles.openModalButton}
           onPress={() => bottomSheetRef.current?.expand()}
         >
-          <Entypo name="modern-mic" size={28} color="white" />
+          <ThemedView style={styles.iconContainer}>
+            <Entypo name="modern-mic" size={32} color="white" />
+          </ThemedView>
           <ThemedText style={styles.openModalButtonText}>
             Sing or Hum a Note
           </ThemedText>
           <ThemedText style={styles.openModalSubtext}>
-            I tell you which note you sang
+            I&apos;ll tell you which note you sang
           </ThemedText>
         </Pressable>
       </ThemedView>
@@ -52,24 +54,44 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 24,
+      paddingVertical: 28,
       paddingHorizontal: 32,
-      borderRadius: 16,
-      gap: 8,
+      borderRadius: 20,
+      gap: 12,
       backgroundColor:
         colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
       marginHorizontal: 20,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    iconContainer: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 8,
     },
     openModalButtonText: {
       color: "white",
-      fontSize: 18,
-      fontWeight: "600",
+      fontSize: 20,
+      fontWeight: "700",
       textAlign: "center",
+      letterSpacing: 0.5,
     },
     openModalSubtext: {
-      color: "rgba(255, 255, 255, 0.8)",
-      fontSize: 14,
+      color: "rgba(255, 255, 255, 0.85)",
+      fontSize: 15,
       textAlign: "center",
+      fontWeight: "400",
+      lineHeight: 20,
     },
 
     listContainer: {
