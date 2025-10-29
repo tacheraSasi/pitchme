@@ -1,4 +1,5 @@
 import RecordModal from "@/components/record-modal";
+import TabsHeader from "@/components/tabs-header";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
@@ -101,9 +102,7 @@ export default function RecordScreen() {
     <GestureHandlerRootView style={styles.container}>
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Record Studio</ThemedText>
-          </ThemedView>
+          <TabsHeader title="Record Studio" />
 
           <ThemedView style={styles.recordingSection}>
             <Pressable
