@@ -109,7 +109,9 @@ export default function RecordScreen() {
               style={styles.openModalButton}
               onPress={() => bottomSheetRef.current?.expand()}
             >
+              <ThemedView style={styles.iconContainer}>
               <Entypo name="plus" size={28} color="white" />
+              </ThemedView>
               <ThemedText style={styles.openModalButtonText}>
                 Capture the Sound
               </ThemedText>
@@ -156,11 +158,20 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       paddingHorizontal: 16,
       marginBottom: 24,
     },
+    iconContainer: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 8,
+    },
     openModalButton: {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 24,
+      paddingVertical: 16,
       paddingHorizontal: 32,
       borderRadius: 16,
       gap: 8,

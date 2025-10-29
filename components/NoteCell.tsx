@@ -1,7 +1,7 @@
 import { ThemedText } from "@/components/themed-text";
 import { Note } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme.web";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
