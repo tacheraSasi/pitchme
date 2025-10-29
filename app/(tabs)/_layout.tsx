@@ -28,7 +28,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="record"
         options={{
-          title: "Record",
+          title: "Studio",
           tabBarIcon: ({ color }) => (
             <Entypo name="mic" size={24} color={color} />
           ),

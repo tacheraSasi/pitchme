@@ -31,6 +31,8 @@ export const NotesList = () => {
   const handleNotePress = useCallback(
     (note: Note) => {
       try {
+        console.log("Playing note:", note);
+        
         if (currentPlayerRef.current) {
           currentPlayerRef.current.pause();
           currentPlayerRef.current.seekTo(0);
@@ -53,9 +55,17 @@ export const NotesList = () => {
 
         const player = audioPlayers[note];
         if (player) {
+          console.log("Player found for note:", note);
           currentPlayerRef.current = player;
-          player.seekTo(0); // Reset to beginning
-          player.play();
+          
+          // Check player status
+          console.log("Player status:", player.status);
+          
+          player.seekTo(0);
+          const playResult = player.play();
+          console.log("Play result:", playResult);
+        } else {
+          console.log("No player found for note:", note);
         }
       } catch (error) {
         console.error("Error playing note:", note, error);
