@@ -63,47 +63,6 @@ export default function SettingsScreen() {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
-        <SectionHeader title="Audio Settings" />
-
-        <SettingItem
-          icon="volume-up"
-          title="Auto-play Notes"
-          subtitle="Automatically play notes when tapped"
-          rightElement={
-            <Switch
-              value={autoPlay}
-              onValueChange={setAutoPlay}
-              trackColor={{
-                false: "#767577",
-                true: Colors[colorScheme ?? "light"].tint,
-              }}
-              thumbColor={autoPlay ? "#f4f3f4" : "#f4f3f4"}
-            />
-          }
-        />
-
-        <SettingItem
-          icon="high-quality"
-          title="Recording Quality"
-          subtitle={`Current: ${
-            recordingQuality.charAt(0).toUpperCase() + recordingQuality.slice(1)
-          }`}
-          onPress={() => {
-            const qualities = ["low", "medium", "high"];
-            const currentIndex = qualities.indexOf(recordingQuality);
-            const nextIndex = (currentIndex + 1) % qualities.length;
-            setRecordingQuality(qualities[nextIndex]);
-          }}
-          rightElement={
-            <Entypo
-              name="chevron-right"
-              size={20}
-              color={Colors[colorScheme ?? "light"].text}
-              opacity={0.5}
-            />
-          }
-        />
-
         <SectionHeader title="Interface" />
 
         <SettingItem
@@ -114,6 +73,7 @@ export default function SettingsScreen() {
             <Switch
               value={notifications}
               onValueChange={setNotifications}
+              disabled
               trackColor={{
                 false: "#767577",
                 true: Colors[colorScheme ?? "light"].tint,
@@ -171,11 +131,53 @@ export default function SettingsScreen() {
             <Switch
               value={hapticFeedback}
               onValueChange={setHapticFeedback}
+              disabled
               trackColor={{
                 false: "#767577",
                 true: Colors[colorScheme ?? "light"].tint,
               }}
               thumbColor={hapticFeedback ? "#f4f3f4" : "#f4f3f4"}
+            />
+          }
+        />
+        <SectionHeader title="Audio Settings" />
+
+        <SettingItem
+          icon="volume-up"
+          title="Auto-play Notes"
+          subtitle="Automatically play notes when tapped"
+          rightElement={
+            <Switch
+              value={autoPlay}
+              onValueChange={setAutoPlay}
+              disabled
+              trackColor={{
+                false: "#767577",
+                true: Colors[colorScheme ?? "light"].tint,
+              }}
+              thumbColor={autoPlay ? "#f4f3f4" : "#f4f3f4"}
+            />
+          }
+        />
+
+        <SettingItem
+          icon="high-quality"
+          title="Recording Quality"
+          subtitle={`Current: ${
+            recordingQuality.charAt(0).toUpperCase() + recordingQuality.slice(1)
+          }`}
+          onPress={() => {
+            const qualities = ["low", "medium", "high"];
+            const currentIndex = qualities.indexOf(recordingQuality);
+            const nextIndex = (currentIndex + 1) % qualities.length;
+            setRecordingQuality(qualities[nextIndex]);
+          }}
+          rightElement={
+            <Entypo
+              name="chevron-right"
+              size={20}
+              color={Colors[colorScheme ?? "light"].text}
+              opacity={0.5}
             />
           }
         />
