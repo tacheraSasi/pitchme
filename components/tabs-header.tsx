@@ -1,4 +1,5 @@
 import AppIcon from "@/components/app-icon";
+import SettingsIcon from "@/components/settings/icon";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import React from "react";
@@ -12,6 +13,7 @@ const TabsHeader = ({ title }: TabsHeaderProps) => {
     <ThemedView style={styles.titleContainer}>
       <AppIcon/>
       <ThemedText type="title">{title}</ThemedText>
+      <SettingsIcon/>
     </ThemedView>
   );
 };
