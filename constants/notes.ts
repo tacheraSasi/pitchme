@@ -15,10 +15,8 @@ export enum Note {
 
 export const NOTES: Note[] = Object.values(Note);
 
-export function getNote(note:Note){
-    return NOTES.find(
-        (n)=>n.toLowerCase() === note.toLowerCase()
-    )
+export function getNote(note: Note) {
+  return NOTES.find((n) => n.toLowerCase() === note.toLowerCase());
 }
 
 export const noteAssets: Record<Note, any> = {

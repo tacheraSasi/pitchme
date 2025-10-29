@@ -1,9 +1,9 @@
 import { ThemedText } from "@/components/themed-text";
 import { Note } from "@/constants/notes";
-import { Pressable, StyleSheet, View } from "react-native";
-import { useState } from "react";
-import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme.web";
+import { useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 
 export interface NoteCellProps {
   note: Note;
@@ -40,7 +40,10 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     pad: {
       borderRadius: 18,
-      backgroundColor: colorScheme === "dark" ? Colors.dark.background : Colors.light.background,
+      backgroundColor:
+        colorScheme === "dark"
+          ? Colors.dark.background
+          : Colors.light.background,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1,
