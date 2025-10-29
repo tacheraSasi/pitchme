@@ -4,22 +4,21 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
 import { StyleSheet, useColorScheme } from "react-native";
 
-export default function SettingsIcon() {
+interface SettingsIconProps {
+    backgroundColor?: string;
+}
+export default function SettingsIcon({ backgroundColor }: SettingsIconProps) {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
   return (
     <ThemedView>
-      <MaterialIcons name="settings" size={26} style={styles.icon} />
+      <MaterialIcons name="settings" size={26} style={[styles.icon, { backgroundColor }]} />
     </ThemedView>
   );
 }
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     icon: {
-      color: "white",
-      padding: 6,
-      borderRadius: 20,
-      backgroundColor:
-        colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
+      color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text, 
     },
   });
