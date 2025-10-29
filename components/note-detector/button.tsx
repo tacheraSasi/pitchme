@@ -9,6 +9,7 @@ import { Pressable, StyleSheet } from "react-native";
 interface NoteDetectorButtonProps {
   bottomSheetRef: React.RefObject<any>;
 }
+
 export default function NoteDetectorButton({ bottomSheetRef }: NoteDetectorButtonProps) {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
@@ -20,10 +21,10 @@ export default function NoteDetectorButton({ bottomSheetRef }: NoteDetectorButto
         >
           <Entypo name="plus" size={28} color="white" />
           <ThemedText style={styles.openModalButtonText}>
-            Capture the Sound
+            Sing or Hum a Note
           </ThemedText>
           <ThemedText style={styles.openModalSubtext}>
-            Let your creativity flow into sound
+            I tell you which note you sang
           </ThemedText>
         </Pressable>
       </ThemedView>
