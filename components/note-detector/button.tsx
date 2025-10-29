@@ -10,29 +10,30 @@ interface NoteDetectorButtonProps {
   bottomSheetRef: React.RefObject<any>;
 }
 
-export default function NoteDetectorButton({ bottomSheetRef }: NoteDetectorButtonProps) {
+export default function NoteDetectorButton({
+  bottomSheetRef,
+}: NoteDetectorButtonProps) {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
   return (
     <ThemedView style={styles.recordingSection}>
-        <Pressable
-          style={styles.openModalButton}
-          onPress={() => bottomSheetRef.current?.expand()}
-        >
-          <ThemedView style={styles.iconContainer}>
-            <Entypo name="modern-mic" size={32} color="white" />
-          </ThemedView>
-          <ThemedText style={styles.openModalButtonText}>
-            Sing or Hum a Note
-          </ThemedText>
-          <ThemedText style={styles.openModalSubtext}>
-            I&apos;ll tell you which note you sang
-          </ThemedText>
-        </Pressable>
-      </ThemedView>
-    );
-  }
-
+      <Pressable
+        style={styles.openModalButton}
+        onPress={() => bottomSheetRef.current?.expand()}
+      >
+        <ThemedView style={styles.iconContainer}>
+          <Entypo name="modern-mic" size={32} color="white" />
+        </ThemedView>
+        <ThemedText style={styles.openModalButtonText}>
+          Sing or Hum a Note
+        </ThemedText>
+        <ThemedText style={styles.openModalSubtext}>
+          I&apos;ll tell you which note you sang
+        </ThemedText>
+      </Pressable>
+    </ThemedView>
+  );
+}
 
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({

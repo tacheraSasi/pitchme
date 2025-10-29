@@ -5,13 +5,15 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useCallback, useMemo, useState } from "react";
-import { Alert, Pressable, StyleSheet, View } from "react-native";
+import { Alert, Pressable, StyleSheet } from "react-native";
 
 interface NoteDetectorBottomSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
 }
 
-const NoteDetectorBottomSheet = ({ bottomSheetRef }: NoteDetectorBottomSheetProps) => {
+const NoteDetectorBottomSheet = ({
+  bottomSheetRef,
+}: NoteDetectorBottomSheetProps) => {
   const colorScheme = useColorScheme();
   const [isRecordingNote, setIsRecordingNote] = useState(false);
   const [isRecordingIdea, setIsRecordingIdea] = useState(false);
@@ -88,7 +90,11 @@ const NoteDetectorBottomSheet = ({ bottomSheetRef }: NoteDetectorBottomSheetProp
         <ThemedView style={styles.header}>
           <ThemedView style={styles.titleSection}>
             <ThemedView style={styles.titleIconContainer}>
-              <Entypo name="sound" size={24} color={Colors[colorScheme ?? "light"].tint} />
+              <Entypo
+                name="sound"
+                size={24}
+                color={Colors[colorScheme ?? "light"].tint}
+              />
             </ThemedView>
             <ThemedText type="subtitle" style={styles.modalTitle}>
               Note Detector
@@ -136,7 +142,10 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       width: 48,
       height: 48,
       borderRadius: 24,
-      backgroundColor: colorScheme === "dark" ? "rgba(107, 89, 195, 0.2)" : "rgba(150, 89, 151, 0.2)",
+      backgroundColor:
+        colorScheme === "dark"
+          ? "rgba(107, 89, 195, 0.2)"
+          : "rgba(150, 89, 151, 0.2)",
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 12,
