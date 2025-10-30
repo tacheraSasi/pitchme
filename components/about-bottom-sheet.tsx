@@ -19,15 +19,13 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
   }, []);
-  const closeModal = () => {
-    bottomSheetRef.current?.close();
-  };
+
 
   return (
     <BottomSheet
       ref={bottomSheetRef}
       index={-1}
-      snapPoints={snapPoints}
+      snapPoints={["40%"]}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
       backgroundStyle={styles.bottomSheetBackground}
