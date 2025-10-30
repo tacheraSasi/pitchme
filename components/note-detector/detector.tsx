@@ -6,8 +6,10 @@ import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
   AudioModule,
+  createAudioPlayer,
   RecordingPresets,
   setAudioModeAsync,
+  useAudioPlayer,
   useAudioRecorder,
   useAudioRecorderState,
 } from "expo-audio";
@@ -16,10 +18,11 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 export default function NoteDetector() {
   const [saved, setSaved] = useState(false)
-  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY); //TODO: Will GET this from settings store
   const recorderState = useAudioRecorderState(recorder);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
+
 
   useEffect(() => {
     (async () => {
@@ -44,6 +47,15 @@ export default function NoteDetector() {
     setSaved(true)
   };
 
+  const playPreview = async ()=>{
+    const previewPlayer = createAudioPlayer(recorder.uri);
+    console.log("recorder path", recorder.uri)
+    console.log("playing the review", previewPlayer)
+    previewPlayer.seekTo(0);
+    previewPlayer.play();
+    previewPlayer.release()
+  }
+
   return (
     <ThemedView style={styles.container}>
       <Pressable
@@ -67,8 +79,10 @@ export default function NoteDetector() {
       <ThemedText>
         {recorder.uri ? `File path: ${recorder.uri}` : ""}
       </ThemedText>
+
+      {/* Preview player section */}
       {saved && (
-        <Pressable style={styles.ideaItem}>
+        <Pressable style={styles.ideaItem} onPress={()=> playPreview()}>
           <View style={styles.ideaIconContainer}>
             <Entypo name="music" size={20} color={styles.ideaIcon.color} />
           </View>
