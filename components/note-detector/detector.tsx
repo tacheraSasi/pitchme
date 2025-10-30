@@ -1,6 +1,8 @@
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import Entypo from "@expo/vector-icons/Entypo";
 import {
   AudioModule,
   RecordingPresets,
@@ -14,6 +16,7 @@ import { Button, Pressable, StyleSheet } from "react-native";
 export default function NoteDetector() {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     (async () => {
@@ -44,8 +47,12 @@ export default function NoteDetector() {
         title={recorderState.isRecording ? "Stop Recording" : "Start Recording"}
         onPress={recorderState.isRecording ? stopRecording : startRecording}
       />
-      <Pressable style={styles.iconContainer}>
-        <MaterialIcons name="mic" style={styles.micIcon} />
+      <Pressable style={[styles.iconContainer]}>
+        <Entypo
+          name="mic"
+          size={60}
+          color={Colors[colorScheme ?? "light"].tint}
+        />
       </Pressable>
       <ThemedText>
         {recorder.uri ? `File path: ${recorder.uri}` : ""}
@@ -58,16 +65,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    alignItems:"center",
     padding: 10,
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    alignItems: "center",
+    flex: 1,
     justifyContent: "center",
-    marginBottom: 8,
+    alignItems: "center",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    borderWidth:2,
+    borderColor: "rgba(91, 69, 99, 0.98)",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    margin: 20,
   },
   micIcon: {},
 });
