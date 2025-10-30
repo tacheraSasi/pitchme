@@ -1,4 +1,5 @@
 import RecordModal from "@/components/record-modal";
+import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
@@ -8,7 +9,6 @@ import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRef } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RecordedIdea {
@@ -68,6 +68,7 @@ export const RECORDED_IDEAS: RecordedIdea[] = [
 export default function RecordScreen() {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
+  const aboutBottomSheetRef = useRef<BottomSheet>(null);
 
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -99,10 +100,13 @@ export default function RecordScreen() {
   );
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <ScreenLayout
+      styles={styles.container}
+      aboutBottomSheetRef={aboutBottomSheetRef}
+    >
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <TabsHeader title="Record Studio" />
+          <TabsHeader title="Record Studio" aboutBottomSheetRef={aboutBottomSheetRef} />
 
           <ThemedView style={styles.recordingSection}>
             <Pressable
@@ -138,7 +142,7 @@ export default function RecordScreen() {
 
         <RecordModal bottomSheetRef={bottomSheetRef} />
       </ThemedView>
-    </GestureHandlerRootView>
+    </ScreenLayout>
   );
 }
 
