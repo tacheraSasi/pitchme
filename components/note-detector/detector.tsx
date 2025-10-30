@@ -9,7 +9,6 @@ import {
   createAudioPlayer,
   RecordingPresets,
   setAudioModeAsync,
-  useAudioPlayer,
   useAudioRecorder,
   useAudioRecorderState,
 } from "expo-audio";
@@ -17,12 +16,11 @@ import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 export default function NoteDetector() {
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved] = useState(false);
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY); //TODO: Will GET this from settings store
   const recorderState = useAudioRecorderState(recorder);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
-
 
   useEffect(() => {
     (async () => {
@@ -44,17 +42,21 @@ export default function NoteDetector() {
 
   const stopRecording = async () => {
     await recorder.stop();
-    setSaved(true)
+    setSaved(true);
   };
 
-  const playPreview = async ()=>{
+  const playPreview = async () => {
     const previewPlayer = createAudioPlayer(recorder.uri);
-    console.log("recorder path", recorder.uri)
-    console.log("playing the review", previewPlayer)
+    console.log("recorder path", recorder.uri);
+    console.log("playing the review", previewPlayer);
     previewPlayer.seekTo(0);
     previewPlayer.play();
-    previewPlayer.release()
-  }
+    previewPlayer.release();
+  };
+
+  const getPlayedNote = () => {
+    return "A";
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -76,13 +78,12 @@ export default function NoteDetector() {
           />
         )}
       </Pressable>
-      <ThemedText>
-        {recorder.uri ? `File path: ${recorder.uri}` : ""}
-      </ThemedText>
+
+      {saved && <ThemedText>NOTE PLAYED IS {getPlayedNote()}</ThemedText>}
 
       {/* Preview player section */}
       {saved && (
-        <Pressable style={styles.ideaItem} onPress={()=> playPreview()}>
+        <Pressable style={styles.ideaItem} onPress={() => playPreview()}>
           <View style={styles.ideaIconContainer}>
             <Entypo name="music" size={20} color={styles.ideaIcon.color} />
           </View>
@@ -120,9 +121,9 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       width: 300,
       height: 300,
       borderRadius: 150,
-      borderWidth: 2,
+      borderWidth: 3,
       borderColor: "rgba(91, 69, 99, 0.98)",
-      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      backgroundColor: "rgba(255, 255, 255, 0.08)",
       margin: 20,
     },
     micIcon: {},
