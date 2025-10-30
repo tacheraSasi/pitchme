@@ -43,16 +43,23 @@ export default function NoteDetector() {
 
   return (
     <ThemedView style={styles.container}>
-      <Button
-        title={recorderState.isRecording ? "Stop Recording" : "Start Recording"}
+      <Pressable
+        style={[styles.iconContainer]}
         onPress={recorderState.isRecording ? stopRecording : startRecording}
-      />
-      <Pressable style={[styles.iconContainer]}>
-        <Entypo
-          name="mic"
-          size={60}
-          color={Colors[colorScheme ?? "light"].tint}
-        />
+      >
+        {recorderState.isRecording ? (
+          <Entypo
+            name="box"
+            size={60}
+            color={Colors[colorScheme ?? "light"].isRecording}
+          />
+        ) : (
+          <Entypo
+            name="mic"
+            size={60}
+            color={Colors[colorScheme ?? "light"].tint}
+          />
+        )}
       </Pressable>
       <ThemedText>
         {recorder.uri ? `File path: ${recorder.uri}` : ""}
@@ -65,7 +72,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems:"center",
+    alignItems: "center",
     padding: 10,
   },
   iconContainer: {
@@ -75,7 +82,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     borderRadius: 150,
-    borderWidth:2,
+    borderWidth: 2,
     borderColor: "rgba(91, 69, 99, 0.98)",
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     margin: 20,
