@@ -15,7 +15,6 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
   const colorScheme = useColorScheme();
 
   const styles = getStyles(colorScheme ?? "light");
-  const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
   }, []);
