@@ -12,21 +12,24 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 interface TabsHeaderProps {
   title: string;
+  aboutBottomSheetRef: React.RefObject<BottomSheet | null>;
 }
-const TabsHeader = ({ title }: TabsHeaderProps) => {
+const TabsHeader = ({ title, aboutBottomSheetRef }: TabsHeaderProps) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
-  const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const openAboutBottomSheet = ()=>{
-    bottomSheetRef.current?.expand()
-  }
+  const openAboutBottomSheet = () => {
+    aboutBottomSheetRef.current?.expand();
+  };
 
   return (
     <ThemedView style={styles.headerContainer}>
       <View style={styles.leftSection}>
-        <Pressable style={styles.iconWrapper} onPress={()=> openAboutBottomSheet()}>
+        <Pressable
+          style={styles.iconWrapper}
+          onPress={() => openAboutBottomSheet()}
+        >
           <AppIcon backgroundColor={styles.iconWrapper.backgroundColor} />
         </Pressable>
         <View style={styles.titleSection}>
