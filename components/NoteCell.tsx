@@ -1,7 +1,9 @@
+import { HapticTab } from "@/components/haptic-tab";
 import { ThemedText } from "@/components/themed/themed-text";
 import { Note } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
@@ -20,6 +22,7 @@ export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         console.log(`Pressed note: ${note}`);
         onPress?.(note);
       }}
@@ -30,7 +33,7 @@ export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
       ]}
     >
       <View style={styles.innerPad}>
-        <ThemedText style={styles.text}>{note}</ThemedText>
+        <ThemedText style={[styles.text, pressed && styles.textPressed]}>{note}</ThemedText>
       </View>
     </Pressable>
   );
@@ -62,5 +65,8 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontWeight: "600",
       fontSize: 18,
       color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
+    },
+    textPressed: {
+      color: Colors[colorScheme].background,
     },
   });
