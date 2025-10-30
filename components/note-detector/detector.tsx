@@ -3,6 +3,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
   AudioModule,
   RecordingPresets,
@@ -48,15 +49,15 @@ export default function NoteDetector() {
         onPress={recorderState.isRecording ? stopRecording : startRecording}
       >
         {recorderState.isRecording ? (
-          <Entypo
-            name="box"
-            size={60}
+          <MaterialIcons
+            name="stop"
+            size={100}
             color={Colors[colorScheme ?? "light"].isRecording}
           />
         ) : (
           <Entypo
             name="mic"
-            size={60}
+            size={100}
             color={Colors[colorScheme ?? "light"].tint}
           />
         )}
