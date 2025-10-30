@@ -1,4 +1,3 @@
-import NoteDetector from "@/components/note-detector/detector";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
@@ -6,15 +5,15 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useCallback, useMemo } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
-interface NoteDetectorBottomSheetProps {
+interface AboutBottomSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
 }
 
-const NoteDetectorBottomSheet = ({
+const AboutBottomSheet = ({
   bottomSheetRef,
-}: NoteDetectorBottomSheetProps) => {
+}: AboutBottomSheetProps) => {
   const colorScheme = useColorScheme();
 
   const styles = getStyles(colorScheme ?? "light");
@@ -53,21 +52,13 @@ const NoteDetectorBottomSheet = ({
               />
             </ThemedView>
             <ThemedText type="subtitle" style={styles.modalTitle}>
-              Note Detector
+              About PitchMe
             </ThemedText>
             <ThemedText style={styles.modalSubtitle}>
               Sing or hum and discover your note
             </ThemedText>
           </ThemedView>
-          <Pressable onPress={closeModal} style={styles.closeButton}>
-            <Entypo
-              name="cross"
-              size={24}
-              color={Colors[colorScheme ?? "light"].text}
-            />
-          </Pressable>
         </ThemedView>
-        <NoteDetector/>
       </BottomSheetView>
     </BottomSheet>
   );
@@ -76,7 +67,7 @@ const NoteDetectorBottomSheet = ({
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     bottomSheetBackground: {
-      backgroundColor:   Colors[colorScheme].background,
+      backgroundColor: Colors[colorScheme].background,
     },
     handleIndicator: {
       backgroundColor: colorScheme === "dark" ? "#444444" : "#cccccc",
@@ -219,4 +210,4 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     },
   });
 
-export default NoteDetectorBottomSheet;
+export default AboutBottomSheet;
