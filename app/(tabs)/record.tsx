@@ -142,7 +142,7 @@ export default function RecordScreen() {
   );
 }
 
-const getStyles = (colorScheme: "light" | "dark" = "light") =>
+export const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     container: {
       flex: 1,

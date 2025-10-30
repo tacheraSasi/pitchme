@@ -12,12 +12,13 @@ import {
   useAudioRecorderState,
 } from "expo-audio";
 import React, { useEffect } from "react";
-import { Button, Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 export default function NoteDetector() {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
   const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme ?? "light");
 
   useEffect(() => {
     (async () => {
@@ -65,28 +66,120 @@ export default function NoteDetector() {
       <ThemedText>
         {recorder.uri ? `File path: ${recorder.uri}` : ""}
       </ThemedText>
+      <Pressable style={styles.ideaItem}>
+        <View style={styles.ideaIconContainer}>
+          <Entypo
+            name="music"
+            size={20}
+            color={styles.ideaIcon.color}
+          />
+        </View>
+        <View style={styles.ideaContent}>
+          <ThemedText style={styles.ideaTitle}>Preview</ThemedText>
+          <View style={styles.ideaMetadata}>
+            <ThemedText style={styles.ideaDuration}>0</ThemedText>
+          </View>
+        </View>
+        <Pressable style={styles.playButton}>
+          <Entypo
+            name="controller-play"
+            size={16}
+            color={Colors[colorScheme ?? "light"].tint}
+          />
+        </Pressable>
+      </Pressable>
     </ThemedView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
-  },
-  iconContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    borderWidth: 2,
-    borderColor: "rgba(91, 69, 99, 0.98)",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    margin: 20,
-  },
-  micIcon: {},
-});
+
+const getStyles = (colorScheme: "light" | "dark" = "light") =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 10,
+    },
+    iconContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      width: 300,
+      height: 300,
+      borderRadius: 150,
+      borderWidth: 2,
+      borderColor: "rgba(91, 69, 99, 0.98)",
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      margin: 20,
+    },
+    micIcon: {},
+    titleContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      marginVertical: 16,
+      alignItems: "center",
+    },
+    recordingSection: {
+      paddingHorizontal: 16,
+      marginBottom: 24,
+    },
+    ideaItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: 16,
+      marginBottom: 12,
+      borderRadius: 12,
+      backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#f8f9fa",
+      borderWidth: 1,
+      borderColor: colorScheme === "dark" ? "#333333" : "#e9ecef",
+    },
+    ideaIconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor:
+        colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 12,
+    },
+    ideaIcon: {
+      color: "white",
+    },
+    ideaContent: {
+      flex: 1,
+      marginRight: 12,
+    },
+    ideaTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      marginBottom: 4,
+      color: Colors[colorScheme].text,
+    },
+    ideaMetadata: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    ideaDuration: {
+      fontSize: 12,
+      opacity: 0.7,
+      fontWeight: "500",
+      color: Colors[colorScheme].text,
+    },
+    ideaDate: {
+      fontSize: 12,
+      opacity: 0.6,
+      color: Colors[colorScheme].text,
+    },
+    playButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f0f0f0",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: colorScheme === "dark" ? "#444444" : "#e0e0e0",
+    },
+  });
