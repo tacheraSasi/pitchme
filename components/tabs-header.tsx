@@ -1,4 +1,3 @@
-import AboutBottomSheet from "@/components/about-bottom-sheet";
 import AppIcon from "@/components/app-icon";
 import SettingsIcon from "@/components/settings/icon";
 import { ThemedText } from "@/components/themed/themed-text";
@@ -7,7 +6,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React, { useRef } from "react";
+import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 interface TabsHeaderProps {

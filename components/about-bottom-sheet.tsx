@@ -4,7 +4,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 
 interface AboutBottomSheetProps {
