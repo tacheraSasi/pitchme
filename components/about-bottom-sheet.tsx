@@ -11,26 +11,18 @@ interface AboutBottomSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
 }
 
-const AboutBottomSheet = ({
-  bottomSheetRef,
-}: AboutBottomSheetProps) => {
+const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
   const colorScheme = useColorScheme();
 
   const styles = getStyles(colorScheme ?? "light");
-
-  // variables
   const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
-
-  // callbacks
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
   }, []);
-
   const closeModal = () => {
     bottomSheetRef.current?.close();
   };
 
-  // renders
   return (
     <BottomSheet
       ref={bottomSheetRef}

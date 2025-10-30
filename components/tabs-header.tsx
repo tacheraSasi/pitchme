@@ -1,11 +1,13 @@
+import AboutBottomSheet from "@/components/about-bottom-sheet";
 import AppIcon from "@/components/app-icon";
 import SettingsIcon from "@/components/settings/icon";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useRef } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 interface TabsHeaderProps {
@@ -15,13 +17,18 @@ const TabsHeader = ({ title }: TabsHeaderProps) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const openAboutBottomSheet = ()=>{
+    bottomSheetRef.current?.expand()
+  }
 
   return (
     <ThemedView style={styles.headerContainer}>
       <View style={styles.leftSection}>
-        <View style={styles.iconWrapper}>
+        <Pressable style={styles.iconWrapper} onPress={()=> openAboutBottomSheet()}>
           <AppIcon backgroundColor={styles.iconWrapper.backgroundColor} />
-        </View>
+        </Pressable>
         <View style={styles.titleSection}>
           <ThemedText type="title" style={styles.titleText}>
             {title}
