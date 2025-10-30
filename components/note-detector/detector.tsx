@@ -11,10 +11,11 @@ import {
   useAudioRecorder,
   useAudioRecorderState,
 } from "expo-audio";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 export default function NoteDetector() {
+  const [saved, setSaved] = useState(false)
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
   const colorScheme = useColorScheme();
@@ -40,7 +41,7 @@ export default function NoteDetector() {
 
   const stopRecording = async () => {
     await recorder.stop();
-    alert(`Recording saved at: ${recorder.uri}`);
+    setSaved(true)
   };
 
   return (
@@ -66,32 +67,29 @@ export default function NoteDetector() {
       <ThemedText>
         {recorder.uri ? `File path: ${recorder.uri}` : ""}
       </ThemedText>
-      <Pressable style={styles.ideaItem}>
-        <View style={styles.ideaIconContainer}>
-          <Entypo
-            name="music"
-            size={20}
-            color={styles.ideaIcon.color}
-          />
-        </View>
-        <View style={styles.ideaContent}>
-          <ThemedText style={styles.ideaTitle}>Preview</ThemedText>
-          <View style={styles.ideaMetadata}>
-            <ThemedText style={styles.ideaDuration}>0</ThemedText>
+      {saved && (
+        <Pressable style={styles.ideaItem}>
+          <View style={styles.ideaIconContainer}>
+            <Entypo name="music" size={20} color={styles.ideaIcon.color} />
           </View>
-        </View>
-        <Pressable style={styles.playButton}>
-          <Entypo
-            name="controller-play"
-            size={16}
-            color={Colors[colorScheme ?? "light"].tint}
-          />
+          <View style={styles.ideaContent}>
+            <ThemedText style={styles.ideaTitle}>Preview</ThemedText>
+            <View style={styles.ideaMetadata}>
+              <ThemedText style={styles.ideaDuration}>0</ThemedText>
+            </View>
+          </View>
+          <Pressable style={styles.playButton}>
+            <Entypo
+              name="controller-play"
+              size={16}
+              color={Colors[colorScheme ?? "light"].tint}
+            />
+          </Pressable>
         </Pressable>
-      </Pressable>
+      )}
     </ThemedView>
   );
 }
-
 
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
