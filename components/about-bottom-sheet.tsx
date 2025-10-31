@@ -35,7 +35,7 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
           <ThemedView style={styles.titleSection}>
             <ThemedView style={styles.titleIconContainer}>
               <Entypo
-                name="sound"
+                name="info"
                 size={24}
                 color={Colors[colorScheme ?? "light"].tint}
               />
@@ -44,7 +44,8 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
               About PitchMe
             </ThemedText>
             <ThemedText style={styles.modalSubtitle}>
-              Sing or hum and discover your note
+              {/* TODO:Will come up with a better text here */}
+              Created by Tachera Sasi 
             </ThemedText>
           </ThemedView>
         </ThemedView>
