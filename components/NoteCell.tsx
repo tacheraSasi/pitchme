@@ -1,4 +1,3 @@
-import { HapticTab } from "@/components/haptic-tab";
 import { ThemedText } from "@/components/themed/themed-text";
 import { Note } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
@@ -33,7 +32,9 @@ export const NoteCell = ({ note, onPress, size = 100 }: NoteCellProps) => {
       ]}
     >
       <View style={styles.innerPad}>
-        <ThemedText style={[styles.text, pressed && styles.textPressed]}>{note}</ThemedText>
+        <ThemedText style={[styles.text, pressed && styles.textPressed]}>
+          {note}
+        </ThemedText>
       </View>
     </Pressable>
   );
