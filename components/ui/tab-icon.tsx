@@ -8,7 +8,7 @@ export default function TabBarIcon(props: {
 }) {
   return (
     <ThemedView>
-      <Entypo size={26} style={{ marginBottom: -3 }} {...props} />
+      <Entypo size={28} style={{ marginBottom: -3 }} {...props} />
     </ThemedView>
   );
 }
