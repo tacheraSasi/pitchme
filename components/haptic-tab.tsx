@@ -1,20 +1,25 @@
-import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
-import { PlatformPressable } from '@react-navigation/elements';
-import * as Haptics from 'expo-haptics';
-import { useEffect, useState } from 'react';
+import { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
+import { PlatformPressable } from "@react-navigation/elements";
+import * as Haptics from "expo-haptics";
+import { useState } from "react";
 
 export function HapticTab(props: BottomTabBarButtonProps) {
-  const [focused, setFocused] = useState(false)
+  const [focused, setFocused] = useState(false);
   return (
     <PlatformPressable
       {...props}
-      style={[ focused && { 
-        paddingHorizontal:10,
-        backgroundColor: 'gray'
-      }]}
+      style={[
+        focused && {
+          paddingHorizontal: 10,
+          backgroundColor: "gray", 
+          //TODO: Handle this well after furthure research the goal is to have nice animations here too
+        },
+      ]}
+      onFocus={() => {
+        setFocused(true);
+        console.log("Tab focused"); //TODO: Add nice animations and change the bg of the tab as well
+      }}
       onPressIn={(ev) => {
-        setFocused(true)
-        console.log("Tab ficused") //TODO: Add nice animations and change the bg of the tab as well 
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         props.onPressIn?.(ev);
       }}
