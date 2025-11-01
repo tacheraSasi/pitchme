@@ -4,7 +4,7 @@ import React from "react";
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import Entypo from "@expo/vector-icons/Entypo";
+import TabBarIcon from "@/components/ui/tab-icon";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -14,15 +14,15 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
-          tabBarButton: HapticTab, 
+          tabBarButton: HapticTab,
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ color }) => (
-              <Entypo name="folder-music" size={24} color={color} />
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name="folder-music" color={color} focused={focused} />
             ),
           }}
         />
@@ -30,8 +30,8 @@ export default function TabLayout() {
           name="record"
           options={{
             title: "Studio",
-            tabBarIcon: ({ color }) => (
-              <Entypo name="mic" size={24} color={color} />
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name="mic" color={color} focused={focused} />
             ),
           }}
         />
