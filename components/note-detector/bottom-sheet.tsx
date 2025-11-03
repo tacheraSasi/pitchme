@@ -4,9 +4,20 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { Animated, Dimensions, Pressable, StyleSheet } from "react-native";
+import React, { useCallback, useMemo, useEffect, useRef } from "react";
+import { 
+  Pressable, 
+  StyleSheet, 
+  View, 
+  Animated, 
+  Dimensions,
+  Platform 
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 
 interface NoteDetectorBottomSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -17,7 +28,7 @@ const NoteDetectorBottomSheet = ({
 }: NoteDetectorBottomSheetProps) => {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
-  const { width, height } = Dimensions.get("window");
+  const { width, height } = Dimensions.get('window');
 
   // Animation values
   const headerOpacity = useRef(new Animated.Value(0)).current;
@@ -28,7 +39,7 @@ const NoteDetectorBottomSheet = ({
   const snapPoints = useMemo(() => ["30%", "60%", "95%"], []);
 
   // Smooth entrance animations
-  const triggerEntranceAnimations = useCallback(() => {
+  const triggerEntranceAnimations = () => {
     Animated.parallel([
       Animated.timing(headerOpacity, {
         toValue: 1,
@@ -51,17 +62,14 @@ const NoteDetectorBottomSheet = ({
         useNativeDriver: true,
       })
     ).start();
-  }, [headerOpacity, cardScale, iconRotation]);
+  };
 
-  const handleSheetChanges = useCallback(
-    (index: number) => {
-      console.log("handleSheetChanges", index);
-      if (index >= 0) {
-        triggerEntranceAnimations();
-      }
-    },
-    [triggerEntranceAnimations]
-  );
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+    if (index >= 0) {
+      triggerEntranceAnimations();
+    }
+  }, [triggerEntranceAnimations]);
 
   const closeModal = useCallback(() => {
     // Exit animation before closing
@@ -79,19 +87,19 @@ const NoteDetectorBottomSheet = ({
     ]).start(() => {
       bottomSheetRef.current?.close();
     });
-  }, [headerOpacity, cardScale, bottomSheetRef]);
+  }, [headerOpacity, cardScale]);
 
   // Icon rotation interpolation
   const rotateInterpolation = iconRotation.interpolate({
     inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
+    outputRange: ['0deg', '360deg'],
   });
 
   useEffect(() => {
     return () => {
       iconRotation.stopAnimation();
     };
-  }, [iconRotation]);
+  }, []);
 
   // renders
   return (
@@ -103,99 +111,33 @@ const NoteDetectorBottomSheet = ({
       enablePanDownToClose={true}
       backgroundStyle={styles.bottomSheetBackground}
       handleIndicatorStyle={styles.handleIndicator}
-      style={styles.bottomSheet}
     >
       <BottomSheetView style={styles.contentContainer}>
-        {/* Animated Header with Glassmorphism Effect */}
-        <Animated.View
-          style={[
-            styles.header,
-            {
-              opacity: headerOpacity,
-              transform: [{ scale: cardScale }],
-            },
-          ]}
-        >
-          <ThemedView style={styles.headerGlass}>
-            {/* Hero Icon Section */}
-            <ThemedView style={styles.heroSection}>
-              <Animated.View
-                style={[
-                  styles.heroIconContainer,
-                  { transform: [{ rotate: rotateInterpolation }] },
-                ]}
-              >
-                <ThemedView style={styles.iconGlow}>
-                  <Entypo name="sound" size={32} color="#FFFFFF" />
-                </ThemedView>
-              </Animated.View>
-
-              <ThemedView style={styles.titleContainer}>
-                <ThemedText style={styles.heroTitle}>Note Detector</ThemedText>
-                <ThemedText style={styles.heroSubtitle}>
-                  🎵 Sing, hum & discover your musical note
-                </ThemedText>
-
-                {/* Feature Pills */}
-                <ThemedView style={styles.featurePills}>
-                  <ThemedView style={styles.pill}>
-                    <Entypo
-                      name="music"
-                      size={14}
-                      color={Colors[colorScheme ?? "light"].tint}
-                    />
-                    <ThemedText style={styles.pillText}>Real-time</ThemedText>
-                  </ThemedView>
-                  <ThemedView style={styles.pill}>
-                    <Entypo
-                      name="tools"
-                      size={14}
-                      color={Colors[colorScheme ?? "light"].tint}
-                    />
-                    <ThemedText style={styles.pillText}>AI-powered</ThemedText>
-                  </ThemedView>
-                </ThemedView>
-              </ThemedView>
+        <ThemedView style={styles.header}>
+          <ThemedView style={styles.titleSection}>
+            <ThemedView style={styles.titleIconContainer}>
+              <Entypo
+                name="sound"
+                size={24}
+                color={Colors[colorScheme ?? "light"].tint}
+              />
             </ThemedView>
-
-            {/* Close Button with Hover Effect */}
-            <Pressable onPress={closeModal} style={styles.closeButton}>
-              <ThemedView style={styles.closeButtonInner}>
-                <Entypo
-                  name="cross"
-                  size={20}
-                  color={Colors[colorScheme ?? "light"].text}
-                />
-              </ThemedView>
-            </Pressable>
-          </ThemedView>
-        </Animated.View>
-
-        {/* Detector Container with Premium Styling */}
-        <Animated.View
-          style={[
-            styles.detectorContainer,
-            { transform: [{ scale: cardScale }] },
-          ]}
-        >
-          <ThemedView style={styles.detectorWrapper}>
-            <NoteDetector />
-          </ThemedView>
-        </Animated.View>
-
-        {/* Bottom Tips Section */}
-        <ThemedView style={styles.tipsSection}>
-          <ThemedView style={styles.tipItem}>
-            <Entypo
-              name="info"
-              size={16}
-              color={Colors[colorScheme ?? "light"].tint}
-            />
-            <ThemedText style={styles.tipText}>
-              Hold your device close and sing clearly for best results
+            <ThemedText type="subtitle" style={styles.modalTitle}>
+              Note Detector
+            </ThemedText>
+            <ThemedText style={styles.modalSubtitle}>
+              Sing or hum and discover your note
             </ThemedText>
           </ThemedView>
+          <Pressable onPress={closeModal} style={styles.closeButton}>
+            <Entypo
+              name="cross"
+              size={24}
+              color={Colors[colorScheme ?? "light"].text}
+            />
+          </Pressable>
         </ThemedView>
+        <NoteDetector/>
       </BottomSheetView>
     </BottomSheet>
   );
@@ -203,210 +145,147 @@ const NoteDetectorBottomSheet = ({
 
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
-    // Enhanced Bottom Sheet Styling
-    bottomSheet: {
-      shadowColor: colorScheme === "dark" ? "#000" : "#000",
-      shadowOffset: { width: 0, height: -10 },
-      shadowOpacity: 0.3,
-      shadowRadius: 20,
-      elevation: 20,
-    },
     bottomSheetBackground: {
-      backgroundColor: Colors[colorScheme].background,
-      borderTopLeftRadius: 28,
-      borderTopRightRadius: 28,
+      backgroundColor:   Colors[colorScheme].background,
     },
     handleIndicator: {
-      backgroundColor: colorScheme === "dark" ? "#555555" : "#d0d0d0",
-      width: 50,
-      height: 5,
-      borderRadius: 3,
+      backgroundColor: colorScheme === "dark" ? "#444444" : "#cccccc",
     },
     contentContainer: {
       flex: 1,
-      paddingHorizontal: 24,
-      paddingTop: 8,
-      paddingBottom: 34,
+      padding: 20,
     },
-
-    // Hero Header Section
     header: {
-      marginBottom: 28,
-      borderRadius: 24,
-      overflow: "hidden",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: 32,
     },
-    headerGlass: {
+    titleSection: {
+      flex: 1,
+      alignItems: "center",
+    },
+    titleIconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
       backgroundColor:
         colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.05)"
-          : "rgba(0, 0, 0, 0.02)",
-      backdropFilter: "blur(20px)",
-      borderRadius: 24,
-      borderWidth: 1,
-      borderColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.1)"
-          : "rgba(0, 0, 0, 0.05)",
-      padding: 20,
-      position: "relative",
-    },
-    heroSection: {
+          ? "rgba(107, 89, 195, 0.2)"
+          : "rgba(150, 89, 151, 0.2)",
       alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 12,
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: "800",
+      color: Colors[colorScheme].text,
       marginBottom: 4,
     },
-    heroIconContainer: {
-      width: 80,
-      height: 80,
-      borderRadius: 40,
-      marginBottom: 16,
-      alignItems: "center",
-      justifyContent: "center",
-      overflow: "hidden",
-    },
-    iconGlow: {
-      width: "100%",
-      height: "100%",
-      borderRadius: 40,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor:
-        colorScheme === "dark"
-          ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-          : "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-      shadowColor: Colors[colorScheme].tint,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.4,
-      shadowRadius: 16,
-      elevation: 12,
-    },
-
-    // Typography
-    titleContainer: {
-      alignItems: "center",
-      marginBottom: 16,
-    },
-    heroTitle: {
-      fontSize: 32,
-      fontWeight: "900",
+    modalSubtitle: {
+      fontSize: 16,
       color: Colors[colorScheme].text,
-      marginBottom: 6,
+      opacity: 0.7,
       textAlign: "center",
-      letterSpacing: -1,
     },
-    heroSubtitle: {
-      fontSize: 17,
-      color: Colors[colorScheme].text,
-      opacity: 0.75,
-      textAlign: "center",
-      marginBottom: 20,
-      lineHeight: 24,
-    },
-
-    // Feature Pills
-    featurePills: {
-      flexDirection: "row",
-      gap: 12,
-      justifyContent: "center",
-    },
-    pill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      backgroundColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.1)"
-          : "rgba(0, 0, 0, 0.05)",
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: Colors[colorScheme].tint + "30",
-    },
-    pillText: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: Colors[colorScheme].text,
-      opacity: 0.8,
-    },
-
-    // Close Button
     closeButton: {
-      position: "absolute",
-      top: 16,
-      right: 16,
-      zIndex: 10,
+      padding: 4,
     },
-    closeButtonInner: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      backgroundColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.1)"
-          : "rgba(0, 0, 0, 0.05)",
+    recordingSection: {
+      marginBottom: 32,
+    },
+    sectionDescription: {
+      fontSize: 16,
+      opacity: 0.7,
+      textAlign: "center",
+      marginBottom: 24,
+      color: Colors[colorScheme].text,
+    },
+    recordingButtons: {
+      gap: 16,
+      marginBottom: 20,
+    },
+    recordButton: {
+      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      borderWidth: 1,
-      borderColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.1)"
-          : "rgba(0, 0, 0, 0.05)",
+      paddingVertical: 24,
+      paddingHorizontal: 20,
+      borderRadius: 16,
+      gap: 8,
     },
-
-    // Detector Container
-    detectorContainer: {
-      marginBottom: 24,
-      borderRadius: 20,
+    noteButton: {
+      backgroundColor:
+        colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
+    },
+    ideaButton: {
+      backgroundColor: colorScheme === "dark" ? "#E85A4F" : "#FF6B6B",
+    },
+    recordingButton: {
+      backgroundColor: "#FF4444",
+    },
+    buttonText: {
+      color: "white",
+      fontSize: 16,
+      fontWeight: "600",
+      textAlign: "center",
+    },
+    buttonSubtext: {
+      color: "rgba(255, 255, 255, 0.8)",
+      fontSize: 12,
+      textAlign: "center",
+    },
+    statusContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 12,
+      gap: 12,
+    },
+    recordingIndicator: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: "#FF4444",
+    },
+    recordingText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: "#FF4444",
+    },
+    progressContainer: {
+      paddingHorizontal: 20,
+      marginTop: 8,
+    },
+    progressBar: {
+      height: 4,
+      backgroundColor: colorScheme === "dark" ? "#333333" : "#e0e0e0",
+      borderRadius: 2,
       overflow: "hidden",
     },
-    detectorWrapper: {
-      backgroundColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.03)"
-          : "rgba(0, 0, 0, 0.02)",
-      borderRadius: 20,
-      padding: 20,
-      borderWidth: 1,
-      borderColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.08)"
-          : "rgba(0, 0, 0, 0.06)",
-      shadowColor: colorScheme === "dark" ? "#000" : "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 12,
-      elevation: 6,
+    progressFill: {
+      height: "100%",
+      backgroundColor: "#FF4444",
+      borderRadius: 2,
     },
-
-    // Tips Section
     tipsSection: {
       marginTop: "auto",
-      paddingTop: 16,
+      paddingTop: 20,
+      borderTopWidth: 1,
+      borderTopColor: colorScheme === "dark" ? "#333333" : "#e0e0e0",
     },
-    tipItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      backgroundColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.05)"
-          : "rgba(0, 0, 0, 0.03)",
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor:
-        colorScheme === "dark"
-          ? "rgba(255, 255, 255, 0.08)"
-          : "rgba(0, 0, 0, 0.05)",
-    },
-    tipText: {
-      flex: 1,
-      fontSize: 14,
+    tipsTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      marginBottom: 12,
       color: Colors[colorScheme].text,
-      opacity: 0.8,
+    },
+    tipsText: {
+      fontSize: 14,
+      opacity: 0.7,
       lineHeight: 20,
-      fontWeight: "500",
+      color: Colors[colorScheme].text,
     },
   });
 
