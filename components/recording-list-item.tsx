@@ -1,8 +1,9 @@
 import { ThemedText } from "@/components/themed/themed-text";
 import { Colors } from "@/constants/theme";
+import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
 import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import { Alert, Pressable, View } from "react-native";
 
@@ -19,19 +20,19 @@ export function RecordingListItem({
   colorScheme: "light" | "dark";
   styles: any;
 }) {
-  const audioPlayer = useAudioPlayer({ uri: recording.uri });
-  const playerStatus = useAudioPlayerStatus(audioPlayer);
+  const { player, playExclusive, pause } = useGlobalAudioPlayer(recording.uri);
+  const playerStatus = useAudioPlayerStatus(player);
   const { removeRecording } = useRecordingsStore();
 
-  const togglePlayback = () => {
+  const togglePlayback = async () => {
     if (playerStatus.playing) {
-      audioPlayer.pause();
+      await pause();
     } else {
-      // If we're at the end, restart
+      // restart if ended
       if (playerStatus.currentTime >= playerStatus.duration) {
-        audioPlayer.seekTo(0);
+        player.seekTo(0);
       }
-      audioPlayer.play();
+      await playExclusive();
     }
   };
 
