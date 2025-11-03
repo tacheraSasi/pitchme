@@ -5,6 +5,7 @@ import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
+import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Alert, Animated, Pressable, StyleSheet, View } from "react-native";
 import {
@@ -12,7 +13,6 @@ import {
   PanGestureHandlerGestureEvent,
   State,
 } from "react-native-gesture-handler";
-import * as Haptics from "expo-haptics";
 
 export function RecordingListItem({
   recording,
@@ -131,12 +131,18 @@ export function RecordingListItem({
     );
   };
 
-  
-
   return (
     <View style={swipeStyles.container}>
-      {/* Delete Background */}
-      <View style={swipeStyles.deleteBackground}>
+      <View
+        style={[
+          swipeStyles.deleteBackground,
+          {
+            backgroundColor: isDark
+              ? Colors.dark.isRecording
+              : Colors.light.isRecording,
+          },
+        ]}
+      >
         <Entypo
           name="trash"
           size={20}
@@ -159,6 +165,9 @@ export function RecordingListItem({
             swipeStyles.itemContainer,
             {
               transform: [{ translateX }],
+              backgroundColor: isDark
+                ? Colors.dark.background
+                : Colors.light.background,
               marginBottom: 0, // Handled by container
             },
           ]}
@@ -209,22 +218,18 @@ const swipeStyles = StyleSheet.create({
     overflow: "hidden",
   },
   deleteBackground: {
-    display: "flex",
     position: "absolute",
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    justifyContent: "center",
-    alignItems: "flex-end",
-    paddingRight: 24,
-    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingRight: 20,
   },
   deleteIcon: {
-    display: "flex",
-    alignSelf:"flex-end",
-    marginLeft: 8,
-    right: 0,
+    alignSelf: "center",
+    marginRight: 4,
   },
   itemContainer: {
     backgroundColor: "transparent",
