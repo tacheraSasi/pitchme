@@ -32,7 +32,7 @@ export const Colors = {
     icon: "#9BA1A6",
     tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
-    isRecording: "#FF4444",
+    isRecording: "#ea4e4eff",
     waveformActive: "#FF6B6B",
     waveformInactive: tintColorDark,
     bottomSheetBackground: "#1a1a1a",

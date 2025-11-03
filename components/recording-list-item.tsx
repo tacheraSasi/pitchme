@@ -145,7 +145,7 @@ export function RecordingListItem({
       >
         <Entypo
           name="trash"
-          size={20}
+          size={30}
           color="white"
           style={swipeStyles.deleteIcon}
         />
@@ -223,13 +223,11 @@ const swipeStyles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    justifyContent: "flex-end",
-    alignItems: "center",
+    justifyContent: "center",
+    alignItems: "flex-end",
     paddingRight: 20,
   },
   deleteIcon: {
-    alignSelf: "center",
-    marginRight: 4,
   },
   itemContainer: {
     backgroundColor: "transparent",
