@@ -4,8 +4,8 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { Alert, Pressable, StyleSheet, View, Animated } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, Animated, Pressable, StyleSheet, View } from "react-native";
 
 interface RecordModalProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -103,7 +103,7 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
       <BottomSheetView style={styles.contentContainer}>
         <ThemedView style={styles.header}>
           <ThemedText type="subtitle" style={styles.modalTitle}>
-            Record Musical Idea
+            Musical Idea
           </ThemedText>
           <Pressable onPress={closeModal} style={styles.closeButton}>
             <Entypo
@@ -128,8 +128,8 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
                   styles.waveformBar,
                   {
                     backgroundColor: isRecording
-                      ? "#FF6B6B"
-                      : Colors[colorScheme ?? "light"].tint,
+                      ? Colors[colorScheme ?? "light"].waveformActive
+                      : Colors[colorScheme ?? "light"].waveformInactive,
                     transform: [
                       {
                         scaleY: isRecording ? animation : 0.3,
@@ -194,10 +194,10 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     bottomSheetBackground: {
-      backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#ffffff",
+      backgroundColor: Colors[colorScheme].bottomSheetBackground,
     },
     handleIndicator: {
-      backgroundColor: colorScheme === "dark" ? "#444444" : "#cccccc",
+      backgroundColor: Colors[colorScheme].handleIndicator,
     },
     contentContainer: {
       flex: 1,
@@ -259,7 +259,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       elevation: 8,
     },
     recordingButton: {
-      backgroundColor: "#FF4444",
+      backgroundColor: Colors[colorScheme].isRecording,
       transform: [{ scale: 0.98 }],
     },
     buttonContent: {
@@ -270,7 +270,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       width: 64,
       height: 64,
       borderRadius: 32,
-      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      backgroundColor: Colors[colorScheme].buttonOverlay,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -278,7 +278,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       width: 64,
       height: 64,
       borderRadius: 32,
-      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      backgroundColor: Colors[colorScheme].buttonOverlay,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -289,13 +289,13 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderRadius: 4,
     },
     buttonText: {
-      color: "white",
+      color: colorScheme === "dark" ? "#000" : "#fff",
       fontSize: 18,
       fontWeight: "700",
       textAlign: "center",
     },
     buttonSubtext: {
-      color: "rgba(255, 255, 255, 0.8)",
+      color: Colors[colorScheme].buttonSubtext,
       fontSize: 14,
       textAlign: "center",
     },
@@ -311,12 +311,12 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       width: 12,
       height: 12,
       borderRadius: 6,
-      backgroundColor: "#FF4444",
+      backgroundColor: Colors[colorScheme].isRecording,
     },
     recordingText: {
       fontSize: 14,
       fontWeight: "500",
-      color: "#FF4444",
+      color: Colors[colorScheme].isRecording,
     },
     tipsSection: {
       marginTop: "auto",
