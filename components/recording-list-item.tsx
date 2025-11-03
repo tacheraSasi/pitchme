@@ -1,10 +1,10 @@
 import { ThemedText } from "@/components/themed/themed-text";
 import { Colors } from "@/constants/theme";
-import useRecordingsStore, { RecordingItem } from "@/stores/recordingsStore";
+import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import * as FileSystem from "expo-file-system";
 import { Alert, Pressable, View } from "react-native";
-import * as FileSystem  from "expo-file-system";
 
 export function RecordingListItem({
   recording,
