@@ -2,6 +2,8 @@ import AboutBottomSheet from "@/components/about-bottom-sheet";
 import BottomSheet from "@gorhom/bottom-sheet";
 import React from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Toaster } from "sonner-native";
+
 
 interface ScreenLayoutProps {
   styles: object;
@@ -16,6 +18,7 @@ const ScreenLayout = ({
   return (
     <GestureHandlerRootView style={styles}>
       {children}
+      <Toaster />
       <AboutBottomSheet bottomSheetRef={aboutBottomSheetRef} />
     </GestureHandlerRootView>
   );

@@ -14,7 +14,8 @@ import {
 } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Animated, Pressable, StyleSheet, View } from "react-native";
+import { Animated, Pressable, StyleSheet, View } from "react-native";
+import { toast } from "sonner-native";
 
 interface RecordModalProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -49,10 +50,7 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
         // Request recording permissions
         const { granted } = await requestRecordingPermissionsAsync();
         if (!granted) {
-          Alert.alert(
-            "Permission required",
-            "Microphone access is required to record audio."
-          );
+          toast.error("Microphone access is required to record audio.");
           return;
         }
 
@@ -64,7 +62,7 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
         });
       } catch (error) {
         console.error("Error setting up audio:", error);
-        Alert.alert("Error", "Failed to setup audio recording.");
+        toast.error("Failed to setup audio recording.");
       }
     };
 
@@ -109,7 +107,7 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
       setIsRecording(true);
     } catch (error) {
       console.error("Error starting recording:", error);
-      Alert.alert("Error", "Failed to start recording.");
+      toast.error("Failed to start recording.");
     }
   };
 
@@ -119,11 +117,9 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
       setIsRecording(false);
 
       if (audioRecorder.uri) {
-        // Generate unique name
         const timestamp = Date.now();
         const fileName = `pitchme_recording_${timestamp}.m4a`;
 
-        // Create or reference the "pitchme" folder in the document directory
         const recordingsDir = new FileSystem.Directory(
           FileSystem.Paths.document,
           "pitchme"
@@ -144,17 +140,11 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
           uri: destFile.uri,
           durationMillis: recorderState?.durationMillis ?? 0,
         });
-
-        Alert.alert("Success", "Your musical idea has been captured!", [
-          {
-            text: "OK",
-            onPress: () => bottomSheetRef.current?.close(),
-          },
-        ]);
+        toast.success("Your musical idea has been captured!");
       }
     } catch (error) {
       console.error("Error saving recording:", error);
-      Alert.alert("Error", "Failed to save recording.");
+      toast.error("Failed to save recording.");
     }
   };
 
