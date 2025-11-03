@@ -12,6 +12,7 @@ import {
   PanGestureHandlerGestureEvent,
   State,
 } from "react-native-gesture-handler";
+import * as Haptics from "expo-haptics";
 
 export function RecordingListItem({
   recording,
@@ -82,6 +83,7 @@ export function RecordingListItem({
   };
 
   const handleDeleteRecording = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
       "Delete Recording",
       `Are you sure you want to delete "${recording.title}"? This action cannot be undone.`,
@@ -135,7 +137,6 @@ export function RecordingListItem({
     <View style={swipeStyles.container}>
       {/* Delete Background */}
       <View style={swipeStyles.deleteBackground}>
-        {/* <ThemedText style={swipeStyles.deleteText}>Delete</ThemedText> */}
         <Entypo
           name="trash"
           size={20}
@@ -208,18 +209,20 @@ const swipeStyles = StyleSheet.create({
     overflow: "hidden",
   },
   deleteBackground: {
+    display: "flex",
     position: "absolute",
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: "#6e6363ff",
     justifyContent: "center",
     alignItems: "flex-end",
     paddingRight: 24,
     flexDirection: "row",
   },
   deleteIcon: {
+    display: "flex",
+    alignSelf:"flex-end",
     marginLeft: 8,
     right: 0,
   },
