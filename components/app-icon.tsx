@@ -5,7 +5,7 @@ import { Image, StyleSheet } from "react-native";
 interface AppIconProps {
   backgroundColor?: string;
 }
-const iconSource = require("../assets/images/icon.png");
+const iconSource = require("../assets/images/app-icon.png");
 const AppIcon = ({ backgroundColor }: AppIconProps) => {
   return (
     <ThemedView>
