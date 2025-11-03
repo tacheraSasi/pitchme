@@ -1,9 +1,10 @@
 import { ThemedText } from "@/components/themed/themed-text";
 import { Colors } from "@/constants/theme";
-import { RecordingItem } from "@/stores/recordingsStore";
+import useRecordingsStore, { RecordingItem } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
+import * as FileSystem  from "expo-file-system";
 
 export function RecordingListItem({
   recording,
@@ -20,6 +21,7 @@ export function RecordingListItem({
 }) {
   const audioPlayer = useAudioPlayer({ uri: recording.uri });
   const playerStatus = useAudioPlayerStatus(audioPlayer);
+  const { removeRecording } = useRecordingsStore();
 
   const togglePlayback = () => {
     if (playerStatus.playing) {
@@ -31,6 +33,33 @@ export function RecordingListItem({
       }
       audioPlayer.play();
     }
+  };
+
+  const handleDeleteRecording = (recording: RecordingItem) => {
+    Alert.alert(
+      "Delete Recording",
+      "Are you sure you want to delete this recording?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // Delete the file using the File class
+              const file = new FileSystem.File(recording.uri);
+              file.delete();
+
+              // Remove from store
+              await removeRecording(recording.id);
+            } catch (error) {
+              console.error("Error deleting recording:", error);
+              Alert.alert("Error", "Failed to delete recording.");
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
