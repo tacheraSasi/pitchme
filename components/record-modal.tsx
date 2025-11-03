@@ -270,7 +270,10 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       width: 64,
       height: 64,
       borderRadius: 32,
-      backgroundColor: Colors[colorScheme].buttonOverlay,
+      backgroundColor:
+        colorScheme === "light"
+          ? Colors[colorScheme].buttonOverlay
+          : Colors.light.tint,
       alignItems: "center",
       justifyContent: "center",
     },
