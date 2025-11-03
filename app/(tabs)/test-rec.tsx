@@ -1,21 +1,21 @@
-import { View, StyleSheet, Pressable, ScrollView, Alert } from "react-native";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useRecordingsStore, RecordingItem } from "@/stores/recordingsStore";
+import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import {
-  useAudioRecorder,
-  useAudioRecorderState,
   RecordingPresets,
-  setAudioModeAsync,
   requestRecordingPermissionsAsync,
+  setAudioModeAsync,
   useAudioPlayer,
   useAudioPlayerStatus,
+  useAudioRecorder,
+  useAudioRecorderState,
 } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import { useEffect, useState } from "react";
+import { Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 export default function RecordingsScreen() {
   const colorScheme = useColorScheme();
@@ -78,8 +78,9 @@ const stopRecording = async () => {
       const timestamp = Date.now();
       const fileName = `pitchme_recording_${timestamp}.m4a`;
 
-      // Create or reference the "recordings" folder in the document directory
-      const recordingsDir = new FileSystem.Directory(FileSystem.Paths.document, "pitchme/ideas");
+      // Create or reference the "pitchme/ideas" folder in the document directory
+      const recordingsDir = new FileSystem.Directory(FileSystem.Paths.document, "pitchme");
+      console.log("rec dir",recordingsDir)
       if (!recordingsDir.exists) {
         recordingsDir.create();
       }
@@ -91,6 +92,7 @@ const stopRecording = async () => {
       const tempFile = new FileSystem.File(audioRecorder.uri);
       tempFile.move(destFile);
 
+      // Get info about the saved file
       const info = destFile.info();
       console.log("Saved recording:", info);
 
@@ -116,32 +118,32 @@ const stopRecording = async () => {
     }
   };
 
-const handleDeleteRecording = (recording: RecordingItem) => {
-  Alert.alert(
-    "Delete Recording",
-    "Are you sure you want to delete this recording?",
-    [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            // Delete the file using the File class
-            const file = new FileSystem.File(recording.uri);
-            file.delete();
+  const handleDeleteRecording = (recording: RecordingItem) => {
+    Alert.alert(
+      "Delete Recording",
+      "Are you sure you want to delete this recording?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // Delete the file using the File class
+              const file = new FileSystem.File(recording.uri);
+              file.delete();
 
-            // Remove from store
-            await removeRecording(recording.id);
-          } catch (error) {
-            console.error("Error deleting recording:", error);
-            Alert.alert("Error", "Failed to delete recording.");
-          }
+              // Remove from store
+              await removeRecording(recording.id);
+            } catch (error) {
+              console.error("Error deleting recording:", error);
+              Alert.alert("Error", "Failed to delete recording.");
+            }
+          },
         },
-      },
-    ]
-  );
-};
+      ]
+    );
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -295,11 +297,7 @@ function RecordingListItem({
       </View>
 
       <Pressable style={styles.deleteButton} onPress={onDelete}>
-        <Entypo
-          name="trash"
-          size={20}
-          color="red"
-        />
+        <Entypo name="trash" size={20} color="red" />
       </Pressable>
     </ThemedView>
   );
