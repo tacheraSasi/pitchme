@@ -129,42 +129,13 @@ export function RecordingListItem({
     );
   };
 
-  const swipeStyles = StyleSheet.create({
-    container: {
-      marginBottom: 12,
-      borderRadius: 16,
-      overflow: "hidden",
-    },
-    deleteBackground: {
-      position: "absolute",
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      backgroundColor: "#FF3B30",
-      justifyContent: "center",
-      alignItems: "flex-end",
-      paddingRight: 24,
-      flexDirection: "row",
-    },
-    deleteIcon: {
-      marginLeft: 8,
-    },
-    deleteText: {
-      color: "white",
-      fontWeight: "700",
-      fontSize: 16,
-    },
-    itemContainer: {
-      backgroundColor: "transparent",
-    },
-  });
+  
 
   return (
     <View style={swipeStyles.container}>
       {/* Delete Background */}
       <View style={swipeStyles.deleteBackground}>
-        <ThemedText style={swipeStyles.deleteText}>Delete</ThemedText>
+        {/* <ThemedText style={swipeStyles.deleteText}>Delete</ThemedText> */}
         <Entypo
           name="trash"
           size={20}
@@ -229,3 +200,30 @@ export function RecordingListItem({
     </View>
   );
 }
+
+const swipeStyles = StyleSheet.create({
+  container: {
+    marginBottom: 12,
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  deleteBackground: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "#6e6363ff",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingRight: 24,
+    flexDirection: "row",
+  },
+  deleteIcon: {
+    marginLeft: 8,
+    right: 0,
+  },
+  itemContainer: {
+    backgroundColor: "transparent",
+  },
+});
