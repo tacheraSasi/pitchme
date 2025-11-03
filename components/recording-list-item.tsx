@@ -202,7 +202,7 @@ export function RecordingListItem({
                 playerStatus.playing ? "controller-paus" : "controller-play"
               }
               size={18}
-              color={isDark ? "#7B6AE0" : Colors.light.tint}
+              color={isDark ? Colors.dark.tint : Colors.light.tint}
             />
           </Pressable>
         </Animated.View>

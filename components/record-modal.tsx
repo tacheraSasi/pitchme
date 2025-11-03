@@ -370,7 +370,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       textAlign: "center",
     },
     buttonSubtext: {
-      color: Colors[colorScheme].buttonSubtext,
+      color: Colors.light.buttonSubtext,
       fontSize: 14,
       textAlign: "center",
     },
