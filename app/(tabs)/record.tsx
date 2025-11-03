@@ -12,8 +12,8 @@ import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRef } from "react";
 import { FlatList, Pressable, StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 export default function RecordScreen() {
   const colorScheme = useColorScheme();
@@ -23,8 +23,6 @@ export default function RecordScreen() {
 
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
-
-
 
   return (
     <ScreenLayout
@@ -76,22 +74,24 @@ export default function RecordScreen() {
                 </ThemedText>
               </ThemedView>
             ) : (
-              <FlatList
-                data={recordings}
-                renderItem={({ item }) => (
-                  <RecordingListItem
-                    recording={item}
-                    formatTime={formatTime}
-                    formatDate={formatDate}
-                    colorScheme={colorScheme ?? "light"}
-                    styles={styles}
-                  />
-                )}
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.listContent}
-                style={{ flex: 1 }}
-              />
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <FlatList
+                  data={recordings}
+                  renderItem={({ item }) => (
+                    <RecordingListItem
+                      recording={item}
+                      formatTime={formatTime}
+                      formatDate={formatDate}
+                      colorScheme={colorScheme ?? "light"}
+                      styles={styles}
+                    />
+                  )}
+                  keyExtractor={(item) => item.id}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={styles.listContent}
+                  style={{ flex: 1 }}
+                />
+              </GestureHandlerRootView>
             )}
           </ThemedView>
         </SafeAreaView>
@@ -169,7 +169,6 @@ export const getStyles = (colorScheme: "light" | "dark" = "light") =>
       flexDirection: "row",
       alignItems: "center",
       padding: 16,
-      marginBottom: 12,
       borderRadius: 12,
       backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#f8f9fa",
       borderWidth: 1,

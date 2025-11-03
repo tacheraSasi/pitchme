@@ -5,7 +5,13 @@ import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
-import { Alert, Pressable, View } from "react-native";
+import { useRef } from "react";
+import { Alert, Animated, Pressable, StyleSheet, View } from "react-native";
+import {
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+  State,
+} from "react-native-gesture-handler";
 
 export function RecordingListItem({
   recording,
@@ -24,11 +30,17 @@ export function RecordingListItem({
   const playerStatus = useAudioPlayerStatus(player);
   const { removeRecording } = useRecordingsStore();
 
+  // Animation values
+  const translateX = useRef(new Animated.Value(0)).current;
+  const panRef = useRef(null);
+  const isDark = colorScheme === "dark";
+
+  const SWIPE_THRESHOLD = -80;
+
   const togglePlayback = async () => {
     if (playerStatus.playing) {
       await pause();
     } else {
-      // restart if ended
       if (playerStatus.currentTime >= playerStatus.duration) {
         player.seekTo(0);
       }
@@ -36,26 +48,80 @@ export function RecordingListItem({
     }
   };
 
-  const handleDeleteRecording = (recording: RecordingItem) => {
+  const onPanGestureEvent = (event: PanGestureHandlerGestureEvent) => {
+    const { translationX } = event.nativeEvent;
+
+    if (translationX <= 0) {
+      translateX.setValue(translationX);
+    }
+  };
+
+  const onPanHandlerStateChange = (event: PanGestureHandlerGestureEvent) => {
+    const { translationX, state } = event.nativeEvent;
+
+    if (state === State.END) {
+      if (translationX <= SWIPE_THRESHOLD) {
+        // Swipe far enough - animate and show delete confirmation
+        Animated.timing(translateX, {
+          toValue: -200,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => {
+          handleDeleteRecording();
+        });
+      } else {
+        // Return to original position
+        Animated.spring(translateX, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: 100,
+          friction: 8,
+        }).start();
+      }
+    }
+  };
+
+  const handleDeleteRecording = () => {
     Alert.alert(
       "Delete Recording",
-      "Are you sure you want to delete this recording?",
+      `Are you sure you want to delete "${recording.title}"? This action cannot be undone.`,
       [
-        { text: "Cancel", style: "cancel" },
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {
+            Animated.spring(translateX, {
+              toValue: 0,
+              useNativeDriver: true,
+            }).start();
+          },
+        },
         {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
             try {
-              // Delete the file using the File class
-              const file = new FileSystem.File(recording.uri);
-              file.delete();
-
-              // Remove from store
-              await removeRecording(recording.id);
+              // Animate out before deleting
+              Animated.timing(translateX, {
+                toValue: -500,
+                duration: 300,
+                useNativeDriver: true,
+              }).start(async () => {
+                try {
+                  const file = new FileSystem.File(recording.uri);
+                  await file.delete();
+                  await removeRecording(recording.id);
+                } catch (error) {
+                  console.error("Error deleting recording:", error);
+                  Alert.alert("Error", "Failed to delete recording.");
+                }
+              });
             } catch (error) {
-              console.error("Error deleting recording:", error);
-              Alert.alert("Error", "Failed to delete recording.");
+              console.error("Error in delete animation:", error);
+              Animated.spring(translateX, {
+                toValue: 0,
+                useNativeDriver: true,
+              }).start();
             }
           },
         },
@@ -63,31 +129,103 @@ export function RecordingListItem({
     );
   };
 
+  const swipeStyles = StyleSheet.create({
+    container: {
+      marginBottom: 12,
+      borderRadius: 16,
+      overflow: "hidden",
+    },
+    deleteBackground: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      backgroundColor: "#FF3B30",
+      justifyContent: "center",
+      alignItems: "flex-end",
+      paddingRight: 24,
+      flexDirection: "row",
+    },
+    deleteIcon: {
+      marginLeft: 8,
+    },
+    deleteText: {
+      color: "white",
+      fontWeight: "700",
+      fontSize: 16,
+    },
+    itemContainer: {
+      backgroundColor: "transparent",
+    },
+  });
+
   return (
-    <Pressable style={styles.ideaItem}>
-      <View style={styles.ideaIconContainer}>
-        <Entypo name="sound-mix" size={20} color={styles.ideaIcon.color} />
-      </View>
-      <View style={styles.ideaContent}>
-        <ThemedText style={styles.ideaTitle} numberOfLines={1}>
-          {recording.title}
-        </ThemedText>
-        <View style={styles.ideaMetadata}>
-          <ThemedText style={styles.ideaDuration}>
-            {formatTime(recording.durationMillis)}
-          </ThemedText>
-          <ThemedText style={styles.ideaDate}>
-            {formatDate(recording.date)}
-          </ThemedText>
-        </View>
-      </View>
-      <Pressable style={styles.playButton} onPress={togglePlayback}>
+    <View style={swipeStyles.container}>
+      {/* Delete Background */}
+      <View style={swipeStyles.deleteBackground}>
+        <ThemedText style={swipeStyles.deleteText}>Delete</ThemedText>
         <Entypo
-          name={playerStatus.playing ? "controller-paus" : "controller-play"}
-          size={16}
-          color={Colors[colorScheme].tint}
+          name="trash"
+          size={20}
+          color="white"
+          style={swipeStyles.deleteIcon}
         />
-      </Pressable>
-    </Pressable>
+      </View>
+
+      {/* Swipeable Item */}
+      <PanGestureHandler
+        ref={panRef}
+        onGestureEvent={onPanGestureEvent}
+        onHandlerStateChange={onPanHandlerStateChange}
+        activeOffsetX={[-10, 10]}
+        minPointers={1}
+      >
+        <Animated.View
+          style={[
+            styles.ideaItem,
+            swipeStyles.itemContainer,
+            {
+              transform: [{ translateX }],
+              marginBottom: 0, // Handled by container
+            },
+          ]}
+        >
+          <Pressable style={styles.ideaIconContainer}>
+            <Entypo name="sound-mix" size={22} color="white" />
+          </Pressable>
+
+          <View style={styles.ideaContent}>
+            <ThemedText style={styles.ideaTitle} numberOfLines={1}>
+              {recording.title}
+            </ThemedText>
+            <View style={styles.ideaMetadata}>
+              <ThemedText style={styles.ideaDuration}>
+                {formatTime(recording.durationMillis)}
+              </ThemedText>
+              <ThemedText style={styles.ideaDate}>
+                {formatDate(recording.date)}
+              </ThemedText>
+            </View>
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.playButton,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={togglePlayback}
+          >
+            <Entypo
+              name={
+                playerStatus.playing ? "controller-paus" : "controller-play"
+              }
+              size={18}
+              color={isDark ? "#7B6AE0" : Colors.light.tint}
+            />
+          </Pressable>
+        </Animated.View>
+      </PanGestureHandler>
+    </View>
   );
 }
