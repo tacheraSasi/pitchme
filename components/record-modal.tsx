@@ -4,8 +4,8 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useCallback, useMemo, useState } from "react";
-import { Alert, Pressable, StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { Alert, Pressable, StyleSheet, View, Animated } from "react-native";
 
 interface RecordModalProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -13,9 +13,11 @@ interface RecordModalProps {
 
 const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
   const colorScheme = useColorScheme();
-  const [isRecordingNote, setIsRecordingNote] = useState(false);
-  const [isRecordingIdea, setIsRecordingIdea] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [recordingProgress, setRecordingProgress] = useState(0);
+  const [waveformAnimations] = useState(() =>
+    Array.from({ length: 20 }, () => new Animated.Value(0.3))
+  );
 
   const styles = getStyles(colorScheme ?? "light");
 
@@ -27,45 +29,59 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
     console.log("handleSheetChanges", index);
   }, []);
 
-  const handleRecordNote = () => {
-    if (isRecordingNote) {
-      setIsRecordingNote(false);
-      setRecordingProgress(0);
-      Alert.alert("Recording Stopped", "Your custom note has been saved!");
+  // Waveform animation
+  useEffect(() => {
+    if (isRecording) {
+      const animations = waveformAnimations.map((anim, index) =>
+        Animated.loop(
+          Animated.sequence([
+            Animated.delay(index * 50),
+            Animated.timing(anim, {
+              toValue: 0.8 + Math.random() * 0.2,
+              duration: 300,
+              useNativeDriver: true,
+            }),
+            Animated.timing(anim, {
+              toValue: 0.3 + Math.random() * 0.3,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+          ])
+        )
+      );
+
+      animations.forEach((anim) => anim.start());
+
+      return () => {
+        animations.forEach((anim) => anim.stop());
+      };
     } else {
-      setIsRecordingNote(true);
-      Alert.alert("Recording Started", "Recording your custom note...");
-      // Simulate recording progress
-      const interval = setInterval(() => {
-        setRecordingProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 500);
+      waveformAnimations.forEach((anim) => anim.setValue(0.3));
     }
-  };
+  }, [isRecording]);
 
   const handleRecordIdea = () => {
-    if (isRecordingIdea) {
-      setIsRecordingIdea(false);
+    if (isRecording) {
+      setIsRecording(false);
       setRecordingProgress(0);
-      Alert.alert("Recording Stopped", "Your music idea has been saved!");
+      Alert.alert("Recording Saved", "Your musical idea has been captured!");
     } else {
-      setIsRecordingIdea(true);
-      Alert.alert("Recording Started", "Recording your music idea...");
+      setIsRecording(true);
       // Simulate recording progress
       const interval = setInterval(() => {
         setRecordingProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
+            setIsRecording(false);
+            Alert.alert(
+              "Recording Complete",
+              "Your musical idea has been saved!"
+            );
             return 100;
           }
-          return prev + 10;
+          return prev + 2;
         });
-      }, 500);
+      }, 100);
     }
   };
 
@@ -87,7 +103,7 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
       <BottomSheetView style={styles.contentContainer}>
         <ThemedView style={styles.header}>
           <ThemedText type="subtitle" style={styles.modalTitle}>
-            Start Recording
+            Record Musical Idea
           </ThemedText>
           <Pressable onPress={closeModal} style={styles.closeButton}>
             <Entypo
@@ -100,84 +116,74 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
 
         <ThemedView style={styles.recordingSection}>
           <ThemedText style={styles.sectionDescription}>
-            Choose what you want to record
+            Capture your musical inspiration - melodies, rhythms, or harmonies
           </ThemedText>
 
-          <View style={styles.recordingButtons}>
-            <Pressable
-              style={[
-                styles.recordButton,
-                styles.noteButton,
-                isRecordingNote && styles.recordingButton,
-              ]}
-              onPress={handleRecordNote}
-            >
-              <Entypo
-                name={isRecordingNote ? "controller-stop" : "mic"}
-                size={28}
-                color="white"
+          {/* Waveform Visualization */}
+          <View style={styles.waveformContainer}>
+            {waveformAnimations.map((animation, index) => (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.waveformBar,
+                  {
+                    backgroundColor: isRecording
+                      ? "#FF6B6B"
+                      : Colors[colorScheme ?? "light"].tint,
+                    transform: [
+                      {
+                        scaleY: isRecording ? animation : 0.3,
+                      },
+                    ],
+                  },
+                ]}
               />
-              <ThemedText style={styles.buttonText}>
-                {isRecordingNote ? "Stop Recording" : "Record Note"}
-              </ThemedText>
-              <ThemedText style={styles.buttonSubtext}>
-                Custom musical note
-              </ThemedText>
-            </Pressable>
-
-            <Pressable
-              style={[
-                styles.recordButton,
-                styles.ideaButton,
-                isRecordingIdea && styles.recordingButton,
-              ]}
-              onPress={handleRecordIdea}
-            >
-              <Entypo
-                name={isRecordingIdea ? "controller-stop" : "sound-mix"}
-                size={28}
-                color="white"
-              />
-              <ThemedText style={styles.buttonText}>
-                {isRecordingIdea ? "Stop Recording" : "Record Idea"}
-              </ThemedText>
-              <ThemedText style={styles.buttonSubtext}>
-                Musical idea or melody
-              </ThemedText>
-            </Pressable>
+            ))}
           </View>
 
+          {/* Recording Button */}
+          <Pressable
+            style={[styles.recordButton, isRecording && styles.recordingButton]}
+            onPress={handleRecordIdea}
+          >
+            <View style={styles.buttonContent}>
+              {isRecording ? (
+                <View style={styles.stopIcon}>
+                  <View style={styles.stopSquare} />
+                </View>
+              ) : (
+                <View style={styles.micIcon}>
+                  <Entypo name="mic" size={32} color="white" />
+                </View>
+              )}
+              <ThemedText style={styles.buttonText}>
+                {isRecording ? "Stop Recording" : "Start Recording"}
+              </ThemedText>
+              <ThemedText style={styles.buttonSubtext}>
+                {isRecording
+                  ? "Tap to save your idea"
+                  : "Tap to capture musical inspiration"}
+              </ThemedText>
+            </View>
+          </Pressable>
+
           {/* Recording Status */}
-          {(isRecordingNote || isRecordingIdea) && (
+          {isRecording && (
             <View style={styles.statusContainer}>
               <View style={styles.recordingIndicator} />
               <ThemedText style={styles.recordingText}>
-                Recording in progress... {recordingProgress}%
+                Recording... {recordingProgress}%
               </ThemedText>
-            </View>
-          )}
-
-          {/* Recording Progress Bar */}
-          {(isRecordingNote || isRecordingIdea) && (
-            <View style={styles.progressContainer}>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    { width: `${recordingProgress}%` },
-                  ]}
-                />
-              </View>
             </View>
           )}
         </ThemedView>
 
         <ThemedView style={styles.tipsSection}>
-          <ThemedText style={styles.tipsTitle}>💡 Recording Tips</ThemedText>
+          <ThemedText style={styles.tipsTitle}>🎵 Musical Tips</ThemedText>
           <ThemedText style={styles.tipsText}>
-            • Hold your device close to the sound source{"\n"}• Record in a
-            quiet environment{"\n"}• Keep recordings under 2 minutes for best
-            results
+            • Hum or sing your melody clearly{"\n"}• Use instruments for better
+            quality{"\n"}• Record in a quiet space for clean audio{"\n"}• Keep
+            ideas under 30 seconds for quick capture
           </ThemedText>
         </ThemedView>
       </BottomSheetView>
@@ -213,54 +219,93 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     },
     recordingSection: {
       marginBottom: 32,
+      alignItems: "center",
     },
     sectionDescription: {
       fontSize: 16,
       opacity: 0.7,
       textAlign: "center",
-      marginBottom: 24,
+      marginBottom: 32,
       color: Colors[colorScheme].text,
     },
-    recordingButtons: {
-      gap: 16,
-      marginBottom: 20,
-    },
-    recordButton: {
-      flexDirection: "column",
+    waveformContainer: {
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+      height: 80,
+      marginBottom: 32,
+      gap: 3,
+    },
+    waveformBar: {
+      width: 4,
+      height: 40,
+      borderRadius: 2,
+      marginHorizontal: 1,
+    },
+    recordButton: {
+      width: "100%",
+      maxWidth: 280,
+      backgroundColor: Colors[colorScheme].tint,
+      borderRadius: 20,
       paddingVertical: 24,
       paddingHorizontal: 20,
-      borderRadius: 16,
-      gap: 8,
-    },
-    noteButton: {
-      backgroundColor:
-        colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
-    },
-    ideaButton: {
-      backgroundColor: colorScheme === "dark" ? "#E85A4F" : "#FF6B6B",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+      elevation: 8,
     },
     recordingButton: {
       backgroundColor: "#FF4444",
+      transform: [{ scale: 0.98 }],
+    },
+    buttonContent: {
+      alignItems: "center",
+      gap: 12,
+    },
+    micIcon: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    stopIcon: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    stopSquare: {
+      width: 24,
+      height: 24,
+      backgroundColor: "white",
+      borderRadius: 4,
     },
     buttonText: {
       color: "white",
-      fontSize: 16,
-      fontWeight: "600",
+      fontSize: 18,
+      fontWeight: "700",
       textAlign: "center",
     },
     buttonSubtext: {
       color: "rgba(255, 255, 255, 0.8)",
-      fontSize: 12,
+      fontSize: 14,
       textAlign: "center",
     },
     statusContainer: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 12,
+      paddingVertical: 16,
       gap: 12,
+      marginTop: 16,
     },
     recordingIndicator: {
       width: 12,
@@ -272,21 +317,6 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 14,
       fontWeight: "500",
       color: "#FF4444",
-    },
-    progressContainer: {
-      paddingHorizontal: 20,
-      marginTop: 8,
-    },
-    progressBar: {
-      height: 4,
-      backgroundColor: colorScheme === "dark" ? "#333333" : "#e0e0e0",
-      borderRadius: 2,
-      overflow: "hidden",
-    },
-    progressFill: {
-      height: "100%",
-      backgroundColor: "#FF4444",
-      borderRadius: 2,
     },
     tipsSection: {
       marginTop: "auto",
