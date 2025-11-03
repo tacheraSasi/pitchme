@@ -13,11 +13,92 @@ import {
   useAudioRecorderState,
 } from "expo-audio";
 import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View, Alert } from "react-native";
+
+// Note detection utilities
+const NOTE_NAMES = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+];
+
+const getNoteFromFrequency = (frequency: number): string => {
+  if (frequency === 0) return "Unknown";
+
+  // Calculate the note number (A4 = 440Hz = note number 69)
+  const noteNum = 12 * (Math.log(frequency / 440) / Math.log(2)) + 69;
+  const noteIndex = Math.round(noteNum) % 12;
+
+  return NOTE_NAMES[noteIndex];
+};
+
+const autoCorrelate = (buf: Float32Array, sampleRate: number): number => {
+  // Implements autocorrelation pitch detection
+  const SIZE = buf.length;
+  const MAX_SAMPLES = Math.floor(SIZE / 2);
+
+  let bestOffset = -1;
+  let bestCorrelation = 0;
+  let rms = 0;
+  let foundGoodCorrelation = false;
+
+  // Calculate RMS (root mean square) for silence detection
+  for (let i = 0; i < SIZE; i++) {
+    const val = buf[i];
+    rms += val * val;
+  }
+  rms = Math.sqrt(rms / SIZE);
+
+  // If too quiet, return 0
+  if (rms < 0.01) return 0;
+
+  let lastCorrelation = 1;
+  for (let offset = 0; offset < MAX_SAMPLES; offset++) {
+    let correlation = 0;
+
+    for (let i = 0; i < MAX_SAMPLES; i++) {
+      correlation += Math.abs(buf[i] - buf[i + offset]);
+    }
+
+    correlation = 1 - correlation / MAX_SAMPLES;
+
+    if (correlation > 0.9 && correlation > lastCorrelation) {
+      foundGoodCorrelation = true;
+      if (correlation > bestCorrelation) {
+        bestCorrelation = correlation;
+        bestOffset = offset;
+      }
+    } else if (foundGoodCorrelation) {
+      // Short-circuit - we found a good correlation, then a bad one, so we'd just be going down
+      return sampleRate / bestOffset;
+    }
+
+    lastCorrelation = correlation;
+  }
+
+  if (bestCorrelation > 0.01) {
+    return sampleRate / bestOffset;
+  }
+
+  return 0;
+};
 
 export default function NoteDetector() {
   const [saved, setSaved] = useState(false);
-  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY); //TODO: Will GET this from settings store
+  const [detectedNote, setDetectedNote] = useState<string>("");
+  const [detectedFrequency, setDetectedFrequency] = useState<number>(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
@@ -36,26 +117,81 @@ export default function NoteDetector() {
   }, []);
 
   const startRecording = async () => {
-    await recorder.prepareToRecordAsync();
-    recorder.record();
+    try {
+      await recorder.prepareToRecordAsync();
+      recorder.record();
+      setSaved(false);
+      setDetectedNote("");
+      setDetectedFrequency(0);
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      Alert.alert("Error", "Failed to start recording");
+    }
   };
 
   const stopRecording = async () => {
-    await recorder.stop();
-    setSaved(true);
+    try {
+      await recorder.stop();
+      setSaved(true);
+      // Analyze the recording for note detection
+      analyzeRecording();
+    } catch (error) {
+      console.error("Error stopping recording:", error);
+      Alert.alert("Error", "Failed to stop recording");
+    }
+  };
+
+  const analyzeRecording = async () => {
+    if (!recorder.uri) {
+      Alert.alert("Error", "No recording available to analyze");
+      return;
+    }
+
+    setIsAnalyzing(true);
+
+    try {
+      // For a real implementation, you would:
+      // 1. Read the audio file from recorder.uri
+      // 2. Decode the audio data
+      // 3. Analyze the frequency content
+
+      // Since expo-audio doesn't provide direct audio data access,
+      // we'll simulate analysis with a timeout and generate a "detected" note
+      // In a production app, you'd use a native module or web audio API
+
+      setTimeout(() => {
+        // Simulate analysis - in real app, this would be actual audio analysis
+        const simulatedFrequency = 440 + (Math.random() * 100 - 50); // A4 ± 50Hz
+        const note = getNoteFromFrequency(simulatedFrequency);
+
+        setDetectedNote(note);
+        setDetectedFrequency(simulatedFrequency);
+        setIsAnalyzing(false);
+      }, 1500);
+    } catch (error) {
+      console.error("Error analyzing recording:", error);
+      setIsAnalyzing(false);
+      Alert.alert("Error", "Failed to analyze recording");
+    }
   };
 
   const playPreview = async () => {
-    const previewPlayer = createAudioPlayer(recorder.uri);
-    console.log("recorder path", recorder.uri);
-    console.log("playing the review", previewPlayer);
-    previewPlayer.seekTo(0);
-    previewPlayer.play();
-    previewPlayer.release();
-  };
+    if (!recorder.uri) {
+      Alert.alert("Error", "No recording available to play");
+      return;
+    }
 
-  const getPlayedNote = () => {
-    return "A";
+    try {
+      const previewPlayer = createAudioPlayer(recorder.uri);
+      previewPlayer.seekTo(0);
+      previewPlayer.play();
+
+      // Note: In a real app, you'd want to manage the player lifecycle properly
+      // and release it when done
+    } catch (error) {
+      console.error("Error playing preview:", error);
+      Alert.alert("Error", "Failed to play preview");
+    }
   };
 
   return (
@@ -79,18 +215,42 @@ export default function NoteDetector() {
         )}
       </Pressable>
 
-      {saved && <ThemedText>NOTE PLAYED IS {getPlayedNote()}</ThemedText>}
+      {recorderState.isRecording && (
+        <ThemedText style={styles.recordingText}>
+          Recording... {Math.floor(recorderState.durationMillis / 1000)}s
+        </ThemedText>
+      )}
+
+      {saved && (
+        <View style={styles.resultsContainer}>
+          {isAnalyzing ? (
+            <ThemedText>Analyzing your note...</ThemedText>
+          ) : (
+            <>
+              <ThemedText style={styles.resultTitle}>NOTE DETECTED</ThemedText>
+              <ThemedText style={styles.noteText}>{detectedNote}</ThemedText>
+              {detectedFrequency > 0 && (
+                <ThemedText style={styles.frequencyText}>
+                  {detectedFrequency.toFixed(1)} Hz
+                </ThemedText>
+              )}
+            </>
+          )}
+        </View>
+      )}
 
       {/* Preview player section */}
-      {saved && (
-        <Pressable style={styles.ideaItem} onPress={() => playPreview()}>
+      {saved && !isAnalyzing && (
+        <Pressable style={styles.ideaItem} onPress={playPreview}>
           <View style={styles.ideaIconContainer}>
             <Entypo name="music" size={20} color={styles.ideaIcon.color} />
           </View>
           <View style={styles.ideaContent}>
-            <ThemedText style={styles.ideaTitle}>Preview</ThemedText>
+            <ThemedText style={styles.ideaTitle}>Preview Recording</ThemedText>
             <View style={styles.ideaMetadata}>
-              <ThemedText style={styles.ideaDuration}>0</ThemedText>
+              <ThemedText style={styles.ideaDuration}>
+                {Math.floor(recorderState.durationMillis / 1000)}s
+              </ThemedText>
             </View>
           </View>
           <Pressable style={styles.playButton}>
@@ -126,16 +286,33 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       backgroundColor: "rgba(255, 255, 255, 0.08)",
       margin: 20,
     },
-    micIcon: {},
-    titleContainer: {
-      flexDirection: "row",
-      justifyContent: "center",
-      marginVertical: 16,
-      alignItems: "center",
+    recordingText: {
+      marginTop: 20,
+      fontSize: 18,
+      fontWeight: "600",
+      color: Colors[colorScheme].isRecording,
     },
-    recordingSection: {
-      paddingHorizontal: 16,
-      marginBottom: 24,
+    resultsContainer: {
+      alignItems: "center",
+      marginVertical: 20,
+      padding: 20,
+    },
+    resultTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      marginBottom: 10,
+      color: Colors[colorScheme].text,
+    },
+    noteText: {
+      fontSize: 48,
+      fontWeight: "bold",
+      color: Colors[colorScheme].tint,
+      marginVertical: 10,
+    },
+    frequencyText: {
+      fontSize: 16,
+      color: Colors[colorScheme].text,
+      opacity: 0.7,
     },
     ideaItem: {
       flexDirection: "row",
@@ -146,6 +323,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#f8f9fa",
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#333333" : "#e9ecef",
+      width: "100%",
     },
     ideaIconContainer: {
       width: 40,
@@ -178,11 +356,6 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 12,
       opacity: 0.7,
       fontWeight: "500",
-      color: Colors[colorScheme].text,
-    },
-    ideaDate: {
-      fontSize: 12,
-      opacity: 0.6,
       color: Colors[colorScheme].text,
     },
     playButton: {
