@@ -13,6 +13,64 @@ import { useRef } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// Recording List Item Component
+function RecordingListItem({
+  recording,
+  formatTime,
+  formatDate,
+  colorScheme,
+  styles,
+}: {
+  recording: RecordingItem;
+  formatTime: (millis: number) => string;
+  formatDate: (dateString: string) => string;
+  colorScheme: "light" | "dark";
+  styles: any;
+}) {
+  const audioPlayer = useAudioPlayer({ uri: recording.uri });
+  const playerStatus = useAudioPlayerStatus(audioPlayer);
+
+  const togglePlayback = () => {
+    if (playerStatus.playing) {
+      audioPlayer.pause();
+    } else {
+      // If we're at the end, restart
+      if (playerStatus.currentTime >= playerStatus.duration) {
+        audioPlayer.seekTo(0);
+      }
+      audioPlayer.play();
+    }
+  };
+
+  return (
+    <Pressable style={styles.ideaItem}>
+      <View style={styles.ideaIconContainer}>
+        <Entypo name="sound-mix" size={20} color={styles.ideaIcon.color} />
+      </View>
+      <View style={styles.ideaContent}>
+        <ThemedText style={styles.ideaTitle} numberOfLines={1}>
+          {recording.title}
+        </ThemedText>
+        <View style={styles.ideaMetadata}>
+          <ThemedText style={styles.ideaDuration}>
+            {formatTime(recording.durationMillis)}
+          </ThemedText>
+          <ThemedText style={styles.ideaDate}>
+            {formatDate(recording.date)}
+          </ThemedText>
+        </View>
+      </View>
+      <Pressable style={styles.playButton} onPress={togglePlayback}>
+        <Entypo
+          name={playerStatus.playing ? "controller-paus" : "controller-play"}
+          size={16}
+          color={Colors[colorScheme].tint}
+        />
+      </Pressable>
+    </Pressable>
+  );
+}
+
 export default function RecordScreen() {
   const colorScheme = useColorScheme();
   const recordings = useRecordingsList();
@@ -39,52 +97,6 @@ export default function RecordScreen() {
     if (diffDays === 2) return "Yesterday";
     if (diffDays <= 7) return `${diffDays - 1} days ago`;
     return recordDate.toLocaleDateString();
-  };
-
-  const renderRecordedIdea = ({ item }: { item: RecordingItem }) => {
-    // Create audio player for this recording
-    const audioPlayer = useAudioPlayer({ uri: item.uri });
-    const playerStatus = useAudioPlayerStatus(audioPlayer);
-
-    const togglePlayback = () => {
-      if (playerStatus.playing) {
-        audioPlayer.pause();
-      } else {
-        // If we're at the end, restart
-        if (playerStatus.currentTime >= playerStatus.duration) {
-          audioPlayer.seekTo(0);
-        }
-        audioPlayer.play();
-      }
-    };
-
-    return (
-      <Pressable style={styles.ideaItem}>
-        <View style={styles.ideaIconContainer}>
-          <Entypo name="sound-mix" size={20} color={styles.ideaIcon.color} />
-        </View>
-        <View style={styles.ideaContent}>
-          <ThemedText style={styles.ideaTitle} numberOfLines={1}>
-            {item.title}
-          </ThemedText>
-          <View style={styles.ideaMetadata}>
-            <ThemedText style={styles.ideaDuration}>
-              {formatTime(item.durationMillis)}
-            </ThemedText>
-            <ThemedText style={styles.ideaDate}>
-              {formatDate(item.date)}
-            </ThemedText>
-          </View>
-        </View>
-        <Pressable style={styles.playButton} onPress={togglePlayback}>
-          <Entypo
-            name={playerStatus.playing ? "controller-paus" : "controller-play"}
-            size={16}
-            color={Colors[colorScheme ?? "light"].tint}
-          />
-        </Pressable>
-      </Pressable>
-    );
   };
 
   return (
@@ -118,16 +130,42 @@ export default function RecordScreen() {
 
           <ThemedView style={styles.listContainer}>
             <ThemedText style={styles.listTitle}>
-              Your Recordings ({RECORDED_IDEAS.length})
+              Your Recordings ({recordings.length})
             </ThemedText>
-            <FlatList
-              data={RECORDED_IDEAS}
-              renderItem={renderRecordedIdea}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.listContent}
-              style={{ flex: 1 }}
-            />
+            {recordings.length === 0 ? (
+              <ThemedView style={styles.emptyState}>
+                <Entypo
+                  name="sound-mix"
+                  size={48}
+                  color={Colors[colorScheme ?? "light"].icon}
+                  style={styles.emptyIcon}
+                />
+                <ThemedText style={styles.emptyText}>
+                  No recordings yet
+                </ThemedText>
+                <ThemedText style={styles.emptySubtext}>
+                  Tap &quot;Capture the Sound&quot; to record your first musical
+                  idea
+                </ThemedText>
+              </ThemedView>
+            ) : (
+              <FlatList
+                data={recordings}
+                renderItem={({ item }) => (
+                  <RecordingListItem
+                    recording={item}
+                    formatTime={formatTime}
+                    formatDate={formatDate}
+                    colorScheme={colorScheme ?? "light"}
+                    styles={styles}
+                  />
+                )}
+                keyExtractor={(item) => item.id}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.listContent}
+                style={{ flex: 1 }}
+              />
+            )}
           </ThemedView>
         </SafeAreaView>
 
@@ -257,5 +295,28 @@ export const getStyles = (colorScheme: "light" | "dark" = "light") =>
       justifyContent: "center",
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#444444" : "#e0e0e0",
+    },
+    emptyState: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 60,
+      paddingHorizontal: 20,
+    },
+    emptyIcon: {
+      opacity: 0.5,
+      marginBottom: 16,
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: "600",
+      marginBottom: 8,
+      opacity: 0.7,
+      color: Colors[colorScheme].text,
+    },
+    emptySubtext: {
+      fontSize: 14,
+      opacity: 0.5,
+      textAlign: "center",
+      color: Colors[colorScheme].text,
     },
   });
