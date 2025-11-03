@@ -1,4 +1,3 @@
-// app/recordings.tsx
 import { View, StyleSheet, Pressable, ScrollView, Alert } from "react-native";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
@@ -69,46 +68,46 @@ export default function RecordingsScreen() {
     }
   };
 
-  const stopRecording = async () => {
-    try {
-      await audioRecorder.stop();
-      setIsRecording(false);
+const stopRecording = async () => {
+  try {
+    await audioRecorder.stop();
+    setIsRecording(false);
 
-      if (audioRecorder.uri) {
-        // Generate a unique filename
-        const timestamp = new Date().getTime();
-        const fileName = `recording_${timestamp}.m4a`;
-        const permanentUri = `${FileSystem.documentDirectory}recordings/${fileName}`;
+    if (audioRecorder.uri) {
+      // Generate unique name
+      const timestamp = Date.now();
+      const fileName = `recording_${timestamp}.m4a`;
 
-        // Ensure directory exists
-        await FileSystem.makeDirectoryAsync(
-          `${FileSystem.documentDirectory}recordings/`,
-          { intermediates: true }
-        );
-
-        // Move file to permanent location
-        await FileSystem.moveAsync({
-          from: audioRecorder.uri,
-          to: permanentUri,
-        });
-
-        // Get file info for duration
-        const fileInfo = await FileSystem.getInfoAsync(permanentUri);
-
-        // Add to store
-        await addRecording({
-          title: `Recording ${new Date().toLocaleString()}`,
-          uri: permanentUri,
-          durationMillis: recorderState.durationMillis,
-        });
-
-        Alert.alert("Success", "Recording saved successfully!");
+      // Create or reference the "recordings" folder in the document directory
+      const recordingsDir = new FileSystem.Directory(FileSystem.Paths.document, "recordings");
+      if (!recordingsDir.exists) {
+        recordingsDir.create();
       }
-    } catch (error) {
-      console.error("Error stopping recording:", error);
-      Alert.alert("Error", "Failed to save recording.");
+
+      // Create a File instance for the destination
+      const destFile = new FileSystem.File(recordingsDir, fileName);
+
+      // Move the recorded file to the new location
+      const tempFile = new FileSystem.File(audioRecorder.uri);
+      tempFile.move(destFile);
+
+      // Optionally, verify
+      const info = destFile.info();
+      console.log("Saved recording:", info);
+
+      // Add to your local store or list
+      await addRecording({
+        title: `Recording ${new Date().toLocaleString()}`,
+        uri: destFile.uri,
+      });
+
+      Alert.alert("Success", "Recording saved successfully!");
     }
-  };
+  } catch (error) {
+    console.error("Error saving recording:", error);
+    Alert.alert("Error", "Failed to save recording.");
+  }
+};
 
   const handleRecordPress = () => {
     if (isRecording) {
