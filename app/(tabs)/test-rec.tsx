@@ -76,29 +76,28 @@ const stopRecording = async () => {
     if (audioRecorder.uri) {
       // Generate unique name
       const timestamp = Date.now();
-      const fileName = `recording_${timestamp}.m4a`;
+      const fileName = `pitchme_recording_${timestamp}.m4a`;
 
       // Create or reference the "recordings" folder in the document directory
-      const recordingsDir = new FileSystem.Directory(FileSystem.Paths.document, "recordings");
+      const recordingsDir = new FileSystem.Directory(FileSystem.Paths.document, "pitchme/ideas");
       if (!recordingsDir.exists) {
         recordingsDir.create();
       }
 
-      // Create a File instance for the destination
+      // File instance for the destination
       const destFile = new FileSystem.File(recordingsDir, fileName);
 
       // Move the recorded file to the new location
       const tempFile = new FileSystem.File(audioRecorder.uri);
       tempFile.move(destFile);
 
-      // Optionally, verify
       const info = destFile.info();
       console.log("Saved recording:", info);
 
-      // Add to your local store or list
       await addRecording({
         title: `Recording ${new Date().toLocaleString()}`,
         uri: destFile.uri,
+        durationMillis: recorderState?.durationMillis ?? 0,
       });
 
       Alert.alert("Success", "Recording saved successfully!");
