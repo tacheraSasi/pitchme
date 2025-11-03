@@ -1,4 +1,5 @@
 import RecordModal from "@/components/record-modal";
+import { RecordingListItem } from "@/components/recording-list-item";
 import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
 import { ThemedText } from "@/components/themed/themed-text";
@@ -6,6 +7,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { RecordingItem, useRecordingsList } from "@/stores/recordingsStore";
+import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
@@ -13,63 +15,6 @@ import { useRef } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Recording List Item Component
-function RecordingListItem({
-  recording,
-  formatTime,
-  formatDate,
-  colorScheme,
-  styles,
-}: {
-  recording: RecordingItem;
-  formatTime: (millis: number) => string;
-  formatDate: (dateString: string) => string;
-  colorScheme: "light" | "dark";
-  styles: any;
-}) {
-  const audioPlayer = useAudioPlayer({ uri: recording.uri });
-  const playerStatus = useAudioPlayerStatus(audioPlayer);
-
-  const togglePlayback = () => {
-    if (playerStatus.playing) {
-      audioPlayer.pause();
-    } else {
-      // If we're at the end, restart
-      if (playerStatus.currentTime >= playerStatus.duration) {
-        audioPlayer.seekTo(0);
-      }
-      audioPlayer.play();
-    }
-  };
-
-  return (
-    <Pressable style={styles.ideaItem}>
-      <View style={styles.ideaIconContainer}>
-        <Entypo name="sound-mix" size={20} color={styles.ideaIcon.color} />
-      </View>
-      <View style={styles.ideaContent}>
-        <ThemedText style={styles.ideaTitle} numberOfLines={1}>
-          {recording.title}
-        </ThemedText>
-        <View style={styles.ideaMetadata}>
-          <ThemedText style={styles.ideaDuration}>
-            {formatTime(recording.durationMillis)}
-          </ThemedText>
-          <ThemedText style={styles.ideaDate}>
-            {formatDate(recording.date)}
-          </ThemedText>
-        </View>
-      </View>
-      <Pressable style={styles.playButton} onPress={togglePlayback}>
-        <Entypo
-          name={playerStatus.playing ? "controller-paus" : "controller-play"}
-          size={16}
-          color={Colors[colorScheme].tint}
-        />
-      </Pressable>
-    </Pressable>
-  );
-}
 
 export default function RecordScreen() {
   const colorScheme = useColorScheme();
@@ -80,24 +25,7 @@ export default function RecordScreen() {
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const formatTime = (millis: number) => {
-    const totalSeconds = Math.floor(millis / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
 
-  const formatDate = (dateString: string) => {
-    const now = new Date();
-    const recordDate = new Date(dateString);
-    const diffTime = Math.abs(now.getTime() - recordDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) return "Today";
-    if (diffDays === 2) return "Yesterday";
-    if (diffDays <= 7) return `${diffDays - 1} days ago`;
-    return recordDate.toLocaleDateString();
-  };
 
   return (
     <ScreenLayout
