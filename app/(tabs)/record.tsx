@@ -5,99 +5,87 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { RecordingItem, useRecordingsList } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useRef } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-interface RecordedIdea {
-  id: string;
-  title: string;
-  duration: string;
-  date: string;
-  type: "note" | "idea";
-}
-
-// Dummy data for recorded ideas
-export const RECORDED_IDEAS: RecordedIdea[] = [
-  {
-    id: "1",
-    title: "Melody for chorus",
-    duration: "0:45",
-    date: "Today",
-    type: "idea",
-  },
-  {
-    id: "2",
-    title: "Custom C# note",
-    duration: "0:12",
-    date: "Yesterday",
-    type: "note",
-  },
-  {
-    id: "3",
-    title: "Jazz progression idea",
-    duration: "1:23",
-    date: "2 days ago",
-    type: "idea",
-  },
-  {
-    id: "4",
-    title: "Vocal harmony concept",
-    duration: "0:38",
-    date: "3 days ago",
-    type: "idea",
-  },
-  {
-    id: "5",
-    title: "Bass line experiment",
-    duration: "0:56",
-    date: "1 week ago",
-    type: "idea",
-  },
-  {
-    id: "6",
-    title: "Custom F major note",
-    duration: "0:08",
-    date: "1 week ago",
-    type: "note",
-  },
-];
-
 export default function RecordScreen() {
   const colorScheme = useColorScheme();
+  const recordings = useRecordingsList();
   const styles = getStyles(colorScheme ?? "light");
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
 
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const renderRecordedIdea = ({ item }: { item: RecordedIdea }) => (
-    <Pressable style={styles.ideaItem}>
-      <View style={styles.ideaIconContainer}>
-        <Entypo
-          name={item.type === "note" ? "music" : "sound-mix"}
-          size={20}
-          color={styles.ideaIcon.color}
-        />
-      </View>
-      <View style={styles.ideaContent}>
-        <ThemedText style={styles.ideaTitle}>{item.title}</ThemedText>
-        <View style={styles.ideaMetadata}>
-          <ThemedText style={styles.ideaDuration}>{item.duration}</ThemedText>
-          <ThemedText style={styles.ideaDate}>{item.date}</ThemedText>
+  const formatTime = (millis: number) => {
+    const totalSeconds = Math.floor(millis / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const now = new Date();
+    const recordDate = new Date(dateString);
+    const diffTime = Math.abs(now.getTime() - recordDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) return "Today";
+    if (diffDays === 2) return "Yesterday";
+    if (diffDays <= 7) return `${diffDays - 1} days ago`;
+    return recordDate.toLocaleDateString();
+  };
+
+  const renderRecordedIdea = ({ item }: { item: RecordingItem }) => {
+    // Create audio player for this recording
+    const audioPlayer = useAudioPlayer({ uri: item.uri });
+    const playerStatus = useAudioPlayerStatus(audioPlayer);
+
+    const togglePlayback = () => {
+      if (playerStatus.playing) {
+        audioPlayer.pause();
+      } else {
+        // If we're at the end, restart
+        if (playerStatus.currentTime >= playerStatus.duration) {
+          audioPlayer.seekTo(0);
+        }
+        audioPlayer.play();
+      }
+    };
+
+    return (
+      <Pressable style={styles.ideaItem}>
+        <View style={styles.ideaIconContainer}>
+          <Entypo name="sound-mix" size={20} color={styles.ideaIcon.color} />
         </View>
-      </View>
-      <Pressable style={styles.playButton}>
-        <Entypo
-          name="controller-play"
-          size={16}
-          color={Colors[colorScheme ?? "light"].tint}
-        />
+        <View style={styles.ideaContent}>
+          <ThemedText style={styles.ideaTitle} numberOfLines={1}>
+            {item.title}
+          </ThemedText>
+          <View style={styles.ideaMetadata}>
+            <ThemedText style={styles.ideaDuration}>
+              {formatTime(item.durationMillis)}
+            </ThemedText>
+            <ThemedText style={styles.ideaDate}>
+              {formatDate(item.date)}
+            </ThemedText>
+          </View>
+        </View>
+        <Pressable style={styles.playButton} onPress={togglePlayback}>
+          <Entypo
+            name={playerStatus.playing ? "controller-paus" : "controller-play"}
+            size={16}
+            color={Colors[colorScheme ?? "light"].tint}
+          />
+        </Pressable>
       </Pressable>
-    </Pressable>
-  );
+    );
+  };
 
   return (
     <ScreenLayout
@@ -106,7 +94,10 @@ export default function RecordScreen() {
     >
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <TabsHeader title="Record Studio" aboutBottomSheetRef={aboutBottomSheetRef} />
+          <TabsHeader
+            title="Record Studio"
+            aboutBottomSheetRef={aboutBottomSheetRef}
+          />
 
           <ThemedView style={styles.recordingSection}>
             <Pressable

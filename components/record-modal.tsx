@@ -2,8 +2,17 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import {
+  RecordingPresets,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync,
+  useAudioRecorder,
+  useAudioRecorderState,
+} from "expo-audio";
+import * as FileSystem from "expo-file-system";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Animated, Pressable, StyleSheet, View } from "react-native";
 
@@ -14,12 +23,16 @@ interface RecordModalProps {
 const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
   const colorScheme = useColorScheme();
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingProgress, setRecordingProgress] = useState(0);
   const [waveformAnimations] = useState(() =>
     Array.from({ length: 20 }, () => new Animated.Value(0.3))
   );
 
+  const { addRecording } = useRecordingsStore();
   const styles = getStyles(colorScheme ?? "light");
+
+  // Initialize audio recorder
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorderState = useAudioRecorderState(audioRecorder);
 
   // variables
   const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
@@ -27,6 +40,35 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
+  }, []);
+
+  // Setup audio permissions and mode
+  useEffect(() => {
+    const setupAudio = async () => {
+      try {
+        // Request recording permissions
+        const { granted } = await requestRecordingPermissionsAsync();
+        if (!granted) {
+          Alert.alert(
+            "Permission required",
+            "Microphone access is required to record audio."
+          );
+          return;
+        }
+
+        // Configure audio mode
+        await setAudioModeAsync({
+          allowsRecording: true,
+          playsInSilentMode: true,
+          shouldPlayInBackground: false,
+        });
+      } catch (error) {
+        console.error("Error setting up audio:", error);
+        Alert.alert("Error", "Failed to setup audio recording.");
+      }
+    };
+
+    setupAudio();
   }, []);
 
   // Waveform animation
@@ -58,30 +100,69 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
     } else {
       waveformAnimations.forEach((anim) => anim.setValue(0.3));
     }
-  }, [isRecording]);
+  }, [isRecording, waveformAnimations]);
+
+  const startRecording = async () => {
+    try {
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      Alert.alert("Error", "Failed to start recording.");
+    }
+  };
+
+  const stopRecording = async () => {
+    try {
+      await audioRecorder.stop();
+      setIsRecording(false);
+
+      if (audioRecorder.uri) {
+        // Generate unique name
+        const timestamp = Date.now();
+        const fileName = `pitchme_recording_${timestamp}.m4a`;
+
+        // Create or reference the "pitchme" folder in the document directory
+        const recordingsDir = new FileSystem.Directory(
+          FileSystem.Paths.document,
+          "pitchme"
+        );
+        if (!recordingsDir.exists) {
+          recordingsDir.create();
+        }
+
+        // File instance for the destination
+        const destFile = new FileSystem.File(recordingsDir, fileName);
+
+        // Move the recorded file to the new location
+        const tempFile = new FileSystem.File(audioRecorder.uri);
+        tempFile.move(destFile);
+
+        await addRecording({
+          title: `Musical Idea ${new Date().toLocaleString()}`,
+          uri: destFile.uri,
+          durationMillis: recorderState?.durationMillis ?? 0,
+        });
+
+        Alert.alert("Success", "Your musical idea has been captured!", [
+          {
+            text: "OK",
+            onPress: () => bottomSheetRef.current?.close(),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error saving recording:", error);
+      Alert.alert("Error", "Failed to save recording.");
+    }
+  };
 
   const handleRecordIdea = () => {
     if (isRecording) {
-      setIsRecording(false);
-      setRecordingProgress(0);
-      Alert.alert("Recording Saved", "Your musical idea has been captured!");
+      stopRecording();
     } else {
-      setIsRecording(true);
-      // Simulate recording progress
-      const interval = setInterval(() => {
-        setRecordingProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsRecording(false);
-            Alert.alert(
-              "Recording Complete",
-              "Your musical idea has been saved!"
-            );
-            return 100;
-          }
-          return prev + 2;
-        });
-      }, 100);
+      startRecording();
     }
   };
 
@@ -172,7 +253,8 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
             <View style={styles.statusContainer}>
               <View style={styles.recordingIndicator} />
               <ThemedText style={styles.recordingText}>
-                Recording... {recordingProgress}%
+                Recording...{" "}
+                {Math.floor((recorderState?.durationMillis ?? 0) / 1000)}s
               </ThemedText>
             </View>
           )}
