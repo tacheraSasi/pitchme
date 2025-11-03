@@ -19,7 +19,6 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
     console.log("handleSheetChanges", index);
   }, []);
 
-
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -44,8 +43,13 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
               About PitchMe
             </ThemedText>
             <ThemedText style={styles.modalSubtitle}>
-              {/* TODO:Will come up with a better text here */}
-              Created by Tachera Sasi 
+              Record, tag & share ideas
+            </ThemedText>
+            <ThemedText style={styles.desc}>
+              PitchMe is your personal musical idea companion. Capture
+              inspiration whenever it strikes with seamless audio recording,
+              organize your creative thoughts with tags, and never lose a melody
+              again.
             </ThemedText>
           </ThemedView>
         </ThemedView>
@@ -98,6 +102,14 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 16,
       color: Colors[colorScheme].text,
       opacity: 0.7,
+      textAlign: "center",
+    },
+    desc: {
+      fontSize: 12,
+      color: Colors[colorScheme].text,
+      fontStyle:"italic",
+      opacity: 0.7,
+      marginTop:6,
       textAlign: "center",
     },
     closeButton: {
