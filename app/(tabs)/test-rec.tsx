@@ -116,30 +116,32 @@ const stopRecording = async () => {
     }
   };
 
-  const handleDeleteRecording = (recording: RecordingItem) => {
-    Alert.alert(
-      "Delete Recording",
-      "Are you sure you want to delete this recording?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              // Delete the file from storage
-              await FileSystem.deleteAsync(recording.uri);
-              // Remove from store
-              await removeRecording(recording.id);
-            } catch (error) {
-              console.error("Error deleting recording:", error);
-              Alert.alert("Error", "Failed to delete recording.");
-            }
-          },
+const handleDeleteRecording = (recording: RecordingItem) => {
+  Alert.alert(
+    "Delete Recording",
+    "Are you sure you want to delete this recording?",
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            // Delete the file using the File class
+            const file = new FileSystem.File(recording.uri);
+            file.delete();
+
+            // Remove from store
+            await removeRecording(recording.id);
+          } catch (error) {
+            console.error("Error deleting recording:", error);
+            Alert.alert("Error", "Failed to delete recording.");
+          }
         },
-      ]
-    );
-  };
+      },
+    ]
+  );
+};
 
   return (
     <ThemedView style={styles.container}>
