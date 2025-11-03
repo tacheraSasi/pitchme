@@ -229,9 +229,9 @@ export default function SettingsScreen() {
             </ThemedText>
           </Link>
 
-          <ThemedText style={styles.footerText}>
+          {/* <ThemedText style={styles.footerText}>
             Made with ♪ for music lovers
-          </ThemedText>
+          </ThemedText> */}
         </View>
       </ScrollView>
     </ThemedView>

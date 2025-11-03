@@ -57,7 +57,6 @@ export function ThemedStatusBar({
   );
 }
 
-// Preset configurations for common use cases
 export const StatusBarPresets = {
   /** Default themed status bar */
   default: () => <ThemedStatusBar />,
