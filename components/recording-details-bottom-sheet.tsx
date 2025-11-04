@@ -137,7 +137,7 @@ const RecordingDetailsBottomSheet = ({
               // Delete the file
               const file = new FileSystem.File(recording.uri);
               if (file.exists) {
-                await file.delete();
+                file.delete();
               }
 
               // Remove from store
@@ -295,7 +295,7 @@ const RecordingDetailsBottomSheet = ({
                   playerStatus.playing ? "controller-paus" : "controller-play"
                 }
                 size={24}
-                color="white"
+                color={colorScheme === "dark" ? "black" : "white"}
               />
             </ThemedView>
             <ThemedView style={styles.playbackInfo}>
@@ -455,6 +455,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     },
     playbackInfo: {
       flex: 1,
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f5f5f5",
     },
     playbackStatus: {
       fontSize: 16,
