@@ -18,11 +18,13 @@ import { toast } from "sonner-native";
 interface RecordingDetailsBottomSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
   recording: RecordingItem | null;
+  onChange?: (index: number) => void;
 }
 
 const RecordingDetailsBottomSheet = ({
   bottomSheetRef,
   recording,
+  onChange,
 }: RecordingDetailsBottomSheetProps) => {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
@@ -44,22 +46,21 @@ const RecordingDetailsBottomSheet = ({
   const snapPoints = useMemo(() => ["50%", "75%"], []);
 
   // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("RecordingDetailsBottomSheet handleSheetChanges", index);
-    if (index === -1) {
-      // Sheet closed, reset editing state
-      setIsEditing(false);
-      setEditedTitle("");
-    }
-  }, []);
-
-  // Update local state when recording changes
-  useEffect(() => {
-    if (recording) {
-      setEditedTitle(recording.title);
-      loadFileInfo();
-    }
-  }, [recording]);
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      console.log("RecordingDetailsBottomSheet handleSheetChanges", index);
+      if (index === -1) {
+        // Sheet closed, reset editing state
+        setIsEditing(false);
+        setEditedTitle("");
+      }
+      // Call parent onChange handler if provided
+      if (onChange) {
+        onChange(index);
+      }
+    },
+    [onChange]
+  );
 
   const loadFileInfo = useCallback(async () => {
     if (!recording?.uri) {
@@ -81,6 +82,14 @@ const RecordingDetailsBottomSheet = ({
       setFileInfo({ size: 0, exists: false });
     }
   }, [recording?.uri]);
+
+  // Update local state when recording changes
+  useEffect(() => {
+    if (recording) {
+      setEditedTitle(recording.title);
+      loadFileInfo();
+    }
+  }, [recording, loadFileInfo]);
 
   const handleSaveTitle = async () => {
     if (!recording || !editedTitle.trim()) {

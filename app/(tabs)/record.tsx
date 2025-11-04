@@ -1,4 +1,5 @@
 import RecordModal from "@/components/record-modal";
+import RecordingDetailsBottomSheet from "@/components/recording-details-bottom-sheet";
 import { RecordingListItem } from "@/components/recording-list-item";
 import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
@@ -10,7 +11,7 @@ import { RecordingItem, useRecordingsList } from "@/stores/recordingsStore";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,8 +22,27 @@ export default function RecordScreen() {
   const styles = getStyles(colorScheme ?? "light");
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
 
-  // ref
+  // State for selected recording
+  const [selectedRecording, setSelectedRecording] =
+    useState<RecordingItem | null>(null);
+
+  // refs
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const recordingDetailsBottomSheetRef = useRef<BottomSheet>(null);
+
+  // Handler for long press on recording item
+  const handleRecordingLongPress = (recording: RecordingItem) => {
+    setSelectedRecording(recording);
+    recordingDetailsBottomSheetRef.current?.expand();
+  };
+
+  // Handler for when recording details sheet changes
+  const handleRecordingDetailsSheetChanges = (index: number) => {
+    if (index === -1) {
+      // Sheet closed, clear selected recording
+      setSelectedRecording(null);
+    }
+  };
 
   return (
     <ScreenLayout
@@ -84,6 +104,7 @@ export default function RecordScreen() {
                       formatDate={formatDate}
                       colorScheme={colorScheme ?? "light"}
                       styles={styles}
+                      onLongPress={handleRecordingLongPress}
                     />
                   )}
                   keyExtractor={(item) => item.id}
@@ -97,6 +118,11 @@ export default function RecordScreen() {
         </SafeAreaView>
 
         <RecordModal bottomSheetRef={bottomSheetRef} />
+        <RecordingDetailsBottomSheet 
+          bottomSheetRef={recordingDetailsBottomSheetRef}
+          recording={selectedRecording}
+          onChange={handleRecordingDetailsSheetChanges}
+        />
       </ThemedView>
     </ScreenLayout>
   );
