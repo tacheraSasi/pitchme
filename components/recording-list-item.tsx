@@ -183,39 +183,39 @@ export function RecordingListItem({
               },
             ]}
           >
-          <Pressable style={styles.ideaIconContainer}>
-            <Entypo name="sound-mix" size={22} color="white" />
-          </Pressable>
+            <Pressable style={styles.ideaIconContainer}>
+              <Entypo name="sound-mix" size={22} color="white" />
+            </Pressable>
 
-          <View style={styles.ideaContent}>
-            <ThemedText style={styles.ideaTitle} numberOfLines={1}>
-              {recording.title}
-            </ThemedText>
-            <View style={styles.ideaMetadata}>
-              <ThemedText style={styles.ideaDuration}>
-                {formatTime(recording.durationMillis)}
+            <View style={styles.ideaContent}>
+              <ThemedText style={styles.ideaTitle} numberOfLines={1}>
+                {recording.title}
               </ThemedText>
-              <ThemedText style={styles.ideaDate}>
-                {formatDate(recording.date)}
-              </ThemedText>
+              <View style={styles.ideaMetadata}>
+                <ThemedText style={styles.ideaDuration}>
+                  {formatTime(recording.durationMillis)}
+                </ThemedText>
+                <ThemedText style={styles.ideaDate}>
+                  {formatDate(recording.date)}
+                </ThemedText>
+              </View>
             </View>
-          </View>
 
-          <Pressable
-            style={({ pressed }) => [
-              styles.playButton,
-              pressed && { opacity: 0.7 },
-            ]}
-            onPress={togglePlayback}
-          >
-            <Entypo
-              name={
-                playerStatus.playing ? "controller-paus" : "controller-play"
-              }
-              size={18}
-              color={isDark ? Colors.dark.tint : Colors.light.tint}
-            />
-          </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.playButton,
+                pressed && { opacity: 0.7 },
+              ]}
+              onPress={togglePlayback}
+            >
+              <Entypo
+                name={
+                  playerStatus.playing ? "controller-paus" : "controller-play"
+                }
+                size={18}
+                color={isDark ? Colors.dark.tint : Colors.light.tint}
+              />
+            </Pressable>
           </Animated.View>
         </Pressable>
       </PanGestureHandler>
@@ -239,8 +239,7 @@ const swipeStyles = StyleSheet.create({
     alignItems: "flex-end",
     paddingRight: 20,
   },
-  deleteIcon: {
-  },
+  deleteIcon: {},
   itemContainer: {
     backgroundColor: "transparent",
   },

@@ -1,5 +1,4 @@
 import RecordModal from "@/components/record-modal";
-import RecordingDetailsBottomSheet from "@/components/recording-details-bottom-sheet";
 import { RecordingListItem } from "@/components/recording-list-item";
 import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
@@ -7,7 +6,7 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useRecordingsList } from "@/stores/recordingsStore";
+import { RecordingItem, useRecordingsList } from "@/stores/recordingsStore";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
