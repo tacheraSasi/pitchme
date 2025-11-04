@@ -39,7 +39,8 @@ export function RecordingListItem({
   const panRef = useRef(null);
   const isDark = colorScheme === "dark";
 
-  const SWIPE_THRESHOLD = -80;
+  const SWIPE_THRESHOLD = -80; // Left swipe for delete
+  const DETAILS_SWIPE_THRESHOLD = 80; // Right swipe for details
 
   const togglePlayback = async () => {
     if (playerStatus.playing) {
@@ -55,8 +56,14 @@ export function RecordingListItem({
   const onPanGestureEvent = (event: PanGestureHandlerGestureEvent) => {
     const { translationX } = event.nativeEvent;
 
-    if (translationX <= 0) {
-      translateX.setValue(translationX);
+    // Allow both left swipe (delete) and right swipe (details)
+    translateX.setValue(translationX);
+  };
+
+  const handleDetailsSwipe = () => {
+    if (onLongPress) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      onLongPress(recording);
     }
   };
 
@@ -65,13 +72,29 @@ export function RecordingListItem({
 
     if (state === State.END) {
       if (translationX <= SWIPE_THRESHOLD) {
-        // Swipe far enough - animate and show delete confirmation
+        // Left swipe - show delete confirmation
         Animated.timing(translateX, {
           toValue: -200,
           duration: 200,
           useNativeDriver: true,
         }).start(() => {
           handleDeleteRecording();
+        });
+      } else if (translationX >= DETAILS_SWIPE_THRESHOLD) {
+        // Right swipe - open details bottom sheet
+        Animated.timing(translateX, {
+          toValue: 200,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => {
+          handleDetailsSwipe();
+          // Return to original position after opening details
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            tension: 100,
+            friction: 8,
+          }).start();
         });
       } else {
         // Return to original position
@@ -135,6 +158,7 @@ export function RecordingListItem({
 
   return (
     <View style={swipeStyles.container}>
+      {/* Delete Background (Left Swipe) */}
       <View
         style={[
           swipeStyles.deleteBackground,
@@ -153,71 +177,81 @@ export function RecordingListItem({
         />
       </View>
 
+      {/* Details Background (Right Swipe) */}
+      <View
+        style={[
+          swipeStyles.detailsBackground,
+          {
+            backgroundColor: isDark
+              ? `${Colors.dark.tint}40` // Add transparency to dark tint
+              : `${Colors.light.tint}40`, // Add transparency to light tint
+          },
+        ]}
+      >
+        <Entypo
+          name="info"
+          size={30}
+          color={isDark ? Colors.dark.tint : Colors.light.tint}
+          style={swipeStyles.detailsIcon}
+        />
+      </View>
+
       {/* Swipeable Item */}
       <PanGestureHandler
         ref={panRef}
         onGestureEvent={onPanGestureEvent}
         onHandlerStateChange={onPanHandlerStateChange}
         activeOffsetX={[-10, 10]}
+        activeOffsetY={[-1000, 1000]}
         minPointers={1}
       >
-        <Pressable
-          onLongPress={() => {
-            if (onLongPress) {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              onLongPress(recording);
-            }
-          }}
-          delayLongPress={500}
+        <Animated.View
+          style={[
+            styles.ideaItem,
+            swipeStyles.itemContainer,
+            {
+              transform: [{ translateX }],
+              backgroundColor: isDark
+                ? Colors.dark.background
+                : Colors.light.background,
+              marginBottom: 0, // i handled this in the container
+            },
+          ]}
         >
-          <Animated.View
-            style={[
-              styles.ideaItem,
-              swipeStyles.itemContainer,
-              {
-                transform: [{ translateX }],
-                backgroundColor: isDark
-                  ? Colors.dark.background
-                  : Colors.light.background,
-                marginBottom: 0, // i handled this in the container
-              },
-            ]}
-          >
-            <Pressable style={styles.ideaIconContainer}>
-              <Entypo name="sound-mix" size={22} color="white" />
-            </Pressable>
+          <View style={styles.ideaIconContainer}>
+            <Entypo name="sound-mix" size={22} color="white" />
+          </View>
 
-            <View style={styles.ideaContent}>
-              <ThemedText style={styles.ideaTitle} numberOfLines={1}>
-                {recording.title}
+          <View style={styles.ideaContent}>
+            <ThemedText style={styles.ideaTitle} numberOfLines={1}>
+              {recording.title}
+            </ThemedText>
+            <View style={styles.ideaMetadata}>
+              <ThemedText style={styles.ideaDuration}>
+                {formatTime(recording.durationMillis)}
               </ThemedText>
-              <View style={styles.ideaMetadata}>
-                <ThemedText style={styles.ideaDuration}>
-                  {formatTime(recording.durationMillis)}
-                </ThemedText>
-                <ThemedText style={styles.ideaDate}>
-                  {formatDate(recording.date)}
-                </ThemedText>
-              </View>
+              <ThemedText style={styles.ideaDate}>
+                {formatDate(recording.date)}
+              </ThemedText>
             </View>
+          </View>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.playButton,
-                pressed && { opacity: 0.7 },
-              ]}
-              onPress={togglePlayback}
-            >
-              <Entypo
-                name={
-                  playerStatus.playing ? "controller-paus" : "controller-play"
-                }
-                size={18}
-                color={isDark ? Colors.dark.tint : Colors.light.tint}
-              />
-            </Pressable>
-          </Animated.View>
-        </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.playButton,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={togglePlayback}
+          >
+            <Entypo
+              name={
+                playerStatus.playing ? "controller-paus" : "controller-play"
+              }
+              size={18}
+              color={isDark ? Colors.dark.tint : Colors.light.tint}
+            />
+          </Pressable>
+        </Animated.View>
       </PanGestureHandler>
     </View>
   );
@@ -240,6 +274,17 @@ const swipeStyles = StyleSheet.create({
     paddingRight: 20,
   },
   deleteIcon: {},
+  detailsBackground: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    paddingLeft: 20,
+  },
+  detailsIcon: {},
   itemContainer: {
     backgroundColor: "transparent",
   },
