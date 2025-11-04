@@ -22,9 +22,15 @@ export default function RecordScreen() {
   const styles = getStyles(colorScheme ?? "light");
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
 
-  // State for selected recording
-  const [selectedRecording, setSelectedRecording] =
-    useState<RecordingItem | null>(null);
+  // State for selected recording ID (instead of full recording object)
+  const [selectedRecordingId, setSelectedRecordingId] = useState<string | null>(
+    null
+  );
+
+  // Get the current recording data from the store using the ID
+  const selectedRecording = selectedRecordingId
+    ? recordings.find((r) => r.id === selectedRecordingId) || null
+    : null;
 
   // refs
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -32,7 +38,7 @@ export default function RecordScreen() {
 
   // Handler for long press on recording item
   const handleRecordingLongPress = (recording: RecordingItem) => {
-    setSelectedRecording(recording);
+    setSelectedRecordingId(recording.id);
     recordingDetailsBottomSheetRef.current?.expand();
   };
 
@@ -40,7 +46,7 @@ export default function RecordScreen() {
   const handleRecordingDetailsSheetChanges = (index: number) => {
     if (index === -1) {
       // Sheet closed, clear selected recording
-      setSelectedRecording(null);
+      setSelectedRecordingId(null);
     }
   };
 

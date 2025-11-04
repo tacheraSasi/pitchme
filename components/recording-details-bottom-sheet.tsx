@@ -86,10 +86,14 @@ const RecordingDetailsBottomSheet = ({
   // Update local state when recording changes
   useEffect(() => {
     if (recording) {
-      setEditedTitle(recording.title);
+      // Only update the edited title if we're not currently editing
+      // This prevents overriding the user's input while they're typing
+      if (!isEditing) {
+        setEditedTitle(recording.title);
+      }
       loadFileInfo();
     }
-  }, [recording, loadFileInfo]);
+  }, [recording, loadFileInfo, isEditing]);
 
   const handleSaveTitle = async () => {
     if (!recording || !editedTitle.trim()) {
@@ -99,6 +103,7 @@ const RecordingDetailsBottomSheet = ({
     try {
       await updateRecordingTitle(recording.id, editedTitle.trim());
       setIsEditing(false);
+      // The editedTitle will be updated automatically when the recording prop updates from the store
       toast.success("Recording title updated!");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
