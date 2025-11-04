@@ -12,8 +12,8 @@ import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, StyleSheet, TextInput } from "react-native";
-import { toast } from "sonner-native";
+import { Pressable, StyleSheet, TextInput } from "react-native";
+import { alert, toast } from "yooo-native";
 
 interface RecordingDetailsBottomSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -116,7 +116,7 @@ const RecordingDetailsBottomSheet = ({
   const handleDeleteRecording = () => {
     if (!recording) return;
 
-    Alert.alert(
+    alert.dialog(
       "Delete Recording",
       `Are you sure you want to delete "${recording.title}"? This action cannot be undone.`,
       [
