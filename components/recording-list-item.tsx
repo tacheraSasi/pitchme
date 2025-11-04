@@ -6,7 +6,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
 import {
   PanGestureHandler,
@@ -37,6 +37,9 @@ export function RecordingListItem({
   const translateX = useRef(new Animated.Value(0)).current;
   const panRef = useRef(null);
   const isDark = colorScheme === "dark";
+  const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
+    null
+  );
 
   const SWIPE_THRESHOLD = -80;
   const DETAILS_SWIPE_THRESHOLD = 80;
@@ -55,6 +58,13 @@ export function RecordingListItem({
   const onPanGestureEvent = (event: PanGestureHandlerGestureEvent) => {
     const { translationX } = event.nativeEvent;
     translateX.setValue(translationX);
+
+    // Update swipe direction based on translation
+    if (Math.abs(translationX) > 10) {
+      setSwipeDirection(translationX > 0 ? "right" : "left");
+    } else {
+      setSwipeDirection(null);
+    }
   };
 
   const handleDetailsSwipe = () => {
@@ -96,7 +106,9 @@ export function RecordingListItem({
           useNativeDriver: true,
           tension: 100,
           friction: 8,
-        }).start();
+        }).start(() => {
+          setSwipeDirection(null);
+        });
       }
     }
   };
@@ -151,40 +163,44 @@ export function RecordingListItem({
 
   return (
     <View style={swipeStyles.container}>
-      <View
-        style={[
-          swipeStyles.deleteBackground,
-          {
-            backgroundColor: isDark
-              ? Colors.dark.isRecording
-              : Colors.light.isRecording,
-          },
-        ]}
-      >
-        <Entypo
-          name="trash"
-          size={30}
-          color="white"
-          style={swipeStyles.deleteIcon}
-        />
-      </View>
-
-      <View
-        style={[
-          swipeStyles.detailsBackground,
-          {
-            backgroundColor: isDark ? Colors.dark.tint : Colors.light.tint,
-          },
-        ]}
-      >
-        <Entypo
-          name="info"
-          size={30}
-          color={isDark ? Colors.dark.background : "white"}
-          style={swipeStyles.detailsIcon}
-        />
-      </View>
-
+      {/* Delete Background (Left Swipe) - Only show when swiping left */}
+      {swipeDirection === "left" && (
+        <View
+          style={[
+            swipeStyles.deleteBackground,
+            {
+              backgroundColor: isDark
+                ? Colors.dark.isRecording
+                : Colors.light.isRecording,
+            },
+          ]}
+        >
+          <Entypo
+            name="trash"
+            size={30}
+            color="white"
+            style={swipeStyles.deleteIcon}
+          />
+        </View>
+      )}
+      {/* Details Background (Right Swipe) - Only show when swiping right */}
+      {swipeDirection === "right" && (
+        <View
+          style={[
+            swipeStyles.detailsBackground,
+            {
+              backgroundColor: isDark ? Colors.dark.tint : Colors.light.tint,
+            },
+          ]}
+        >
+          <Entypo
+            name="info"
+            size={30}
+            color={isDark ? Colors.dark.background : "white"}
+            style={swipeStyles.detailsIcon}
+          />
+        </View>
+      )}{" "}
       <PanGestureHandler
         ref={panRef}
         onGestureEvent={onPanGestureEvent}
