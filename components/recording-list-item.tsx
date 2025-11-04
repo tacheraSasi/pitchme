@@ -39,8 +39,8 @@ export function RecordingListItem({
   const panRef = useRef(null);
   const isDark = colorScheme === "dark";
 
-  const SWIPE_THRESHOLD = -80; // Left swipe for delete
-  const DETAILS_SWIPE_THRESHOLD = 80; // Right swipe for details
+  const SWIPE_THRESHOLD = -80;
+  const DETAILS_SWIPE_THRESHOLD = 80;
 
   const togglePlayback = async () => {
     if (playerStatus.playing) {
@@ -55,8 +55,6 @@ export function RecordingListItem({
 
   const onPanGestureEvent = (event: PanGestureHandlerGestureEvent) => {
     const { translationX } = event.nativeEvent;
-
-    // Allow both left swipe (delete) and right swipe (details)
     translateX.setValue(translationX);
   };
 
@@ -72,7 +70,6 @@ export function RecordingListItem({
 
     if (state === State.END) {
       if (translationX <= SWIPE_THRESHOLD) {
-        // Left swipe - show delete confirmation
         Animated.timing(translateX, {
           toValue: -200,
           duration: 200,
@@ -81,14 +78,12 @@ export function RecordingListItem({
           handleDeleteRecording();
         });
       } else if (translationX >= DETAILS_SWIPE_THRESHOLD) {
-        // Right swipe - open details bottom sheet
         Animated.timing(translateX, {
           toValue: 200,
           duration: 200,
           useNativeDriver: true,
         }).start(() => {
           handleDetailsSwipe();
-          // Return to original position after opening details
           Animated.spring(translateX, {
             toValue: 0,
             useNativeDriver: true,
@@ -97,7 +92,6 @@ export function RecordingListItem({
           }).start();
         });
       } else {
-        // Return to original position
         Animated.spring(translateX, {
           toValue: 0,
           useNativeDriver: true,
@@ -158,7 +152,6 @@ export function RecordingListItem({
 
   return (
     <View style={swipeStyles.container}>
-      {/* Delete Background (Left Swipe) */}
       <View
         style={[
           swipeStyles.deleteBackground,
@@ -177,21 +170,18 @@ export function RecordingListItem({
         />
       </View>
 
-      {/* Details Background (Right Swipe) */}
       <View
         style={[
           swipeStyles.detailsBackground,
           {
-            backgroundColor: isDark
-              ? `${Colors.dark.tint}40` // Add transparency to dark tint
-              : `${Colors.light.tint}40`, // Add transparency to light tint
+            backgroundColor: isDark ? Colors.dark.tint : Colors.light.tint,
           },
         ]}
       >
         <Entypo
           name="info"
           size={30}
-          color={isDark ? Colors.dark.tint : Colors.light.tint}
+          color={isDark ? Colors.dark.background : "white"}
           style={swipeStyles.detailsIcon}
         />
       </View>
