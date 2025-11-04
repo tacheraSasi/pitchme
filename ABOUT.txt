@@ -1,0 +1,6 @@
+PitchMe is a React Native music app that records audio and detects 
+the musical pitch/notes being sung or played. Users can record their 
+voice or instruments, view the detected notes, and manage their recordings 
+with features like playback, title editing, and organization. It's designed 
+for musicians, singers, and music students who want to analyze and track
+their pitch accuracy.
