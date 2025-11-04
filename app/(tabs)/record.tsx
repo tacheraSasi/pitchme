@@ -1,4 +1,5 @@
 import RecordModal from "@/components/record-modal";
+import RecordingDetailsBottomSheet from "@/components/recording-details-bottom-sheet";
 import { RecordingListItem } from "@/components/recording-list-item";
 import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
