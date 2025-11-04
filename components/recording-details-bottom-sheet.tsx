@@ -12,12 +12,7 @@ import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { 
-  Pressable, 
-  StyleSheet, 
-  TextInput, 
-  Alert 
-} from "react-native";
+import { Alert, Pressable, StyleSheet, TextInput } from "react-native";
 import { toast } from "sonner-native";
 
 interface RecordingDetailsBottomSheetProps {
@@ -25,13 +20,13 @@ interface RecordingDetailsBottomSheetProps {
   recording: RecordingItem | null;
 }
 
-const RecordingDetailsBottomSheet = ({ 
-  bottomSheetRef, 
-  recording 
+const RecordingDetailsBottomSheet = ({
+  bottomSheetRef,
+  recording,
 }: RecordingDetailsBottomSheetProps) => {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [fileInfo, setFileInfo] = useState<{
@@ -40,7 +35,9 @@ const RecordingDetailsBottomSheet = ({
   } | null>(null);
 
   const { updateRecordingTitle, removeRecording } = useRecordingsStore();
-  const { player, playExclusive, pause } = useGlobalAudioPlayer(recording?.uri || "");
+  const { player, playExclusive, pause } = useGlobalAudioPlayer(
+    recording?.uri || ""
+  );
   const playerStatus = useAudioPlayerStatus(player);
 
   // Snap points for the bottom sheet
@@ -74,10 +71,10 @@ const RecordingDetailsBottomSheet = ({
       const file = new FileSystem.File(recording.uri);
       const exists = file.exists;
       const info = exists ? await file.info() : null;
-      
+
       setFileInfo({
         size: info?.size || 0,
-        exists
+        exists,
       });
     } catch (error) {
       console.error("Error loading file info:", error);
@@ -128,15 +125,17 @@ const RecordingDetailsBottomSheet = ({
               if (file.exists) {
                 await file.delete();
               }
-              
+
               // Remove from store
               await removeRecording(recording.id);
-              
+
               // Close the bottom sheet
               bottomSheetRef.current?.close();
-              
+
               toast.success("Recording deleted");
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success
+              );
             } catch (error) {
               console.error("Error deleting recording:", error);
               toast.error("Failed to delete recording");
@@ -221,36 +220,42 @@ const RecordingDetailsBottomSheet = ({
           <ThemedView style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>Title</ThemedText>
             {!isEditing ? (
-              <Pressable 
-                onPress={() => setIsEditing(true)} 
+              <Pressable
+                onPress={() => setIsEditing(true)}
                 style={styles.editButton}
               >
-                <MaterialIcons 
-                  name="edit" 
-                  size={18} 
-                  color={Colors[colorScheme ?? "light"].tint} 
+                <MaterialIcons
+                  name="edit"
+                  size={18}
+                  color={Colors[colorScheme ?? "light"].tint}
                 />
               </Pressable>
             ) : (
               <ThemedView style={styles.editActions}>
-                <Pressable onPress={handleCancelEdit} style={styles.actionButton}>
-                  <MaterialIcons 
-                    name="close" 
-                    size={18} 
-                    color={Colors[colorScheme ?? "light"].text} 
+                <Pressable
+                  onPress={handleCancelEdit}
+                  style={styles.actionButton}
+                >
+                  <MaterialIcons
+                    name="close"
+                    size={18}
+                    color={Colors[colorScheme ?? "light"].text}
                   />
                 </Pressable>
-                <Pressable onPress={handleSaveTitle} style={styles.actionButton}>
-                  <MaterialIcons 
-                    name="check" 
-                    size={18} 
-                    color={Colors[colorScheme ?? "light"].tint} 
+                <Pressable
+                  onPress={handleSaveTitle}
+                  style={styles.actionButton}
+                >
+                  <MaterialIcons
+                    name="check"
+                    size={18}
+                    color={Colors[colorScheme ?? "light"].tint}
                   />
                 </Pressable>
               </ThemedView>
             )}
           </ThemedView>
-          
+
           {isEditing ? (
             <TextInput
               style={styles.titleInput}
@@ -272,7 +277,9 @@ const RecordingDetailsBottomSheet = ({
           <Pressable style={styles.playbackButton} onPress={togglePlayback}>
             <ThemedView style={styles.playbackIcon}>
               <Entypo
-                name={playerStatus.playing ? "controller-paus" : "controller-play"}
+                name={
+                  playerStatus.playing ? "controller-paus" : "controller-play"
+                }
                 size={24}
                 color="white"
               />
@@ -321,9 +328,14 @@ const RecordingDetailsBottomSheet = ({
 
         {/* Actions Section */}
         <ThemedView style={styles.actionsSection}>
-          <Pressable style={styles.deleteButton} onPress={handleDeleteRecording}>
+          <Pressable
+            style={styles.deleteButton}
+            onPress={handleDeleteRecording}
+          >
             <Entypo name="trash" size={20} color="white" />
-            <ThemedText style={styles.deleteButtonText}>Delete Recording</ThemedText>
+            <ThemedText style={styles.deleteButtonText}>
+              Delete Recording
+            </ThemedText>
           </Pressable>
         </ThemedView>
       </BottomSheetView>
