@@ -211,39 +211,102 @@ export function RecordingListItem({
       >
         <Animated.View
           style={[
-            styles.ideaItem,
-            swipeStyles.itemContainer,
+            recordingItemStyles.container,
             {
               transform: [{ translateX }],
+              borderWidth: 1.5,
+              borderColor: colorScheme === "dark" ? "#333333" : "#e9ecef",
               backgroundColor: isDark
                 ? Colors.dark.background
                 : Colors.light.background,
-              marginBottom: 0,
             },
           ]}
         >
-          <View style={styles.ideaIconContainer}>
-            <Entypo name="sound-mix" size={22} color="white" />
+          <View style={recordingItemStyles.iconContainer}>
+            <View
+              style={[
+                recordingItemStyles.iconBackground,
+                {
+                  backgroundColor: isDark
+                    ? Colors.dark.tint
+                    : Colors.light.tint,
+                },
+              ]}
+            >
+              <Entypo
+                name="sound-mix"
+                size={24}
+                color={isDark ? Colors.dark.background : "white"}
+              />
+            </View>
           </View>
 
-          <View style={styles.ideaContent}>
-            <ThemedText style={styles.ideaTitle} numberOfLines={1}>
-              {recording.title}
-            </ThemedText>
-            <View style={styles.ideaMetadata}>
-              <ThemedText style={styles.ideaDuration}>
-                {formatTime(recording.durationMillis)}
+          <View style={recordingItemStyles.contentContainer}>
+            <View style={recordingItemStyles.titleContainer}>
+              <ThemedText style={recordingItemStyles.title} numberOfLines={1}>
+                {recording.title}
               </ThemedText>
-              <ThemedText style={styles.ideaDate}>
-                {formatDate(recording.date)}
-              </ThemedText>
+              {playerStatus.playing && (
+                <View style={recordingItemStyles.playingIndicator}>
+                  <View
+                    style={[
+                      recordingItemStyles.playingDot,
+                      {
+                        backgroundColor: isDark
+                          ? Colors.dark.tint
+                          : Colors.light.tint,
+                      },
+                    ]}
+                  />
+                  <ThemedText style={recordingItemStyles.playingText}>
+                    Playing
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+
+            <View style={recordingItemStyles.metadataContainer}>
+              <View style={recordingItemStyles.durationContainer}>
+                <Entypo
+                  name="clock"
+                  size={12}
+                  color={isDark ? Colors.dark.icon : Colors.light.icon}
+                />
+                <ThemedText style={recordingItemStyles.duration}>
+                  {formatTime(recording.durationMillis)}
+                </ThemedText>
+              </View>
+
+              <View style={recordingItemStyles.separator} />
+
+              <View style={recordingItemStyles.dateContainer}>
+                <Entypo
+                  name="calendar"
+                  size={12}
+                  color={isDark ? Colors.dark.icon : Colors.light.icon}
+                />
+                <ThemedText style={recordingItemStyles.date}>
+                  {formatDate(recording.date)}
+                </ThemedText>
+              </View>
             </View>
           </View>
 
           <Pressable
             style={({ pressed }) => [
-              styles.playButton,
-              pressed && { opacity: 0.7 },
+              recordingItemStyles.playButton,
+              {
+                backgroundColor: pressed
+                  ? isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.05)"
+                  : isDark
+                  ? "rgba(255,255,255,0.05)"
+                  : "rgba(0,0,0,0.02)",
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.1)"
+                  : "rgba(0,0,0,0.08)",
+              },
             ]}
             onPress={togglePlayback}
           >
@@ -251,7 +314,7 @@ export function RecordingListItem({
               name={
                 playerStatus.playing ? "controller-paus" : "controller-play"
               }
-              size={18}
+              size={20}
               color={isDark ? Colors.dark.tint : Colors.light.tint}
             />
           </Pressable>
@@ -263,7 +326,7 @@ export function RecordingListItem({
 
 const swipeStyles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: 16,
     borderRadius: 16,
     overflow: "hidden",
   },
@@ -291,5 +354,118 @@ const swipeStyles = StyleSheet.create({
   detailsIcon: {},
   itemContainer: {
     backgroundColor: "transparent",
+  },
+});
+
+const recordingItemStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    borderColor:"gray",
+    borderWidth:2,
+    marginBottom: 0,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  iconContainer: {
+    marginRight: 16,
+  },
+  iconBackground: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  contentContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    flex: 1,
+    marginRight: 8,
+  },
+  playingIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
+  },
+  playingDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 4,
+  },
+  playingText: {
+    fontSize: 10,
+    fontWeight: "500",
+    textTransform: "uppercase",
+  },
+  metadataContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  durationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  duration: {
+    fontSize: 13,
+    marginLeft: 4,
+    fontWeight: "500",
+    opacity: 0.7,
+  },
+  separator: {
+    width: 2,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    marginHorizontal: 8,
+  },
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  date: {
+    fontSize: 13,
+    marginLeft: 4,
+    fontWeight: "400",
+    opacity: 0.6,
+  },
+  playButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
   },
 });
