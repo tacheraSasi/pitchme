@@ -34,7 +34,6 @@ export function RecordingListItem({
   const playerStatus = useAudioPlayerStatus(player);
   const { removeRecording } = useRecordingsStore();
 
-  // Animation values
   const translateX = useRef(new Animated.Value(0)).current;
   const panRef = useRef(null);
   const isDark = colorScheme === "dark";
@@ -186,7 +185,6 @@ export function RecordingListItem({
         />
       </View>
 
-      {/* Swipeable Item */}
       <PanGestureHandler
         ref={panRef}
         onGestureEvent={onPanGestureEvent}
@@ -204,7 +202,7 @@ export function RecordingListItem({
               backgroundColor: isDark
                 ? Colors.dark.background
                 : Colors.light.background,
-              marginBottom: 0, // i handled this in the container
+              marginBottom: 0,
             },
           ]}
         >
