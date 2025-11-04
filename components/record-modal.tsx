@@ -15,7 +15,7 @@ import {
 import * as FileSystem from "expo-file-system";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
-import { toast } from "sonner-native";
+import { toast } from "yooo-native";
 
 interface RecordModalProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;

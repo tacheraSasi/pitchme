@@ -2,7 +2,7 @@ import AboutBottomSheet from "@/components/about-bottom-sheet";
 import BottomSheet from "@gorhom/bottom-sheet";
 import React from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Toaster } from "sonner-native";
+import { Toaster } from "yooo-native";
 
 
 interface ScreenLayoutProps {

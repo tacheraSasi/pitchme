@@ -44,6 +44,7 @@
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
     "sonner-native": "^0.21.1",
+    "yooo-native": "1.0.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

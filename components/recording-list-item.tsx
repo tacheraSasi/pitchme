@@ -7,12 +7,13 @@ import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
-import { Alert, Animated, Pressable, StyleSheet, View } from "react-native";
+import { Animated, Pressable, StyleSheet, View } from "react-native";
 import {
   PanGestureHandler,
   PanGestureHandlerGestureEvent,
   State,
 } from "react-native-gesture-handler";
+import { alert } from "yooo-native";
 
 export function RecordingListItem({
   recording,
@@ -84,7 +85,7 @@ export function RecordingListItem({
 
   const handleDeleteRecording = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
+    alert.dialog(
       "Delete Recording",
       `Are you sure you want to delete "${recording.title}"? This action cannot be undone.`,
       [
@@ -103,7 +104,6 @@ export function RecordingListItem({
           style: "destructive",
           onPress: async () => {
             try {
-              // Animate out before deleting
               Animated.timing(translateX, {
                 toValue: -500,
                 duration: 300,
@@ -111,11 +111,11 @@ export function RecordingListItem({
               }).start(async () => {
                 try {
                   const file = new FileSystem.File(recording.uri);
-                  await file.delete();
+                  file.delete();
                   await removeRecording(recording.id);
                 } catch (error) {
                   console.error("Error deleting recording:", error);
-                  Alert.alert("Error", "Failed to delete recording.");
+                  alert.error("Failed to delete recording.");
                 }
               });
             } catch (error) {
@@ -168,7 +168,7 @@ export function RecordingListItem({
               backgroundColor: isDark
                 ? Colors.dark.background
                 : Colors.light.background,
-              marginBottom: 0, // Handled by container
+              marginBottom: 0, // i handled this in the container
             },
           ]}
         >
