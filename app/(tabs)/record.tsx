@@ -118,7 +118,7 @@ export default function RecordScreen() {
         </SafeAreaView>
 
         <RecordModal bottomSheetRef={bottomSheetRef} />
-        <RecordingDetailsBottomSheet 
+        <RecordingDetailsBottomSheet
           bottomSheetRef={recordingDetailsBottomSheetRef}
           recording={selectedRecording}
           onChange={handleRecordingDetailsSheetChanges}
