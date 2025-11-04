@@ -15,6 +15,7 @@ interface RecordingsState {
   addRecording: (
     r: Omit<RecordingItem, "id" | "date"> & { title?: string }
   ) => Promise<void>;
+  updateRecordingTitle: (id: string, title: string) => Promise<void>;
   removeRecording: (id: string) => Promise<void>;
   clearAll: () => Promise<void>;
 }
@@ -34,6 +35,13 @@ export const useRecordingsStore = create<RecordingsState>()(
           date,
         };
         set((s) => ({ recordings: [item, ...s.recordings] }));
+      },
+      updateRecordingTitle: async (id, title) => {
+        set((s) => ({
+          recordings: s.recordings.map((r) =>
+            r.id === id ? { ...r, title } : r
+          ),
+        }));
       },
       removeRecording: async (id) => {
         set((s) => ({ recordings: s.recordings.filter((r) => r.id !== id) }));

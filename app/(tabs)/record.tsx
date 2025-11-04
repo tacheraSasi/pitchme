@@ -1,4 +1,5 @@
 import RecordModal from "@/components/record-modal";
+import RecordingDetailsBottomSheet from "@/components/recording-details-bottom-sheet";
 import { RecordingListItem } from "@/components/recording-list-item";
 import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
@@ -6,11 +7,11 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useRecordingsList } from "@/stores/recordingsStore";
+import { RecordingItem, useRecordingsList } from "@/stores/recordingsStore";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,8 +22,33 @@ export default function RecordScreen() {
   const styles = getStyles(colorScheme ?? "light");
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
 
-  // ref
+  // State for selected recording ID (instead of full recording object)
+  const [selectedRecordingId, setSelectedRecordingId] = useState<string | null>(
+    null
+  );
+
+  // Get the current recording data from the store using the ID
+  const selectedRecording = selectedRecordingId
+    ? recordings.find((r) => r.id === selectedRecordingId) || null
+    : null;
+
+  // refs
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const recordingDetailsBottomSheetRef = useRef<BottomSheet>(null);
+
+  // Handler for long press on recording item
+  const handleRecordingLongPress = (recording: RecordingItem) => {
+    setSelectedRecordingId(recording.id);
+    recordingDetailsBottomSheetRef.current?.expand();
+  };
+
+  // Handler for when recording details sheet changes
+  const handleRecordingDetailsSheetChanges = (index: number) => {
+    if (index === -1) {
+      // Sheet closed, clear selected recording
+      setSelectedRecordingId(null);
+    }
+  };
 
   return (
     <ScreenLayout
@@ -84,6 +110,7 @@ export default function RecordScreen() {
                       formatDate={formatDate}
                       colorScheme={colorScheme ?? "light"}
                       styles={styles}
+                      onLongPress={handleRecordingLongPress}
                     />
                   )}
                   keyExtractor={(item) => item.id}
@@ -97,6 +124,11 @@ export default function RecordScreen() {
         </SafeAreaView>
 
         <RecordModal bottomSheetRef={bottomSheetRef} />
+        <RecordingDetailsBottomSheet
+          bottomSheetRef={recordingDetailsBottomSheetRef}
+          recording={selectedRecording}
+          onChange={handleRecordingDetailsSheetChanges}
+        />
       </ThemedView>
     </ScreenLayout>
   );

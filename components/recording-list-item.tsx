@@ -21,12 +21,14 @@ export function RecordingListItem({
   formatDate,
   colorScheme,
   styles,
+  onLongPress,
 }: {
   recording: RecordingItem;
   formatTime: (millis: number) => string;
   formatDate: (dateString: string) => string;
   colorScheme: "light" | "dark";
   styles: any;
+  onLongPress?: (recording: RecordingItem) => void;
 }) {
   const { player, playExclusive, pause } = useGlobalAudioPlayer(recording.uri);
   const playerStatus = useAudioPlayerStatus(player);
@@ -159,53 +161,63 @@ export function RecordingListItem({
         activeOffsetX={[-10, 10]}
         minPointers={1}
       >
-        <Animated.View
-          style={[
-            styles.ideaItem,
-            swipeStyles.itemContainer,
-            {
-              transform: [{ translateX }],
-              backgroundColor: isDark
-                ? Colors.dark.background
-                : Colors.light.background,
-              marginBottom: 0, // i handled this in the container
-            },
-          ]}
+        <Pressable
+          onLongPress={() => {
+            if (onLongPress) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              onLongPress(recording);
+            }
+          }}
+          delayLongPress={500}
         >
-          <Pressable style={styles.ideaIconContainer}>
-            <Entypo name="sound-mix" size={22} color="white" />
-          </Pressable>
-
-          <View style={styles.ideaContent}>
-            <ThemedText style={styles.ideaTitle} numberOfLines={1}>
-              {recording.title}
-            </ThemedText>
-            <View style={styles.ideaMetadata}>
-              <ThemedText style={styles.ideaDuration}>
-                {formatTime(recording.durationMillis)}
-              </ThemedText>
-              <ThemedText style={styles.ideaDate}>
-                {formatDate(recording.date)}
-              </ThemedText>
-            </View>
-          </View>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.playButton,
-              pressed && { opacity: 0.7 },
+          <Animated.View
+            style={[
+              styles.ideaItem,
+              swipeStyles.itemContainer,
+              {
+                transform: [{ translateX }],
+                backgroundColor: isDark
+                  ? Colors.dark.background
+                  : Colors.light.background,
+                marginBottom: 0, // i handled this in the container
+              },
             ]}
-            onPress={togglePlayback}
           >
-            <Entypo
-              name={
-                playerStatus.playing ? "controller-paus" : "controller-play"
-              }
-              size={18}
-              color={isDark ? Colors.dark.tint : Colors.light.tint}
-            />
-          </Pressable>
-        </Animated.View>
+            <Pressable style={styles.ideaIconContainer}>
+              <Entypo name="sound-mix" size={22} color="white" />
+            </Pressable>
+
+            <View style={styles.ideaContent}>
+              <ThemedText style={styles.ideaTitle} numberOfLines={1}>
+                {recording.title}
+              </ThemedText>
+              <View style={styles.ideaMetadata}>
+                <ThemedText style={styles.ideaDuration}>
+                  {formatTime(recording.durationMillis)}
+                </ThemedText>
+                <ThemedText style={styles.ideaDate}>
+                  {formatDate(recording.date)}
+                </ThemedText>
+              </View>
+            </View>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.playButton,
+                pressed && { opacity: 0.7 },
+              ]}
+              onPress={togglePlayback}
+            >
+              <Entypo
+                name={
+                  playerStatus.playing ? "controller-paus" : "controller-play"
+                }
+                size={18}
+                color={isDark ? Colors.dark.tint : Colors.light.tint}
+              />
+            </Pressable>
+          </Animated.View>
+        </Pressable>
       </PanGestureHandler>
     </View>
   );
@@ -227,8 +239,7 @@ const swipeStyles = StyleSheet.create({
     alignItems: "flex-end",
     paddingRight: 20,
   },
-  deleteIcon: {
-  },
+  deleteIcon: {},
   itemContainer: {
     backgroundColor: "transparent",
   },
