@@ -14,6 +14,7 @@ import {
 } from "expo-audio";
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View, Alert } from "react-native";
+import { alert } from "yooo-native";
 
 // Note detection utilities
 const NOTE_NAMES = [
@@ -107,7 +108,7 @@ export default function NoteDetector() {
     (async () => {
       const status = await AudioModule.requestRecordingPermissionsAsync();
       if (!status.granted) {
-        alert("Permission to access microphone was denied");
+        alert.error("Permission to access microphone was denied");
       }
       await setAudioModeAsync({
         playsInSilentMode: true,
@@ -125,7 +126,7 @@ export default function NoteDetector() {
       setDetectedFrequency(0);
     } catch (error) {
       console.error("Error starting recording:", error);
-      Alert.alert("Error", "Failed to start recording");
+      alert.error("Failed to start recording");
     }
   };
 
@@ -137,13 +138,13 @@ export default function NoteDetector() {
       analyzeRecording();
     } catch (error) {
       console.error("Error stopping recording:", error);
-      Alert.alert("Error", "Failed to stop recording");
+      alert.error("Failed to stop recording");
     }
   };
 
   const analyzeRecording = async () => {
     if (!recorder.uri) {
-      Alert.alert("Error", "No recording available to analyze");
+      alert.error("No recording available to analyze");
       return;
     }
 
@@ -171,13 +172,13 @@ export default function NoteDetector() {
     } catch (error) {
       console.error("Error analyzing recording:", error);
       setIsAnalyzing(false);
-      Alert.alert("Error", "Failed to analyze recording");
+      alert.error("Failed to analyze recording");
     }
   };
 
   const playPreview = async () => {
     if (!recorder.uri) {
-      Alert.alert("Error", "No recording available to play");
+      alert.error("No recording available to play");
       return;
     }
 
@@ -190,7 +191,7 @@ export default function NoteDetector() {
       // and release it when done
     } catch (error) {
       console.error("Error playing preview:", error);
-      Alert.alert("Error", "Failed to play preview");
+      alert.error("Failed to play preview");
     }
   };
 
@@ -203,13 +204,13 @@ export default function NoteDetector() {
         {recorderState.isRecording ? (
           <MaterialIcons
             name="stop"
-            size={100}
+            size={50}
             color={Colors[colorScheme ?? "light"].isRecording}
           />
         ) : (
           <Entypo
             name="mic"
-            size={100}
+            size={50}
             color={Colors[colorScheme ?? "light"].tint}
           />
         )}
@@ -278,8 +279,8 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      width: 300,
-      height: 300,
+      width: 200,
+      height: 200,
       borderRadius: 150,
       borderWidth: 3,
       borderColor: "rgba(91, 69, 99, 0.98)",
