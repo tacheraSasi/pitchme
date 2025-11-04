@@ -21,12 +21,14 @@ export function RecordingListItem({
   formatDate,
   colorScheme,
   styles,
+  onLongPress,
 }: {
   recording: RecordingItem;
   formatTime: (millis: number) => string;
   formatDate: (dateString: string) => string;
   colorScheme: "light" | "dark";
   styles: any;
+  onLongPress?: (recording: RecordingItem) => void;
 }) {
   const { player, playExclusive, pause } = useGlobalAudioPlayer(recording.uri);
   const playerStatus = useAudioPlayerStatus(player);
@@ -159,19 +161,28 @@ export function RecordingListItem({
         activeOffsetX={[-10, 10]}
         minPointers={1}
       >
-        <Animated.View
-          style={[
-            styles.ideaItem,
-            swipeStyles.itemContainer,
-            {
-              transform: [{ translateX }],
-              backgroundColor: isDark
-                ? Colors.dark.background
-                : Colors.light.background,
-              marginBottom: 0, // i handled this in the container
-            },
-          ]}
+        <Pressable
+          onLongPress={() => {
+            if (onLongPress) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              onLongPress(recording);
+            }
+          }}
+          delayLongPress={500}
         >
+          <Animated.View
+            style={[
+              styles.ideaItem,
+              swipeStyles.itemContainer,
+              {
+                transform: [{ translateX }],
+                backgroundColor: isDark
+                  ? Colors.dark.background
+                  : Colors.light.background,
+                marginBottom: 0, // i handled this in the container
+              },
+            ]}
+          >
           <Pressable style={styles.ideaIconContainer}>
             <Entypo name="sound-mix" size={22} color="white" />
           </Pressable>
@@ -205,7 +216,8 @@ export function RecordingListItem({
               color={isDark ? Colors.dark.tint : Colors.light.tint}
             />
           </Pressable>
-        </Animated.View>
+          </Animated.View>
+        </Pressable>
       </PanGestureHandler>
     </View>
   );
