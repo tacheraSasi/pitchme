@@ -166,17 +166,23 @@ const RecordingDetailsBottomSheet = ({
     if (!recording) return;
 
     try {
-      const outputPath = await exportAudioAsVideo(recording.uri);
+      toast.success("Starting video export...", { duration: 2000 });
+
+      const outputPath = await exportAudioAsVideo(recording.uri, true);
+
       if (outputPath) {
-        toast.success("Recording exported successfully!");
-      } else {
-        toast.error("Failed to export recording");
+        toast.success(
+          `Video exported successfully! Saved to device storage and gallery.`
+        );
+        console.log("Video exported to:", outputPath.uri);
       }
     } catch (error) {
       console.error("Error exporting recording:", error);
-      toast.error("Failed to export recording");
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Failed to export recording: ${errorMessage}`);
     }
-  }
+  };
 
   const togglePlayback = async () => {
     if (!recording) return;
@@ -363,7 +369,11 @@ const RecordingDetailsBottomSheet = ({
             style={styles.exportButton}
             onPress={handleExportRecording}
           >
-            <Entypo name="video" size={20} color={Colors[colorScheme ?? "light"].background} />
+            <Entypo
+              name="video"
+              size={20}
+              color={Colors[colorScheme ?? "light"].background}
+            />
             <ThemedText style={styles.exportButtonText}>
               Export Recording as Video
             </ThemedText>
