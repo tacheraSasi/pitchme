@@ -4,6 +4,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
 import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
+import { exportAudio } from "@/utils/exporter";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -159,6 +160,26 @@ const RecordingDetailsBottomSheet = ({
         },
       ]
     );
+  };
+
+  const handleExportRecording = async () => {
+    if (!recording) return;
+
+    try {
+      toast.success("Starting audio share...", { duration: 2000 });
+
+      const outputPath = await exportAudio(recording.uri, true);
+
+      if (outputPath) {
+        toast.success(`Audio shared successfully! Saved to gallery.`);
+        console.log("Audio shared from:", outputPath.uri);
+      }
+    } catch (error) {
+      console.error("Error sharing recording:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Failed to share recording: ${errorMessage}`);
+    }
   };
 
   const togglePlayback = async () => {
@@ -343,6 +364,19 @@ const RecordingDetailsBottomSheet = ({
         {/* Actions Section */}
         <ThemedView style={styles.actionsSection}>
           <Pressable
+            style={styles.exportButton}
+            onPress={handleExportRecording}
+          >
+            <Entypo
+              name="music"
+              size={20}
+              color={Colors[colorScheme ?? "light"].background}
+            />
+            <ThemedText style={styles.exportButtonText}>
+              Share Recording
+            </ThemedText>
+          </Pressable>
+          <Pressable
             style={styles.deleteButton}
             onPress={handleDeleteRecording}
           >
@@ -493,6 +527,21 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderTopWidth: 1,
       borderTopColor: Colors[colorScheme].borderColor,
     },
+    exportButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: Colors[colorScheme].tint,
+      borderRadius: 12,
+      padding: 16,
+      gap: 8,
+      marginVertical: 8,
+    },
+    exportButtonText: {
+      color: Colors[colorScheme].background,
+      fontSize: 16,
+      fontWeight: "600",
+    },
     deleteButton: {
       flexDirection: "row",
       alignItems: "center",
@@ -501,6 +550,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderRadius: 12,
       padding: 16,
       gap: 8,
+      marginVertical: 8,
     },
     deleteButtonText: {
       color: "white",
