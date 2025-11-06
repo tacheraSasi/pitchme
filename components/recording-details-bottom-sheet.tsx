@@ -4,7 +4,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
 import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
-import { exportAudioAsVideo } from "@/utils/exporter";
+import { exportAudio } from "@/utils/exporter";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -166,21 +166,19 @@ const RecordingDetailsBottomSheet = ({
     if (!recording) return;
 
     try {
-      toast.success("Starting video export...", { duration: 2000 });
+      toast.success("Starting audio share...", { duration: 2000 });
 
-      const outputPath = await exportAudioAsVideo(recording.uri, true);
+      const outputPath = await exportAudio(recording.uri, true);
 
       if (outputPath) {
-        toast.success(
-          `Video exported successfully! Saved to device storage and gallery.`
-        );
-        console.log("Video exported to:", outputPath.uri);
+        toast.success(`Audio shared successfully! Saved to gallery.`);
+        console.log("Audio shared from:", outputPath.uri);
       }
     } catch (error) {
-      console.error("Error exporting recording:", error);
+      console.error("Error sharing recording:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred";
-      toast.error(`Failed to export recording: ${errorMessage}`);
+      toast.error(`Failed to share recording: ${errorMessage}`);
     }
   };
 
@@ -370,12 +368,12 @@ const RecordingDetailsBottomSheet = ({
             onPress={handleExportRecording}
           >
             <Entypo
-              name="video"
+              name="music"
               size={20}
               color={Colors[colorScheme ?? "light"].background}
             />
             <ThemedText style={styles.exportButtonText}>
-              Export Recording as Video
+              Share Recording
             </ThemedText>
           </Pressable>
           <Pressable
