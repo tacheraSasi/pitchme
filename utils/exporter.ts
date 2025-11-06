@@ -5,7 +5,7 @@ import { FFmpegKit } from "ffmpeg-kit-react-native";
 
 export async function exportAudioAsVideo(
   audioPath: string,
-  saveToGallery: boolean = false
+  saveToGallery: boolean = true
 ) {
   try {
     console.log("Starting video export for audio:", audioPath);
