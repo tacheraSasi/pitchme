@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
@@ -20,7 +21,8 @@ export async function exportAudio(
         dialogTitle: "Share your musical idea",
       });
 
-      if (saveToGallery) {
+      // Only try to save to gallery if not in Expo Go (due to Android limitations)
+      if (saveToGallery && !Constants.appOwnership) {
         try {
           const { status } = await MediaLibrary.requestPermissionsAsync();
           if (status === "granted") {
@@ -33,6 +35,10 @@ export async function exportAudio(
         } catch (galleryError) {
           console.warn("Failed to save to gallery:", galleryError);
         }
+      } else if (saveToGallery && Constants.appOwnership) {
+        console.log(
+          "Gallery save skipped in Expo Go due to Android limitations"
+        );
       }
 
       return audioFile;
