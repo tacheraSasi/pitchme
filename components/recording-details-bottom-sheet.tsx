@@ -343,6 +343,15 @@ const RecordingDetailsBottomSheet = ({
         {/* Actions Section */}
         <ThemedView style={styles.actionsSection}>
           <Pressable
+            style={styles.exportButton}
+            // onPress={handleExportRecording}
+          >
+            <Entypo name="video" size={20} color={Colors[colorScheme ?? "light"].background} />
+            <ThemedText style={styles.exportButtonText}>
+              Export Recording as Video
+            </ThemedText>
+          </Pressable>
+          <Pressable
             style={styles.deleteButton}
             onPress={handleDeleteRecording}
           >
@@ -493,6 +502,21 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderTopWidth: 1,
       borderTopColor: Colors[colorScheme].borderColor,
     },
+    exportButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: Colors[colorScheme].tint,
+      borderRadius: 12,
+      padding: 16,
+      gap: 8,
+      marginVertical: 8,
+    },
+    exportButtonText: {
+      color: Colors[colorScheme].background,
+      fontSize: 16,
+      fontWeight: "600",
+    },
     deleteButton: {
       flexDirection: "row",
       alignItems: "center",
@@ -501,6 +525,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderRadius: 12,
       padding: 16,
       gap: 8,
+      marginVertical: 8,
     },
     deleteButtonText: {
       color: "white",
