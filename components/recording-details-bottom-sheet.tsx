@@ -4,6 +4,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
 import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
+import { exportAudioAsVideo } from "@/utils/exporter";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -160,6 +161,22 @@ const RecordingDetailsBottomSheet = ({
       ]
     );
   };
+
+  const handleExportRecording = async () => {
+    if (!recording) return;
+
+    try {
+      const outputPath = await exportAudioAsVideo(recording.uri);
+      if (outputPath) {
+        toast.success("Recording exported successfully!");
+      } else {
+        toast.error("Failed to export recording");
+      }
+    } catch (error) {
+      console.error("Error exporting recording:", error);
+      toast.error("Failed to export recording");
+    }
+  }
 
   const togglePlayback = async () => {
     if (!recording) return;
@@ -344,7 +361,7 @@ const RecordingDetailsBottomSheet = ({
         <ThemedView style={styles.actionsSection}>
           <Pressable
             style={styles.exportButton}
-            // onPress={handleExportRecording}
+            onPress={handleExportRecording}
           >
             <Entypo name="video" size={20} color={Colors[colorScheme ?? "light"].background} />
             <ThemedText style={styles.exportButtonText}>

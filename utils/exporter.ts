@@ -1,7 +1,9 @@
 import { FFmpegKit } from "ffmpeg-kit-react-native";
 import * as FileSystem from "expo-file-system";
 
-export async function exportAudioAsVideo(audioPath: string, imagePath: string) {
+const imagePath = require("@/assets/images/export-place-holder.png");
+
+export async function exportAudioAsVideo(audioPath: string) {
   try {
     const outPutName = `pitch_me_output_video_${Date.now()}.mp4`;
     const outputPath = new FileSystem.File(FileSystem.Paths.document, outPutName);
