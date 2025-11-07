@@ -43,18 +43,16 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
     console.log("handleSheetChanges", index);
   }, []);
 
-  // Setup audio permissions and mode
   useEffect(() => {
     const setupAudio = async () => {
       try {
-        // Request recording permissions
         const { granted } = await requestRecordingPermissionsAsync();
         if (!granted) {
           toast.error("Microphone access is required to record audio.");
           return;
         }
 
-        // Configure audio mode
+        // audio mode
         await setAudioModeAsync({
           allowsRecording: true,
           playsInSilentMode: true,

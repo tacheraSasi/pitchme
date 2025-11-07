@@ -134,7 +134,6 @@ export default function NoteDetector() {
     try {
       await recorder.stop();
       setSaved(true);
-      // Analyze the recording for note detection
       analyzeRecording();
     } catch (error) {
       console.error("Error stopping recording:", error);
@@ -151,17 +150,8 @@ export default function NoteDetector() {
     setIsAnalyzing(true);
 
     try {
-      // For a real implementation, you would:
-      // 1. Read the audio file from recorder.uri
-      // 2. Decode the audio data
-      // 3. Analyze the frequency content
-
-      // Since expo-audio doesn't provide direct audio data access,
-      // we'll simulate analysis with a timeout and generate a "detected" note
-      // In a production app, you'd use a native module or web audio API
 
       setTimeout(() => {
-        // Simulate analysis - in real app, this would be actual audio analysis
         const simulatedFrequency = 440 + (Math.random() * 100 - 50); // A4 ± 50Hz
         const note = getNoteFromFrequency(simulatedFrequency);
 
