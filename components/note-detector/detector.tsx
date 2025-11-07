@@ -2,6 +2,11 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import {
+  detectPitch,
+  frequencyToNote,
+  getPcmDataFromWav,
+} from "@/utils/note-detector";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
@@ -13,7 +18,7 @@ import {
   useAudioRecorderState,
 } from "expo-audio";
 import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, View, Alert } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { alert } from "yooo-native";
 
 // Note detection utilities
@@ -99,7 +104,10 @@ export default function NoteDetector() {
   const [detectedFrequency, setDetectedFrequency] = useState<number>(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorder = useAudioRecorder({
+    ...RecordingPresets.HIGH_QUALITY,
+    extension: ".wav",
+  });
   const recorderState = useAudioRecorderState(recorder);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
@@ -150,7 +158,28 @@ export default function NoteDetector() {
     setIsAnalyzing(true);
 
     try {
+      // Try to analyze the recording
+      if (recorder.uri) {
+        try {
+          const pcmData = await getPcmDataFromWav(recorder.uri);
+          if (pcmData) {
+            const pitch = await detectPitch(pcmData);
+            const detectedNote = frequencyToNote(pitch);
+            console.log(`Detected pitch: ${pitch} Hz, Note: ${detectedNote}`);
+            setDetectedFrequency(pitch ?? 0);
+            setDetectedNote(detectedNote);
+            setIsAnalyzing(false);
+            return;
+          }
+        } catch (analysisError) {
+          console.warn(
+            "Failed to analyze recording, using simulation:",
+            analysisError
+          );
+        }
+      }
 
+      // Fallback to simulation if analysis fails
       setTimeout(() => {
         const simulatedFrequency = 440 + (Math.random() * 100 - 50); // A4 ± 50Hz
         const note = getNoteFromFrequency(simulatedFrequency);

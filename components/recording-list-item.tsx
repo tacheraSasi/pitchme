@@ -200,7 +200,7 @@ export function RecordingListItem({
             style={swipeStyles.detailsIcon}
           />
         </View>
-      )}{" "}
+      )}
       <PanGestureHandler
         ref={panRef}
         onGestureEvent={onPanGestureEvent}
@@ -364,8 +364,8 @@ const recordingItemStyles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 16,
-    borderColor:"gray",
-    borderWidth:2,
+    borderColor: "gray",
+    borderWidth: 2,
     marginBottom: 0,
     shadowColor: "#000",
     shadowOffset: {
