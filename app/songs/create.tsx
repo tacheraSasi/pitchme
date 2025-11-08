@@ -1,3 +1,4 @@
+import ScreenLayout from "@/components/ScreenLayout";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Note, NOTES } from "@/constants/notes";
@@ -5,9 +6,10 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useCreateSong } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Alert,
   Pressable,
@@ -51,6 +53,7 @@ export default function CreateSong() {
   const colorScheme = useColorScheme();
   const createSong = useCreateSong();
   const styles = getStyles(colorScheme ?? "light");
+  const aboutBottomSheetRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -109,214 +112,221 @@ export default function CreateSong() {
       setIsLoading(false);
     }
   };
-
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={Colors[colorScheme ?? "light"].text}
-            />
-          </Pressable>
-          <ThemedText type="subtitle" style={styles.headerTitle}>
-            New Song
-          </ThemedText>
-          <Pressable
-            onPress={handleSave}
-            style={[styles.saveButton, isLoading && styles.saveButtonDisabled]}
-            disabled={isLoading}
-          >
-            <ThemedText style={styles.saveButtonText}>
-              {isLoading ? "Saving..." : "Save"}
+    <ScreenLayout styles={styles.container} aboutBottomSheetRef={aboutBottomSheetRef}>
+      <ThemedView style={styles.container}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.header}>
+            <Pressable onPress={() => router.back()} style={styles.backButton}>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={Colors[colorScheme ?? "light"].text}
+              />
+            </Pressable>
+            <ThemedText type="subtitle" style={styles.headerTitle}>
+              New Song
             </ThemedText>
-          </Pressable>
-        </View>
-
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Song Title */}
-          <View style={styles.section}>
-            <ThemedText style={styles.sectionLabel}>Song Title *</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={formData.title}
-              onChangeText={(text) => handleInputChange("title", text)}
-              placeholder="Enter song title..."
-              placeholderTextColor={Colors[colorScheme ?? "light"].icon}
-              maxLength={100}
-            />
-          </View>
-
-          {/* Musical Properties */}
-          <View style={styles.section}>
-            <ThemedText style={styles.sectionLabel}>
-              Musical Properties
-            </ThemedText>
-
-            <View style={styles.row}>
-              <View style={styles.halfWidth}>
-                <ThemedText style={styles.inputLabel}>Key</ThemedText>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={formData.key}
-                    onValueChange={(value: Note) =>
-                      handleInputChange("key", value)
-                    }
-                    style={styles.picker}
-                    dropdownIconColor={Colors[colorScheme ?? "light"].text}
-                  >
-                    {NOTES.map((note) => (
-                      <Picker.Item key={note} label={note} value={note} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-
-              <View style={styles.halfWidth}>
-                <ThemedText style={styles.inputLabel}>BPM</ThemedText>
-                <TextInput
-                  style={styles.textInput}
-                  value={formData.bpm.toString()}
-                  onChangeText={(text) => {
-                    const bpm = parseInt(text) || 120;
-                    handleInputChange("bpm", Math.max(40, Math.min(200, bpm)));
-                  }}
-                  placeholder="120"
-                  placeholderTextColor={Colors[colorScheme ?? "light"].icon}
-                  keyboardType="numeric"
-                  maxLength={3}
-                />
-              </View>
-            </View>
-
-            <View style={styles.row}>
-              <View style={styles.halfWidth}>
-                <ThemedText style={styles.inputLabel}>
-                  Time Signature
-                </ThemedText>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={formData.timeSignature}
-                    onValueChange={(value: string) =>
-                      handleInputChange("timeSignature", value)
-                    }
-                    style={styles.picker}
-                    dropdownIconColor={Colors[colorScheme ?? "light"].text}
-                  >
-                    {TIME_SIGNATURES.map((sig) => (
-                      <Picker.Item key={sig} label={sig} value={sig} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-
-              <View style={styles.halfWidth}>
-                <ThemedText style={styles.inputLabel}>Genre</ThemedText>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={formData.genre}
-                    onValueChange={(value: string) =>
-                      handleInputChange("genre", value)
-                    }
-                    style={styles.picker}
-                    dropdownIconColor={Colors[colorScheme ?? "light"].text}
-                  >
-                    <Picker.Item label="Select genre..." value="" />
-                    {GENRES.map((genre) => (
-                      <Picker.Item key={genre} label={genre} value={genre} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Description */}
-          <View style={styles.section}>
-            <ThemedText style={styles.sectionLabel}>Description</ThemedText>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              value={formData.description}
-              onChangeText={(text) => handleInputChange("description", text)}
-              placeholder="Describe your song..."
-              placeholderTextColor={Colors[colorScheme ?? "light"].icon}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-              maxLength={500}
-            />
-          </View>
-
-          {/* Inspiration */}
-          <View style={styles.section}>
-            <ThemedText style={styles.sectionLabel}>
-              Inspiration & Ideas
-            </ThemedText>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              value={formData.inspiration}
-              onChangeText={(text) => handleInputChange("inspiration", text)}
-              placeholder="What inspired this song? What story do you want to tell?"
-              placeholderTextColor={Colors[colorScheme ?? "light"].icon}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-              maxLength={500}
-            />
-          </View>
-
-          {/* Tags */}
-          <View style={styles.section}>
-            <ThemedText style={styles.sectionLabel}>Tags</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={formData.tags}
-              onChangeText={(text) => handleInputChange("tags", text)}
-              placeholder="upbeat, summer, love (comma separated)"
-              placeholderTextColor={Colors[colorScheme ?? "light"].icon}
-              maxLength={200}
-            />
-            <ThemedText style={styles.helperText}>
-              Separate tags with commas to help organize your songs
-            </ThemedText>
-          </View>
-
-          {/* Status */}
-          <View style={styles.section}>
             <Pressable
-              style={styles.checkboxRow}
-              onPress={() =>
-                handleInputChange("isCompleted", !formData.isCompleted)
-              }
+              onPress={handleSave}
+              style={[
+                styles.saveButton,
+                isLoading && styles.saveButtonDisabled,
+              ]}
+              disabled={isLoading}
             >
-              <View
-                style={[
-                  styles.checkbox,
-                  formData.isCompleted && styles.checkboxChecked,
-                ]}
-              >
-                {formData.isCompleted && (
-                  <Ionicons
-                    name="checkmark"
-                    size={16}
-                    color={colorScheme === "dark" ? "#000" : "#fff"}
-                  />
-                )}
-              </View>
-              <ThemedText style={styles.checkboxLabel}>
-                Mark as completed
+              <ThemedText style={styles.saveButtonText}>
+                {isLoading ? "Saving..." : "Save"}
               </ThemedText>
             </Pressable>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Song Title */}
+            <View style={styles.section}>
+              <ThemedText style={styles.sectionLabel}>Song Title *</ThemedText>
+              <TextInput
+                style={styles.textInput}
+                value={formData.title}
+                onChangeText={(text) => handleInputChange("title", text)}
+                placeholder="Enter song title..."
+                placeholderTextColor={Colors[colorScheme ?? "light"].icon}
+                maxLength={100}
+              />
+            </View>
+
+            {/* Musical Properties */}
+            <View style={styles.section}>
+              <ThemedText style={styles.sectionLabel}>
+                Musical Properties
+              </ThemedText>
+
+              <View style={styles.row}>
+                <View style={styles.halfWidth}>
+                  <ThemedText style={styles.inputLabel}>Key</ThemedText>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={formData.key}
+                      onValueChange={(value: Note) =>
+                        handleInputChange("key", value)
+                      }
+                      style={styles.picker}
+                      dropdownIconColor={Colors[colorScheme ?? "light"].text}
+                    >
+                      {NOTES.map((note) => (
+                        <Picker.Item key={note} label={note} value={note} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                <View style={styles.halfWidth}>
+                  <ThemedText style={styles.inputLabel}>BPM</ThemedText>
+                  <TextInput
+                    style={styles.textInput}
+                    value={formData.bpm.toString()}
+                    onChangeText={(text) => {
+                      const bpm = parseInt(text) || 120;
+                      handleInputChange(
+                        "bpm",
+                        Math.max(40, Math.min(200, bpm))
+                      );
+                    }}
+                    placeholder="120"
+                    placeholderTextColor={Colors[colorScheme ?? "light"].icon}
+                    keyboardType="numeric"
+                    maxLength={3}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.row}>
+                <View style={styles.halfWidth}>
+                  <ThemedText style={styles.inputLabel}>
+                    Time Signature
+                  </ThemedText>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={formData.timeSignature}
+                      onValueChange={(value: string) =>
+                        handleInputChange("timeSignature", value)
+                      }
+                      style={styles.picker}
+                      dropdownIconColor={Colors[colorScheme ?? "light"].text}
+                    >
+                      {TIME_SIGNATURES.map((sig) => (
+                        <Picker.Item key={sig} label={sig} value={sig} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                <View style={styles.halfWidth}>
+                  <ThemedText style={styles.inputLabel}>Genre</ThemedText>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={formData.genre}
+                      onValueChange={(value: string) =>
+                        handleInputChange("genre", value)
+                      }
+                      style={styles.picker}
+                      dropdownIconColor={Colors[colorScheme ?? "light"].text}
+                    >
+                      <Picker.Item label="Select genre..." value="" />
+                      {GENRES.map((genre) => (
+                        <Picker.Item key={genre} label={genre} value={genre} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* Description */}
+            <View style={styles.section}>
+              <ThemedText style={styles.sectionLabel}>Description</ThemedText>
+              <TextInput
+                style={[styles.textInput, styles.textArea]}
+                value={formData.description}
+                onChangeText={(text) => handleInputChange("description", text)}
+                placeholder="Describe your song..."
+                placeholderTextColor={Colors[colorScheme ?? "light"].icon}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                maxLength={500}
+              />
+            </View>
+
+            {/* Inspiration */}
+            <View style={styles.section}>
+              <ThemedText style={styles.sectionLabel}>
+                Inspiration & Ideas
+              </ThemedText>
+              <TextInput
+                style={[styles.textInput, styles.textArea]}
+                value={formData.inspiration}
+                onChangeText={(text) => handleInputChange("inspiration", text)}
+                placeholder="What inspired this song? What story do you want to tell?"
+                placeholderTextColor={Colors[colorScheme ?? "light"].icon}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                maxLength={500}
+              />
+            </View>
+
+            {/* Tags */}
+            <View style={styles.section}>
+              <ThemedText style={styles.sectionLabel}>Tags</ThemedText>
+              <TextInput
+                style={styles.textInput}
+                value={formData.tags}
+                onChangeText={(text) => handleInputChange("tags", text)}
+                placeholder="upbeat, summer, love (comma separated)"
+                placeholderTextColor={Colors[colorScheme ?? "light"].icon}
+                maxLength={200}
+              />
+              <ThemedText style={styles.helperText}>
+                Separate tags with commas to help organize your songs
+              </ThemedText>
+            </View>
+
+            {/* Status */}
+            <View style={styles.section}>
+              <Pressable
+                style={styles.checkboxRow}
+                onPress={() =>
+                  handleInputChange("isCompleted", !formData.isCompleted)
+                }
+              >
+                <View
+                  style={[
+                    styles.checkbox,
+                    formData.isCompleted && styles.checkboxChecked,
+                  ]}
+                >
+                  {formData.isCompleted && (
+                    <Ionicons
+                      name="checkmark"
+                      size={16}
+                      color={colorScheme === "dark" ? "#000" : "#fff"}
+                    />
+                  )}
+                </View>
+                <ThemedText style={styles.checkboxLabel}>
+                  Mark as completed
+                </ThemedText>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </ThemedView>
+    </ScreenLayout>
   );
 }
 

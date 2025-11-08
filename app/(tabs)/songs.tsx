@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import React, { useRef } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { alert } from "yooo-native";
 
 interface SongItemProps {
   song: Song;
@@ -22,7 +23,7 @@ const SongItem = ({ song, onDelete }: SongItemProps) => {
   const styles = getStyles(colorScheme ?? "light");
 
   const handleDelete = () => {
-    Alert.alert(
+    alert.dialog(
       "Delete Song",
       `Are you sure you want to delete "${song.title}"? This action cannot be undone.`,
       [
