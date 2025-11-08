@@ -16,11 +16,11 @@ export function useGlobalAudioPlayer(uri: string) {
       currentPlayer.pause();
     }
     currentPlayer = player;
-    await player.play();
+    player.play();
   };
 
   const pause = async () => {
-    await player.pause();
+    player.pause();
     if (currentPlayer === player) currentPlayer = null;
   };
 
