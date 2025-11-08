@@ -23,7 +23,7 @@ export default function SettingsScreen() {
   const {
     notifications,
     hapticFeedback,
-    autoPlay,
+    loopNotes: autoPlay,
     recordingQuality,
     themeMode,
   } = useSettingsStore();
