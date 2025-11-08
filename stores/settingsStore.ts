@@ -97,7 +97,7 @@ export const useSetThemeMode = () =>
 export const useCycleTheme = () =>
   useSettingsStore((state) => state.cycleTheme);
 
-export const useSetAutoPlay = () =>
+export const useSetLoopNotes = () =>
   useSettingsStore((state) => state.setLoopNotes);
 export const useSetRecordingQuality = () =>
   useSettingsStore((state) => state.setRecordingQuality);
