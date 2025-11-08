@@ -156,7 +156,6 @@ export default function SettingsScreen() {
             <Switch
               value={loopNotes}
               onValueChange={setLoopNotes}
-              disabled
               trackColor={{
                 false: "#767577",
                 true: Colors[colorScheme ?? "light"].tint,
