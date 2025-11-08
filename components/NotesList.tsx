@@ -4,6 +4,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { NOTES, Note, noteAssets } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useAudioPlayer } from "expo-audio";
 import { useCallback, useRef } from "react";
 import { ScrollView, StyleSheet, useWindowDimensions } from "react-native";
@@ -12,6 +13,7 @@ export const NotesList = () => {
   const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
+  const { loopNotes } = useSettingsStore()
 
   const playerC = useAudioPlayer(noteAssets[Note.C]);
   const playerCSharp = useAudioPlayer(noteAssets[Note.CSharp]);
@@ -67,6 +69,7 @@ export const NotesList = () => {
           console.log("Player status:", player.currentStatus);
 
           player.seekTo(0);
+          player.loop = loopNotes;
           const playResult = player.play();
           console.log("Play result:", playResult);
         } else {

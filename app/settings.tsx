@@ -150,8 +150,8 @@ export default function SettingsScreen() {
 
         <SettingItem
           icon="volume-up"
-          title="Auto-play Notes"
-          subtitle="Automatically play notes when tapped"
+          title="Loop Notes"
+          subtitle="Loop notes when tapped"
           rightElement={
             <Switch
               value={loopNotes}
