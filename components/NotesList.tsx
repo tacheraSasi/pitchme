@@ -4,6 +4,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { NOTES, Note, noteAssets } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useAudioPlayer } from "expo-audio";
 import { useCallback, useRef } from "react";
 import { ScrollView, StyleSheet, useWindowDimensions } from "react-native";
@@ -12,6 +13,7 @@ export const NotesList = () => {
   const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
+  const { loopNotes } = useSettingsStore()
 
   const playerC = useAudioPlayer(noteAssets[Note.C]);
   const playerCSharp = useAudioPlayer(noteAssets[Note.CSharp]);
@@ -36,13 +38,8 @@ export const NotesList = () => {
   const handleNotePress = useCallback(
     (note: Note) => {
       try {
-        console.log("Playing note:", note);
-
-        if (currentPlayerRef.current) {
-          currentPlayerRef.current.pause();
-          currentPlayerRef.current.seekTo(0);
-        }
-
+        console.log("Pressed note:", note);
+  
         const audioPlayers = {
           [Note.C]: playerC,
           [Note.CSharp]: playerCSharp,
@@ -57,23 +54,34 @@ export const NotesList = () => {
           [Note.ASharp]: playerASharp,
           [Note.B]: playerB,
         };
-
+  
         const player = audioPlayers[note];
-        if (player) {
-          console.log("Player found for note:", note);
-          currentPlayerRef.current = player;
-
-          // Check player status
-          console.log("Player status:", player.currentStatus);
-
+        if (!player) return;
+  
+        // if the same note is already playing i → stop it
+        if (currentPlayerRef.current === player) {
+          console.log("Stopping note:", note);
+          player.pause();
           player.seekTo(0);
-          const playResult = player.play();
-          console.log("Play result:", playResult);
-        } else {
-          console.log("No player found for note:", note);
+          currentPlayerRef.current = null;
+          return;
         }
+  
+        // i stop any other note that might be playing
+        if (currentPlayerRef.current) {
+          currentPlayerRef.current.pause();
+          currentPlayerRef.current.seekTo(0);
+        }
+  
+        // play the new note
+        console.log("Playing note:", note);
+        currentPlayerRef.current = player;
+        player.loop = loopNotes;
+        player.seekTo(0);
+        player.play();
+  
       } catch (error) {
-        console.error("Error playing note:", note, error);
+        console.error("Error handling note press:", note, error);
       }
     },
     [
@@ -89,8 +97,10 @@ export const NotesList = () => {
       playerA,
       playerASharp,
       playerB,
+      loopNotes,
     ]
   );
+
 
   return (
     <ThemedView style={styles.wrapper}>
@@ -118,7 +128,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") => {
   const styles = StyleSheet.create({
     wrapper: {
       flex: 1,
-      minHeight: 300, // Ensure minimum height
+      minHeight: 300,
     },
     listTitle: {
       fontSize: 18,
@@ -133,7 +143,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") => {
       justifyContent: "center",
       paddingHorizontal: 8,
       paddingVertical: 10,
-      paddingBottom: 20, // Extra padding at bottom
+      paddingBottom: 20,
     },
   });
   return styles;

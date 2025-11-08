@@ -11,8 +11,8 @@ interface SettingsState {
   setThemeMode: (theme: ThemeMode) => void;
 
   // Audio settings
-  autoPlay: boolean;
-  setAutoPlay: (enabled: boolean) => void;
+  loopNotes: boolean;
+  setLoopNotes: (enabled: boolean) => void;
   recordingQuality: RecordingQuality;
   setRecordingQuality: (quality: RecordingQuality) => void;
 
@@ -30,7 +30,7 @@ interface SettingsState {
 
 const defaultSettings = {
   themeMode: "system" as ThemeMode,
-  autoPlay: false,
+  loopNotes: false,
   recordingQuality: "high" as RecordingQuality,
   notifications: true,
   hapticFeedback: true,
@@ -51,7 +51,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       // Audio actions
-      setAutoPlay: (autoPlay) => set({ autoPlay }),
+      setLoopNotes: (loopNotes) => set({ loopNotes: loopNotes }),
       setRecordingQuality: (recordingQuality) => set({ recordingQuality }),
       cycleRecordingQuality: () => {
         const qualities: RecordingQuality[] = ["low", "medium", "high"];
@@ -83,7 +83,7 @@ export const useSettingsStore = create<SettingsState>()(
 );
 
 export const useThemeMode = () => useSettingsStore((state) => state.themeMode);
-export const useAutoPlay = () => useSettingsStore((state) => state.autoPlay);
+export const useAutoPlay = () => useSettingsStore((state) => state.loopNotes);
 export const useRecordingQuality = () =>
   useSettingsStore((state) => state.recordingQuality);
 export const useNotifications = () =>
@@ -97,8 +97,8 @@ export const useSetThemeMode = () =>
 export const useCycleTheme = () =>
   useSettingsStore((state) => state.cycleTheme);
 
-export const useSetAutoPlay = () =>
-  useSettingsStore((state) => state.setAutoPlay);
+export const useSetLoopNotes = () =>
+  useSettingsStore((state) => state.setLoopNotes);
 export const useSetRecordingQuality = () =>
   useSettingsStore((state) => state.setRecordingQuality);
 export const useCycleRecordingQuality = () =>

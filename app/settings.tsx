@@ -6,8 +6,8 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   useCycleRecordingQuality,
   useCycleTheme,
-  useSetAutoPlay,
   useSetHapticFeedback,
+  useSetLoopNotes,
   useSetNotifications,
   useSettingsStore,
 } from "@/stores/settingsStore";
@@ -23,13 +23,13 @@ export default function SettingsScreen() {
   const {
     notifications,
     hapticFeedback,
-    autoPlay,
+    loopNotes,
     recordingQuality,
     themeMode,
   } = useSettingsStore();
 
   const cycleTheme = useCycleTheme();
-  const setAutoPlay = useSetAutoPlay();
+  const setLoopNotes = useSetLoopNotes();
   const cycleRecordingQuality = useCycleRecordingQuality();
   const setNotifications = useSetNotifications();
   const setHapticFeedback = useSetHapticFeedback();
@@ -150,18 +150,17 @@ export default function SettingsScreen() {
 
         <SettingItem
           icon="volume-up"
-          title="Auto-play Notes"
-          subtitle="Automatically play notes when tapped"
+          title="Loop Notes"
+          subtitle="Loop notes when tapped"
           rightElement={
             <Switch
-              value={autoPlay}
-              onValueChange={setAutoPlay}
-              disabled
+              value={loopNotes}
+              onValueChange={setLoopNotes}
               trackColor={{
                 false: "#767577",
                 true: Colors[colorScheme ?? "light"].tint,
               }}
-              thumbColor={autoPlay ? "#f4f3f4" : "#f4f3f4"}
+              thumbColor={loopNotes ? "#f4f3f4" : "#f4f3f4"}
             />
           }
         />

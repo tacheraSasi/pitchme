@@ -51,6 +51,9 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
               organize your creative thoughts with tags, and never lose a melody
               again.
             </ThemedText>
+            <ThemedText style={styles.desc}>
+              \Tachera Sasi\
+            </ThemedText>
           </ThemedView>
         </ThemedView>
       </BottomSheetView>

@@ -8,6 +8,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import * as Haptics from "expo-haptics";
 
 interface TabsHeaderProps {
   title: string;
@@ -19,6 +20,7 @@ const TabsHeader = ({ title, aboutBottomSheetRef }: TabsHeaderProps) => {
   const styles = getStyles(colorScheme ?? "light");
 
   const openAboutBottomSheet = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); 
     aboutBottomSheetRef.current?.expand();
   };
 
