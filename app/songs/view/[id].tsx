@@ -31,6 +31,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { alert } from "yooo-native";
 
 interface RecordingItemProps {
   recording: SongRecording;
@@ -48,7 +49,6 @@ const RecordingItem = ({
   const colorScheme = useColorScheme();
   const styles = getRecordingItemStyles(colorScheme ?? "light");
 
-  // Create individual audio player for this recording
   const { playExclusive, pause } = useGlobalAudioPlayer(recording.uri);
 
   const formatDuration = (millis: number) => {
@@ -71,6 +71,7 @@ const RecordingItem = ({
       }
       onPlay();
     } catch (error) {
+      alert.dialog("Error","Error playing recording");
       console.error("Error playing recording:", error);
     }
   };
@@ -149,13 +150,14 @@ export default function SongScreen() {
       setCurrentPlayingRecording(
         currentPlayingRecording === recordingId ? null : recordingId
       );
+    getSong(id)
     },
-    [currentPlayingRecording]
+    [currentPlayingRecording,getSong,id]
   );
 
   const handleDeleteRecording = useCallback(
     (recordingId: string) => {
-      Alert.alert(
+      alert.dialog(
         "Delete Recording",
         "Are you sure you want to delete this recording?",
         [
@@ -168,7 +170,7 @@ export default function SongScreen() {
                 await deleteSongRecording(id!, recordingId);
               } catch (error) {
                 console.error("Error deleting recording:", error);
-                Alert.alert("Error", "Failed to delete recording");
+                alert.dialog("Error", "Failed to delete recording");
               }
             },
           },

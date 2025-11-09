@@ -145,7 +145,7 @@ export default function SongsScreen() {
       await deleteSong(id);
     } catch (error) {
       console.error("Error deleting song:", error);
-      Alert.alert("Error", "Failed to delete song. Please try again.");
+      alert.dialog("Error", "Failed to delete song. Please try again.");
     }
   };
 

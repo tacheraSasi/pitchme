@@ -202,7 +202,7 @@ export const getStyles = (colorScheme: "light" | "dark" = "light") =>
       alignItems: "center",
       padding: 16,
       borderRadius: 12,
-      backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#f8f9fa",
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f8f9fa",
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#333333" : "#e9ecef",
     },
