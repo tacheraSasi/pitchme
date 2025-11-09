@@ -22,12 +22,12 @@ export default function RecordScreen() {
   const styles = getStyles(colorScheme ?? "light");
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
 
-  // State for selected recording ID (instead of full recording object)
+  // I State for selected recording ID (instead of full recording object)
   const [selectedRecordingId, setSelectedRecordingId] = useState<string | null>(
     null
   );
 
-  // Get the current recording data from the store using the ID
+  // current recording data from the store using the ID
   const selectedRecording = selectedRecordingId
     ? recordings.find((r) => r.id === selectedRecordingId) || null
     : null;
