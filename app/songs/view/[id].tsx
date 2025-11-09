@@ -8,20 +8,13 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
 import {
   SongRecording,
-  useGetSong,
   useSetCurrentSong,
   useSongsStore,
 } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -71,7 +64,7 @@ const RecordingItem = ({
       }
       onPlay();
     } catch (error) {
-      alert.dialog("Error","Error playing recording");
+      alert.dialog("Error", "Error playing recording");
       console.error("Error playing recording:", error);
     }
   };
@@ -113,12 +106,14 @@ const RecordingItem = ({
 export default function SongScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colorScheme = useColorScheme();
-  const getSong = useGetSong();
   const setCurrentSong = useSetCurrentSong();
   const { deleteSongRecording } = useSongsStore();
   const styles = getStyles(colorScheme ?? "light");
 
-  const song = useMemo(() => getSong(id!), [id, getSong]);
+  // Subscribe directly to the song from the store to get automatic updates
+  const song = useSongsStore((state) =>
+    state.songs.find((song) => song.id === id)
+  );
   const [currentPlayingRecording, setCurrentPlayingRecording] = useState<
     string | null
   >(null);
@@ -150,9 +145,8 @@ export default function SongScreen() {
       setCurrentPlayingRecording(
         currentPlayingRecording === recordingId ? null : recordingId
       );
-    getSong(id)
     },
-    [currentPlayingRecording,getSong,id]
+    [currentPlayingRecording]
   );
 
   const handleDeleteRecording = useCallback(
