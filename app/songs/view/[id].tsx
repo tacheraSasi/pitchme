@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { noteAssets } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
+import { useGlobalAudioPlayer } from "@/hooks/use-global-audio-player";
 import {
   SongRecording,
   useSetCurrentSong,

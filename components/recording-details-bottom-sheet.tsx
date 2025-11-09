@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
+import { useGlobalAudioPlayer } from "@/hooks/use-global-audio-player";
 import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
 import { exportAudio } from "@/utils/exporter";
 import { formatDate, formatTime } from "@/utils/lib";

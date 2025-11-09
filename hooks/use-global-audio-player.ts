@@ -8,7 +8,7 @@ export function useGlobalAudioPlayer(source: string | number) {
 
   if (typeof source === "string") {
     // It's a URI string (like from recordings)
-    // TODO: Add file existence validation later if needed
+    // TODO: Add file existence validation later
     audioSource = { uri: source };
   } else {
     // It's a module reference (number from require(), like from noteAssets)

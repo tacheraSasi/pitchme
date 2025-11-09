@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed/themed-text";
 import { Colors } from "@/constants/theme";
-import { useGlobalAudioPlayer } from "@/hooks/use-global-audioi-player";
+import { useGlobalAudioPlayer } from "@/hooks/use-global-audio-player";
 import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAudioPlayerStatus } from "expo-audio";
