@@ -7,10 +7,11 @@ import { Entypo } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import {
   RecordingPresets,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync,
   useAudioRecorder,
   useAudioRecorderState,
 } from "expo-audio";
-import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
@@ -50,18 +51,17 @@ const SongRecordModal = ({
   useEffect(() => {
     const setupAudio = async () => {
       try {
-        const { granted } = await Audio.requestPermissionsAsync();
+        const { granted } = await requestRecordingPermissionsAsync();
         if (!granted) {
           console.error("Microphone access is required to record audio.");
           return;
         }
 
         // audio mode
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
+        await setAudioModeAsync({
+          allowsRecording: true,
+          playsInSilentMode: true,
+          shouldPlayInBackground: false,
         });
       } catch (error) {
         console.error("Error setting up audio:", error);
