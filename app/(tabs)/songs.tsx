@@ -181,7 +181,19 @@ export default function SongsScreen() {
     >
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <TabsHeader title="Songs" aboutBottomSheetRef={aboutBottomSheetRef} />
+          <View style={styles.headerWithSearch}>
+            <TabsHeader title="Songs" aboutBottomSheetRef={aboutBottomSheetRef} />
+            <Pressable
+              style={styles.searchButton}
+              onPress={() => router.push("/songs/search" as any)}
+            >
+              <Ionicons
+                name="search"
+                size={24}
+                color={Colors[colorScheme ?? "light"].text}
+              />
+            </Pressable>
+          </View>
 
           <ThemedView style={styles.songCreationSection}>
             <Pressable
@@ -223,6 +235,15 @@ const getStyles = (colorScheme: "light" | "dark") =>
   StyleSheet.create({
     container: {
       flex: 1,
+    },
+    headerWithSearch: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingRight: 16,
+    },
+    searchButton: {
+      padding: 8,
+      borderRadius: 8,
     },
     listContainer: {
       padding: 16,
