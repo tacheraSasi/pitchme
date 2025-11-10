@@ -4,14 +4,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ChordProgression, useSongsStore } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
 
 interface ChordProgressionManagerProps {
   songId: string;
@@ -87,12 +80,12 @@ export default function ChordProgressionManager({
 
   const handleSaveProgression = async () => {
     if (!newProgression.name.trim()) {
-      Alert.alert("Error", "Please enter a name for the progression");
+      alert.dialog("Error", "Please enter a name for the progression");
       return;
     }
 
     if (newProgression.chords.length === 0) {
-      Alert.alert("Error", "Please add at least one chord");
+      alert.dialog("Error", "Please add at least one chord");
       return;
     }
 
@@ -108,7 +101,7 @@ export default function ChordProgressionManager({
       setIsAdding(false);
     } catch (error) {
       console.error("Error saving progression:", error);
-      Alert.alert("Error", "Failed to save chord progression");
+      alert.dialog("Error", "Failed to save chord progression");
     }
   };
 
@@ -123,7 +116,7 @@ export default function ChordProgressionManager({
   };
 
   const handleDeleteProgression = (progressionId: string) => {
-    Alert.alert(
+    alert.dialog(
       "Delete Progression",
       "Are you sure you want to delete this chord progression?",
       [

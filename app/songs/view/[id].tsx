@@ -1,4 +1,5 @@
 import ChordProgressionManager from "@/components/chord-progression-manager";
+import MetronomeControls from "@/components/metronome-controls";
 import SongRecordModal from "@/components/song-record-modal";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
@@ -16,7 +17,6 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Alert,
   FlatList,
   Pressable,
   ScrollView,
@@ -136,7 +136,7 @@ export default function SongScreen() {
       await keyPlayer.playExclusive();
     } catch (error) {
       console.error("Error playing key:", error);
-      Alert.alert("Error", "Failed to play key note");
+      alert.dialog("Error", "Failed to play key note");
     }
   }, [keyPlayer]);
 
@@ -355,6 +355,13 @@ export default function SongScreen() {
               </View>
             )}
           </View>
+
+          {/* Metronome */}
+          <MetronomeControls
+            bpm={song.bpm}
+            timeSignature={song.timeSignature}
+            showBpmControls={false} // Don't allow changing BPM in view mode
+          />
 
           {/* Chord Progressions */}
           <ChordProgressionManager

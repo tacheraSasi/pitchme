@@ -1,3 +1,4 @@
+import MetronomeControls from "@/components/metronome-controls";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Note, NOTES } from "@/constants/notes";
@@ -9,7 +10,6 @@ import { Picker } from "@react-native-picker/picker";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,6 +17,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { alert } from "yooo-native";
 
 const GENRES = [
   "Pop",
@@ -92,12 +93,12 @@ export default function EditSong() {
 
   const handleSave = async () => {
     if (!formData.title.trim()) {
-      Alert.alert("Error", "Please enter a song title");
+      alert.dialog("Error", "Please enter a song title");
       return;
     }
 
     if (formData.bpm < 40 || formData.bpm > 200) {
-      Alert.alert("Error", "BPM must be between 40 and 200");
+      alert.dialog("Error", "BPM must be between 40 and 200");
       return;
     }
 
@@ -123,7 +124,7 @@ export default function EditSong() {
       router.back();
     } catch (error) {
       console.error("Error updating song:", error);
-      Alert.alert("Error", "Failed to update song. Please try again.");
+      alert.dialog("Error", "Failed to update song. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -287,6 +288,13 @@ export default function EditSong() {
               </View>
             </View>
           </View>
+
+          {/* Metronome */}
+          <MetronomeControls
+            bpm={formData.bpm}
+            timeSignature={formData.timeSignature}
+            onBpmChange={(bpm) => handleInputChange("bpm", bpm)}
+          />
 
           {/* Description */}
           <View style={styles.section}>
