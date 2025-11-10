@@ -5,6 +5,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { Note, NOTES } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useHaptics } from "@/hooks/useHaptics";
 import { useCreateSong } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
@@ -54,6 +55,7 @@ export default function CreateSong() {
   const createSong = useCreateSong();
   const styles = getStyles(colorScheme ?? "light");
   const aboutBottomSheetRef = useRef(null);
+  const { trigger: Haptics } = useHaptics();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -62,6 +64,7 @@ export default function CreateSong() {
     timeSignature: "4/4",
     description: "",
     inspiration: "",
+    lyrics:"",
     genre: "",
     tags: "",
     isCompleted: false,
@@ -75,11 +78,13 @@ export default function CreateSong() {
 
   const handleSave = async () => {
     if (!formData.title.trim()) {
+      Haptics("error");
       alert.dialog("Error", "Please enter a song title");
       return;
     }
 
     if (formData.bpm < 40 || formData.bpm > 200) {
+      Haptics("error");
       alert.dialog("Error", "BPM must be between 40 and 200");
       return;
     }
@@ -99,6 +104,7 @@ export default function CreateSong() {
         description: formData.description.trim(),
         inspiration: formData.inspiration.trim(),
         genre: formData.genre || undefined,
+        lyrics: formData.lyrics.trim(),
         tags: tagsArray,
         chordProgressions: [],
         isCompleted: formData.isCompleted,
@@ -287,6 +293,21 @@ export default function CreateSong() {
                 numberOfLines={4}
                 textAlignVertical="top"
                 maxLength={500}
+              />
+            </View>
+
+            {/* Lyrics */}
+            <View style={styles.section}>
+              <ThemedText style={styles.sectionLabel}>Lyrics</ThemedText>
+              <TextInput
+                style={[styles.textInput, styles.textArea]}
+                value={formData.lyrics}
+                onChangeText={(text) => handleInputChange("lyrics", text)}
+                placeholder="Write the song lyrics..."
+                placeholderTextColor={Colors[colorScheme ?? "light"].icon}
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
               />
             </View>
 
