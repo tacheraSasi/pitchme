@@ -1,4 +1,4 @@
-import { Metronome, MetronomePlayerInterface } from "@/constants/metronome";
+import { Metronome, MetronomePlayerInterface } from "@/utils/metronome";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGlobalAudioPlayer } from "./use-global-audio-player";
 

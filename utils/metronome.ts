@@ -1,3 +1,4 @@
+import { MetronomeAssets } from "@/constants/metronome-assets";
 import { setAudioModeAsync } from "expo-audio";
 
 export interface MetronomePlayerInterface {
@@ -29,6 +30,8 @@ export class Metronome {
   currentBeat: number;
   beatsPerBar: number;
   onBeatCallback?: (beat: number, isAccent: boolean) => void;
+  clickSoundSource: typeof MetronomeAssets.click;
+  accentSoundSource: typeof MetronomeAssets.accent;
 
   constructor({
     bpm = 120,
@@ -61,6 +64,12 @@ export class Metronome {
   setAudioPlayers(audioPlayers: MetronomePlayerInterface) {
     this.audioPlayers = audioPlayers;
   }
+  public static soundSources() {
+    return {
+      clickSoundSource: MetronomeAssets.click,
+      accentSoundSource: MetronomeAssets.accent,
+    };
+  }
 
   async init() {
     if (this.audioPlayers) return;
@@ -72,7 +81,7 @@ export class Metronome {
         shouldPlayInBackground: false,
       });
 
-      // Audio players will be set externally via setAudioPlayers
+      // Audio players, I set externally via setAudioPlayers
       console.log("Metronome initialized, waiting for audio players");
     } catch (error) {
       console.error("Error initializing metronome sounds:", error);
@@ -177,10 +186,5 @@ export class Metronome {
   }
 }
 
-// Legacy exports for backwards compatibility
-export const metronomeAssets = {
-  click: require("@/assets/notes/C.m4a"),
-  accent: require("@/assets/notes/G.m4a"),
-};
 
 export default Metronome;
