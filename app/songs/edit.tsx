@@ -64,6 +64,7 @@ export default function EditSong() {
     timeSignature: "4/4",
     description: "",
     inspiration: "",
+    lyrics: "",
     genre: "",
     tags: "",
     isCompleted: false,
@@ -80,6 +81,7 @@ export default function EditSong() {
         timeSignature: song.timeSignature,
         description: song.description,
         inspiration: song.inspiration,
+        lyrics: song.lyrics || "",
         genre: song.genre || "",
         tags: song.tags.join(", "),
         isCompleted: song.isCompleted,
@@ -116,6 +118,7 @@ export default function EditSong() {
         timeSignature: formData.timeSignature,
         description: formData.description.trim(),
         inspiration: formData.inspiration.trim(),
+        lyrics: formData.lyrics.trim(),
         genre: formData.genre || undefined,
         tags: tagsArray,
         isCompleted: formData.isCompleted,
@@ -327,6 +330,22 @@ export default function EditSong() {
               numberOfLines={4}
               textAlignVertical="top"
               maxLength={500}
+            />
+          </View>
+
+          {/* Lyrics */}
+          <View style={styles.section}>
+            <ThemedText style={styles.sectionLabel}>Lyrics</ThemedText>
+            <TextInput
+              style={[styles.textInput, styles.textArea]}
+              value={formData.lyrics}
+              onChangeText={(text) => handleInputChange("lyrics", text)}
+              placeholder="Write your lyrics here..."
+              placeholderTextColor={Colors[colorScheme ?? "light"].icon}
+              multiline
+              numberOfLines={6}
+              textAlignVertical="top"
+              maxLength={2000}
             />
           </View>
 
