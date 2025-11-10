@@ -1,21 +1,13 @@
-
-import { HapticFeedbackType, HapticFeedback } from "@/utils/haptics";
+import { HapticFeedback, HapticFeedbackType } from "@/utils/haptics";
 import { useCallback } from "react";
 
 /**
  * Hook that provides haptic feedback functions that respect user settings
  */
 export function useHaptics() {
-  const hapticsEnabled = true; //FIXME: I will Add logic to get this from settings
-
-  const trigger = useCallback(
-    async (type: HapticFeedbackType = "light") => {
-      if (hapticsEnabled) {
-        await HapticFeedback(type);
-      }
-    },
-    [hapticsEnabled]
-  );
+  const trigger = useCallback(async (type: HapticFeedbackType = "light") => {
+    await HapticFeedback(type);
+  }, []);
 
   const light = useCallback(() => trigger("light"), [trigger]);
   const medium = useCallback(() => trigger("medium"), [trigger]);
@@ -34,6 +26,5 @@ export function useHaptics() {
     warning,
     error,
     selection,
-    isEnabled: hapticsEnabled,
   };
 }
