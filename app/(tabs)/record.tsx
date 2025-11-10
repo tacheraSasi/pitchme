@@ -9,12 +9,11 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { RecordingItem, useRecordingsList } from "@/stores/recordingsStore";
 import { formatDate, formatTime } from "@/utils/lib";
-import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, Pressable, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -59,22 +58,12 @@ export default function RecordScreen() {
     >
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <View style={styles.headerWithSearch}>
-            <TabsHeader
-              title="Record Studio"
-              aboutBottomSheetRef={aboutBottomSheetRef}
-            />
-            <Pressable
-              style={styles.searchButton}
-              onPress={() => router.push("/recordings/search" as any)}
-            >
-              <Ionicons
-                name="search"
-                size={24}
-                color={Colors[colorScheme ?? "light"].text}
-              />
-            </Pressable>
-          </View>
+          <TabsHeader
+            title="Record Studio"
+            aboutBottomSheetRef={aboutBottomSheetRef}
+            showSearchButton={true}
+            onSearchPress={() => router.push("/recordings/search" as any)}
+          />
 
           <ThemedView style={styles.recordingSection}>
             <Pressable
@@ -153,15 +142,6 @@ export const getStyles = (colorScheme: "light" | "dark" = "light") =>
     container: {
       flex: 1,
       backgroundColor: "grey",
-    },
-    headerWithSearch: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingRight: 16,
-    },
-    searchButton: {
-      padding: 8,
-      borderRadius: 8,
     },
     titleContainer: {
       flexDirection: "row",

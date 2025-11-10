@@ -4,23 +4,31 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import * as Haptics from "expo-haptics";
 
 interface TabsHeaderProps {
   title: string;
   aboutBottomSheetRef: React.RefObject<BottomSheet | null>;
+  showSearchButton?: boolean;
+  onSearchPress?: () => void;
 }
-const TabsHeader = ({ title, aboutBottomSheetRef }: TabsHeaderProps) => {
+const TabsHeader = ({
+  title,
+  aboutBottomSheetRef,
+  showSearchButton,
+  onSearchPress,
+}: TabsHeaderProps) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 
   const openAboutBottomSheet = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); 
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     aboutBottomSheetRef.current?.expand();
   };
 
@@ -43,14 +51,27 @@ const TabsHeader = ({ title, aboutBottomSheetRef }: TabsHeaderProps) => {
         </View>
       </View>
 
-      <Pressable
-        style={styles.settingsButton}
-        onPress={() => {
-          router.push("/settings");
-        }}
-      >
-        <SettingsIcon backgroundColor={styles.settingsButton.backgroundColor} />
-      </Pressable>
+      <View style={styles.rightSection}>
+        {showSearchButton && onSearchPress && (
+          <Pressable style={styles.searchButton} onPress={onSearchPress}>
+            <Ionicons
+              name="search"
+              size={20}
+              color={Colors[colorScheme ?? "light"].text}
+            />
+          </Pressable>
+        )}
+        <Pressable
+          style={styles.settingsButton}
+          onPress={() => {
+            router.push("/settings");
+          }}
+        >
+          <SettingsIcon
+            backgroundColor={styles.settingsButton.backgroundColor}
+          />
+        </Pressable>
+      </View>
     </ThemedView>
   );
 };
@@ -89,6 +110,20 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     titleSection: {
       flex: 1,
     },
+    rightSection: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    searchButton: {
+      padding: 8,
+      borderRadius: 12,
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f8f9fa",
+      borderWidth: 1,
+      borderColor: colorScheme === "dark" ? "#444444" : "#e0e0e0",
+      alignItems: "center",
+      justifyContent: "center",
+    },
     titleText: {
       fontSize: 24,
       fontWeight: "800",
@@ -97,7 +132,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       marginBottom: 2,
     },
     subtitleText: {
-      fontSize: 13,
+      fontSize: 8,
       color: Colors[colorScheme].text,
       opacity: 0.6,
       fontWeight: "500",
