@@ -132,7 +132,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       marginBottom: 2,
     },
     subtitleText: {
-      fontSize: 8,
+      fontSize: 8.6667,
       color: Colors[colorScheme].text,
       opacity: 0.6,
       fontWeight: "500",

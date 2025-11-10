@@ -21,6 +21,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="songs" options={{ headerShown: false }} />
+        <Stack.Screen name="recordings" options={{ headerShown: false }} />
         <Stack.Screen
           name="settings"
           options={{ presentation: "modal", title: "Settings" }}
@@ -30,4 +31,3 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
-
