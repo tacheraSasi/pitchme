@@ -182,7 +182,10 @@ export default function SongsScreen() {
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.headerWithSearch}>
-            <TabsHeader title="Songs" aboutBottomSheetRef={aboutBottomSheetRef} />
+            <TabsHeader
+              title="Songs"
+              aboutBottomSheetRef={aboutBottomSheetRef}
+            />
             <Pressable
               style={styles.searchButton}
               onPress={() => router.push("/songs/search" as any)}

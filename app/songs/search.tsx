@@ -6,13 +6,7 @@ import { Song, useDeleteSong, useSongsList } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { alert } from "yooo-native";
 
@@ -124,11 +118,7 @@ const SongItem = ({ song, onDelete, colorScheme }: SongItemProps) => {
             Created {formatDate(song.dateCreated)}
           </ThemedText>
           <View style={styles.recordingsCount}>
-            <Ionicons
-              name="mic"
-              size={14}
-              color={Colors[colorScheme].icon}
-            />
+            <Ionicons name="mic" size={14} color={Colors[colorScheme].icon} />
             <ThemedText style={styles.countText}>
               {song.recordings.length} recording
               {song.recordings.length !== 1 ? "s" : ""}
