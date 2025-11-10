@@ -18,7 +18,7 @@ export function useMetronome(options: MetronomeOptions) {
   const clickPlayer = useGlobalAudioPlayer(require("@/assets/notes/C.m4a"));
   const accentPlayer = useGlobalAudioPlayer(require("@/assets/notes/G.m4a"));
 
-  // Initialize metronome instance
+  // Initializing metronome instance
   useEffect(() => {
     if (!metronomeRef.current) {
       metronomeRef.current = new Metronome({

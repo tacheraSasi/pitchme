@@ -5,6 +5,7 @@ import { ChordProgression, useSongsStore } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { alert } from "yooo-native";
 
 interface ChordProgressionManagerProps {
   songId: string;

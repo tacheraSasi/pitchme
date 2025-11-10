@@ -9,7 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { useRef } from "react";
-import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { alert } from "yooo-native";
 
@@ -183,19 +183,22 @@ export default function SongsScreen() {
         <SafeAreaView style={{ flex: 1 }}>
           <TabsHeader title="Songs" aboutBottomSheetRef={aboutBottomSheetRef} />
 
-          <View style={styles.headerActions}>
+          <ThemedView style={styles.songCreationSection}>
             <Pressable
-              style={styles.addButton}
+              style={styles.createSongButton}
               onPress={() => router.push("/songs/create")}
             >
-              <Ionicons
-                name="add"
-                size={20}
-                color={colorScheme === "dark" ? "#000" : "#fff"}
-              />
-              <ThemedText style={styles.addButtonText}>New Song</ThemedText>
+              <ThemedView style={styles.iconContainer}>
+                <Ionicons name="add" size={28} color="white" />
+              </ThemedView>
+              <ThemedText style={styles.createSongButtonText}>
+                Create New Song
+              </ThemedText>
+              <ThemedText style={styles.createSongSubtext}>
+                Start composing your next masterpiece
+              </ThemedText>
             </Pressable>
-          </View>
+          </ThemedView>
 
           {songs.length === 0 ? (
             renderEmptyState()
@@ -225,24 +228,41 @@ const getStyles = (colorScheme: "light" | "dark") =>
       padding: 16,
       paddingBottom: 100,
     },
-    headerActions: {
+    songCreationSection: {
       paddingHorizontal: 16,
-      paddingVertical: 8,
+      marginBottom: 24,
     },
-    addButton: {
-      backgroundColor: Colors[colorScheme].tint,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderRadius: 12,
-      flexDirection: "row",
+    iconContainer: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
       alignItems: "center",
       justifyContent: "center",
-      gap: 8,
+      marginBottom: 8,
     },
-    addButtonText: {
-      color: colorScheme === "dark" ? "#000" : "#fff",
+    createSongButton: {
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 16,
+      paddingHorizontal: 32,
+      borderRadius: 16,
+      gap: 8,
+      backgroundColor:
+        colorScheme === "dark" ? "#6B59C3" : Colors[colorScheme].tint,
+      marginHorizontal: 20,
+    },
+    createSongButtonText: {
+      color: "white",
+      fontSize: 18,
       fontWeight: "600",
-      fontSize: 16,
+      textAlign: "center",
+    },
+    createSongSubtext: {
+      color: "rgba(255, 255, 255, 0.8)",
+      fontSize: 14,
+      textAlign: "center",
     },
     songItem: {
       marginBottom: 16,

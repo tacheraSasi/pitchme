@@ -96,7 +96,7 @@ export default function MetronomeControls({
                 color={
                   bpm <= 40
                     ? Colors[colorScheme ?? "light"].icon
-                    : Colors[colorScheme ?? "light"].tint
+                    : Colors[colorScheme ?? "light"].background
                 }
               />
             </Pressable>
@@ -118,8 +118,8 @@ export default function MetronomeControls({
                 size={20}
                 color={
                   bpm >= 200
-                    ? Colors[colorScheme ?? "light"].icon
-                    : Colors[colorScheme ?? "light"].tint
+                    ? Colors[colorScheme ?? "light"].text
+                    : Colors[colorScheme ?? "light"].background
                 }
               />
             </Pressable>
