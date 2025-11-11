@@ -4,7 +4,7 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Song, useDeleteSong, useSongsList } from "@/stores/songsStore";
+import { Song, useDeleteSong, useSongsList, useToggleFavorite } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
@@ -16,9 +16,10 @@ import { alert } from "yooo-native";
 interface SongItemProps {
   song: Song;
   onDelete: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
 }
 
-const SongItem = ({ song, onDelete }: SongItemProps) => {
+const SongItem = ({ song, onDelete, onToggleFavorite }: SongItemProps) => {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 

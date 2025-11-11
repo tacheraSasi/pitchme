@@ -35,6 +35,7 @@ export interface Song {
   tags: string[];
   isCompleted: boolean;
   lyrics?: string;
+  isFavorite: boolean;
 }
 
 interface SongsState {
@@ -50,6 +51,7 @@ interface SongsState {
     updates: Partial<Omit<Song, "id" | "dateCreated">>
   ) => Promise<void>;
   deleteSong: (id: string) => Promise<void>;
+  toggleFavorite: (id: string) => Promise<void>;
   getSong: (id: string) => Song | undefined;
   setCurrentSong: (song: Song | null) => void;
 
@@ -106,6 +108,7 @@ export const useSongsStore = create<SongsState>()(
           recordings: [],
           dateCreated: now,
           dateModified: now,
+          isFavorite: false,
         };
 
         set((state) => ({
@@ -132,6 +135,25 @@ export const useSongsStore = create<SongsState>()(
         set((state) => ({
           songs: state.songs.filter((song) => song.id !== id),
           currentSong: state.currentSong?.id === id ? null : state.currentSong,
+        }));
+      },
+
+      toggleFavorite: async (id) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          songs: state.songs.map((song) =>
+            song.id === id
+              ? { ...song, isFavorite: !song.isFavorite, dateModified: now }
+              : song
+          ),
+          currentSong:
+            state.currentSong?.id === id
+              ? {
+                  ...state.currentSong,
+                  isFavorite: !state.currentSong.isFavorite,
+                  dateModified: now,
+                }
+              : state.currentSong,
         }));
       },
 
@@ -295,6 +317,7 @@ export const useCurrentSong = () => useSongsStore((state) => state.currentSong);
 export const useCreateSong = () => useSongsStore((state) => state.createSong);
 export const useUpdateSong = () => useSongsStore((state) => state.updateSong);
 export const useDeleteSong = () => useSongsStore((state) => state.deleteSong);
+export const useToggleFavorite = () => useSongsStore((state) => state.toggleFavorite);
 export const useGetSong = () => useSongsStore((state) => state.getSong);
 export const useSetCurrentSong = () =>
   useSongsStore((state) => state.setCurrentSong);
