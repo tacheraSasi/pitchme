@@ -36,6 +36,10 @@ export function useMetronome(options: MetronomeOptions) {
         playAccent: async () => {
           accentPlayer.playExclusive();
         },
+        stop: async () => {
+          clickPlayer.stop();
+          accentPlayer.stop();
+        }
       };
 
       // Set audio players

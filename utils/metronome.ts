@@ -4,6 +4,7 @@ import { setAudioModeAsync } from "expo-audio";
 export interface MetronomePlayerInterface {
   playClick: () => Promise<void>;
   playAccent: () => Promise<void>;
+  stop: () => Promise<void>;
 }
 
 export interface MetronomeConfig {
@@ -185,6 +186,5 @@ export class Metronome {
     this.audioPlayers = null;
   }
 }
-
 
 export default Metronome;

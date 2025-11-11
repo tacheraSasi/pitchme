@@ -30,5 +30,19 @@ export function useGlobalAudioPlayer(source: string | number) {
     if (currentPlayer === player) currentPlayer = null;
   };
 
-  return { player, playExclusive, pause };
+  const stop = async () => {
+    player.pause();
+    player.seekTo(0)
+    if (currentPlayer === player) currentPlayer = null;
+  }
+
+  const stopAll  = async ()=>{
+    if (currentPlayer) {
+      currentPlayer.pause();
+      currentPlayer.seekTo(0);
+      currentPlayer = null;
+    }
+  }
+
+  return { player, playExclusive, pause, stop, stopAll };
 }
