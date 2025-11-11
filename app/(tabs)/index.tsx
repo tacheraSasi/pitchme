@@ -25,7 +25,7 @@ export default function HomeScreen() {
             aboutBottomSheetRef={aboutBottomSheetRef}
           />
           <RecentlyViewed />
-          <NoteDetectorButton bottomSheetRef={bottomSheetRef} />
+          {/* <NoteDetectorButton bottomSheetRef={bottomSheetRef} /> */}
           <NotesList />
         </SafeAreaView>
       </ThemedView>

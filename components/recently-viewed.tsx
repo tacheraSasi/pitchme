@@ -83,7 +83,7 @@ export function RecentlyViewed() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText style={styles.title}>Recently Viewed</ThemedText>
+        <ThemedText style={styles.title}>Recently Viewed Songs</ThemedText>
         <Pressable
           style={styles.viewAllButton}
           onPress={() => router.push("/songs" as any)}
@@ -117,6 +117,7 @@ export function RecentlyViewed() {
 const getStyles = (colorScheme: "light" | "dark") =>
   StyleSheet.create({
     container: {
+      flex: 1,
       paddingHorizontal: 16,
       paddingVertical: 12,
     },
