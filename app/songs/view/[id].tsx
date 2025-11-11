@@ -9,6 +9,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audio-player";
 import {
   SongRecording,
+  useAddToRecentlyViewed,
   useSetCurrentSong,
   useSongsStore,
 } from "@/stores/songsStore";
@@ -107,6 +108,7 @@ export default function SongScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colorScheme = useColorScheme();
   const setCurrentSong = useSetCurrentSong();
+  const addToRecentlyViewed = useAddToRecentlyViewed();
   const { deleteSongRecording } = useSongsStore();
   const styles = getStyles(colorScheme ?? "light");
 
@@ -124,12 +126,13 @@ export default function SongScreen() {
   useEffect(() => {
     if (song) {
       setCurrentSong(song);
+      addToRecentlyViewed(song.id);
     }
 
     return () => {
       setCurrentSong(null);
     };
-  }, [song, setCurrentSong]);
+  }, [song, setCurrentSong, addToRecentlyViewed]);
 
   const handlePlayKey = useCallback(async () => {
     try {

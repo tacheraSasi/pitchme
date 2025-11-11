@@ -1,4 +1,5 @@
 import MetronomeControls from "@/components/metronome-controls";
+import { TapTempo } from "@/components/tap-tempo";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Note, NOTES } from "@/constants/notes";
@@ -293,7 +294,7 @@ export default function EditSong() {
           </View>
 
           {/* Tap Tempo */}
-          <TapTempo 
+          <TapTempo
             onBpmChange={(bpm) => handleInputChange("bpm", bpm)}
             currentBpm={formData.bpm}
           />

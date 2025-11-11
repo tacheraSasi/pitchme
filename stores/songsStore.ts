@@ -41,6 +41,7 @@ export interface Song {
 interface SongsState {
   songs: Song[];
   currentSong: Song | null;
+  recentlyViewed: string[]; // Song IDs in order of recent viewing
 
   // Song CRUD operations
   createSong: (
@@ -54,6 +55,7 @@ interface SongsState {
   toggleFavorite: (id: string) => Promise<void>;
   getSong: (id: string) => Song | undefined;
   setCurrentSong: (song: Song | null) => void;
+  addToRecentlyViewed: (id: string) => void;
 
   // Chord progression operations
   addChordProgression: (
@@ -98,6 +100,7 @@ export const useSongsStore = create<SongsState>()(
     (set, get) => ({
       songs: [],
       currentSong: null,
+      recentlyViewed: [],
 
       createSong: async (songData) => {
         const id = generateId();
@@ -163,6 +166,19 @@ export const useSongsStore = create<SongsState>()(
 
       setCurrentSong: (song) => {
         set({ currentSong: song });
+      },
+
+      addToRecentlyViewed: (id) => {
+        set((state) => {
+          const newRecentlyViewed = [
+            id,
+            ...state.recentlyViewed.filter((viewedId) => viewedId !== id),
+          ];
+          // Keep only the last 5 viewed songs
+          return {
+            recentlyViewed: newRecentlyViewed.slice(0, 5),
+          };
+        });
       },
 
       addChordProgression: async (songId, progression) => {
@@ -322,5 +338,14 @@ export const useToggleFavorite = () =>
 export const useGetSong = () => useSongsStore((state) => state.getSong);
 export const useSetCurrentSong = () =>
   useSongsStore((state) => state.setCurrentSong);
+export const useAddToRecentlyViewed = () =>
+  useSongsStore((state) => state.addToRecentlyViewed);
+export const useRecentlyViewedSongs = () => {
+  const recentlyViewed = useSongsStore((state) => state.recentlyViewed);
+  const songs = useSongsStore((state) => state.songs);
+  return recentlyViewed
+    .map((id) => songs.find((song) => song.id === id))
+    .filter((song): song is Song => song !== undefined);
+};
 
 export default useSongsStore;
