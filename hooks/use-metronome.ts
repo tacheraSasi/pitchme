@@ -39,7 +39,7 @@ export function useMetronome(options: MetronomeOptions) {
         stop: async () => {
           clickPlayer.stop();
           accentPlayer.stop();
-        }
+        },
       };
 
       // Set audio players
@@ -114,19 +114,6 @@ export function useMetronome(options: MetronomeOptions) {
       start();
     }
   }, [isPlaying, start, stop]);
-
-  // Update playing state when metronome settings change
-  useEffect(() => {
-    if (isPlaying && metronomeRef.current) {
-      // Restart with new settings
-      metronomeRef.current.stop();
-      setTimeout(() => {
-        if (metronomeRef.current && isPlaying) {
-          metronomeRef.current.start();
-        }
-      }, 100);
-    }
-  }, [options.bpm, options.timeSignature, isPlaying]);
 
   return {
     isPlaying,

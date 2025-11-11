@@ -114,16 +114,17 @@ export class Metronome {
       const isFirstBeat = this.currentBeat === 1;
       const shouldAccent = isFirstBeat && this.accentFirstBeat;
 
-      // Play scheduled click
-      try {
-        if (shouldAccent && this.audioPlayers) {
-          await this.audioPlayers.playAccent();
-        } else if (this.audioPlayers) {
-          await this.audioPlayers.playClick();
+      // Play scheduled click (don't await to avoid blocking timing)
+      if (this.audioPlayers) {
+        if (shouldAccent) {
+          this.audioPlayers
+            .playAccent()
+            .catch((e) => console.warn("Error playing accent:", e));
+        } else {
+          this.audioPlayers
+            .playClick()
+            .catch((e) => console.warn("Error playing click:", e));
         }
-      } catch (e) {
-        // Ignore play errors
-        console.warn("Error playing metronome click:", e);
       }
 
       // Trigger beat callback
@@ -158,10 +159,18 @@ export class Metronome {
 
   setBpm(bpm: number) {
     this.bpm = bpm;
+    // If running, restart with new BPM
+    if (this.isRunning) {
+      this.restart();
+    }
   }
 
   setSubdivision(subdivision: number) {
     this.subdivision = subdivision;
+    // If running, restart with new subdivision
+    if (this.isRunning) {
+      this.restart();
+    }
   }
 
   setTimeSignature(timeSignature: string) {
@@ -170,6 +179,17 @@ export class Metronome {
     if (this.currentBeat > this.beatsPerBar) {
       this.currentBeat = 1;
     }
+    // If running, restart with new time signature
+    if (this.isRunning) {
+      this.restart();
+    }
+  }
+
+  private restart() {
+    this.stop();
+    setTimeout(() => {
+      this.start();
+    }, 50); // Small delay to ensure clean restart
   }
 
   setAccentFirstBeat(accent: boolean) {

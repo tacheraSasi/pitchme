@@ -14,7 +14,7 @@ interface RecentSongItemProps {
 }
 
 const RecentSongItem = ({ song, colorScheme }: RecentSongItemProps) => {
-  const styles = getStyles(colorScheme);
+  const styles = getStyles(colorScheme); //NOTE: maybe  ill get this straigh from the hook
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
