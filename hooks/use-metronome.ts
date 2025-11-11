@@ -15,8 +15,9 @@ export function useMetronome(options: MetronomeOptions) {
   const metronomeRef = useRef<Metronome | null>(null);
 
   // Audio players for metronome sounds
-  const clickPlayer = useGlobalAudioPlayer(require("@/assets/notes/C.m4a"));
-  const accentPlayer = useGlobalAudioPlayer(require("@/assets/notes/G.m4a"));
+  const metronomeSounds = Metronome.soundSources();
+  const clickPlayer = useGlobalAudioPlayer(metronomeSounds.click);
+  const accentPlayer = useGlobalAudioPlayer(metronomeSounds.accent);
 
   // Initializing metronome instance
   useEffect(() => {

@@ -66,8 +66,8 @@ export class Metronome {
   }
   public static soundSources() {
     return {
-      clickSoundSource: MetronomeAssets.click,
-      accentSoundSource: MetronomeAssets.accent,
+      click: MetronomeAssets.click,
+      accent: MetronomeAssets.accent,
     };
   }
 
