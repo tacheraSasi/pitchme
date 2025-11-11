@@ -292,6 +292,12 @@ export default function EditSong() {
             </View>
           </View>
 
+          {/* Tap Tempo */}
+          <TapTempo 
+            onBpmChange={(bpm) => handleInputChange("bpm", bpm)}
+            currentBpm={formData.bpm}
+          />
+
           {/* Metronome */}
           <MetronomeControls
             bpm={formData.bpm}

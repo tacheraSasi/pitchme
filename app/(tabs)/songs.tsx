@@ -4,7 +4,8 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Song, useDeleteSong, useSongsList, useToggleFavorite } from "@/stores/songsStore";
+import { useHaptics } from "@/hooks/useHaptics";
+import { Song, useDeleteSong, useSongsList } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
@@ -69,13 +70,29 @@ const SongItem = ({ song, onDelete, onToggleFavorite }: SongItemProps) => {
               style={[styles.statusDot, { backgroundColor: getStatusColor() }]}
             />
           </View>
-          <Pressable onPress={handleDelete} style={styles.deleteButton}>
-            <Ionicons
-              name="trash-outline"
-              size={20}
-              color={Colors[colorScheme ?? "light"].icon}
-            />
-          </Pressable>
+          <View style={styles.songActions}>
+            <Pressable
+              onPress={() => onToggleFavorite(song.id)}
+              style={styles.favoriteButton}
+            >
+              <Ionicons
+                name={song.isFavorite ? "heart" : "heart-outline"}
+                size={20}
+                color={
+                  song.isFavorite
+                    ? "#FF6B6B"
+                    : Colors[colorScheme ?? "light"].icon
+                }
+              />
+            </Pressable>
+            <Pressable onPress={handleDelete} style={styles.deleteButton}>
+              <Ionicons
+                name="trash-outline"
+                size={20}
+                color={Colors[colorScheme ?? "light"].icon}
+              />
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.songDetails}>
@@ -138,15 +155,30 @@ export default function SongsScreen() {
   const colorScheme = useColorScheme();
   const songs = useSongsList();
   const deleteSong = useDeleteSong();
+  const toggleFavorite = useToggleFavorite();
+  const haptics = useHaptics();
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
   const styles = getStyles(colorScheme ?? "light");
 
   const handleDeleteSong = async (id: string) => {
     try {
       await deleteSong(id);
+      haptics.success();
     } catch (error) {
       console.error("Error deleting song:", error);
+      haptics.error();
       alert.dialog("Error", "Failed to delete song. Please try again.");
+    }
+  };
+
+  const handleToggleFavorite = async (id: string) => {
+    try {
+      await toggleFavorite(id);
+      haptics.light();
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      haptics.error();
+      alert.dialog("Error", "Failed to update favorite. Please try again.");
     }
   };
 
@@ -213,7 +245,11 @@ export default function SongsScreen() {
               data={songs}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <SongItem song={item} onDelete={handleDeleteSong} />
+                <SongItem
+                  song={item}
+                  onDelete={handleDeleteSong}
+                  onToggleFavorite={handleToggleFavorite}
+                />
               )}
               contentContainerStyle={styles.listContainer}
               showsVerticalScrollIndicator={false}
@@ -303,6 +339,13 @@ const getStyles = (colorScheme: "light" | "dark") =>
       height: 8,
       borderRadius: 4,
       marginLeft: 8,
+    },
+    songActions: {
+      flexDirection: "row",
+      gap: 8,
+    },
+    favoriteButton: {
+      padding: 4,
     },
     deleteButton: {
       padding: 4,

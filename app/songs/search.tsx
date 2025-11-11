@@ -2,7 +2,13 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Song, useDeleteSong, useSongsList } from "@/stores/songsStore";
+import { useHaptics } from "@/hooks/useHaptics";
+import {
+  Song,
+  useDeleteSong,
+  useSongsList,
+  useToggleFavorite,
+} from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -12,15 +18,21 @@ import { alert } from "yooo-native";
 
 type SortOption = "dateCreated" | "title" | "bpm" | "completion";
 type SortOrder = "asc" | "desc";
-type FilterOption = "all" | "completed" | "inProgress";
+type FilterOption = "all" | "completed" | "inProgress" | "favorites";
 
 interface SongItemProps {
   song: Song;
   onDelete: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
   colorScheme: "light" | "dark";
 }
 
-const SongItem = ({ song, onDelete, colorScheme }: SongItemProps) => {
+const SongItem = ({
+  song,
+  onDelete,
+  onToggleFavorite,
+  colorScheme,
+}: SongItemProps) => {
   const styles = getStyles(colorScheme);
 
   const handleDelete = () => {
@@ -69,13 +81,25 @@ const SongItem = ({ song, onDelete, colorScheme }: SongItemProps) => {
               style={[styles.statusDot, { backgroundColor: getStatusColor() }]}
             />
           </View>
-          <Pressable onPress={handleDelete} style={styles.deleteButton}>
-            <Ionicons
-              name="trash-outline"
-              size={20}
-              color={Colors[colorScheme].icon}
-            />
-          </Pressable>
+          <View style={styles.songActions}>
+            <Pressable
+              onPress={() => onToggleFavorite(song.id)}
+              style={styles.favoriteButton}
+            >
+              <Ionicons
+                name={song.isFavorite ? "heart" : "heart-outline"}
+                size={20}
+                color={song.isFavorite ? "#FF6B6B" : Colors[colorScheme].icon}
+              />
+            </Pressable>
+            <Pressable onPress={handleDelete} style={styles.deleteButton}>
+              <Ionicons
+                name="trash-outline"
+                size={20}
+                color={Colors[colorScheme].icon}
+              />
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.songDetails}>
@@ -134,6 +158,8 @@ export default function SongsSearchScreen() {
   const colorScheme = useColorScheme();
   const songs = useSongsList();
   const deleteSong = useDeleteSong();
+  const toggleFavorite = useToggleFavorite();
+  const haptics = useHaptics();
   const styles = getStyles(colorScheme ?? "light");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -145,9 +171,22 @@ export default function SongsSearchScreen() {
   const handleDeleteSong = async (id: string) => {
     try {
       await deleteSong(id);
+      haptics.success();
     } catch (error) {
       console.error("Error deleting song:", error);
+      haptics.error();
       alert.dialog("Error", "Failed to delete song. Please try again.");
+    }
+  };
+
+  const handleToggleFavorite = async (id: string) => {
+    try {
+      await toggleFavorite(id);
+      haptics.light();
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      haptics.error();
+      alert.dialog("Error", "Failed to update favorite. Please try again.");
     }
   };
 
@@ -172,6 +211,7 @@ export default function SongsSearchScreen() {
       filtered = filtered.filter((song) => {
         if (filterBy === "completed") return song.isCompleted;
         if (filterBy === "inProgress") return !song.isCompleted;
+        if (filterBy === "favorites") return song.isFavorite;
         return true;
       });
     }
@@ -293,6 +333,7 @@ export default function SongsSearchScreen() {
                 { key: "all", label: "All Songs" },
                 { key: "completed", label: "Completed" },
                 { key: "inProgress", label: "In Progress" },
+                { key: "favorites", label: "Favorites" },
               ].map((option) => (
                 <Pressable
                   key={option.key}
@@ -408,6 +449,7 @@ export default function SongsSearchScreen() {
                 <SongItem
                   song={item}
                   onDelete={handleDeleteSong}
+                  onToggleFavorite={handleToggleFavorite}
                   colorScheme={colorScheme ?? "light"}
                 />
               )}
@@ -606,6 +648,13 @@ const getStyles = (colorScheme: "light" | "dark") =>
       height: 8,
       borderRadius: 4,
       marginLeft: 8,
+    },
+    songActions: {
+      flexDirection: "row",
+      gap: 8,
+    },
+    favoriteButton: {
+      padding: 4,
     },
     deleteButton: {
       padding: 4,

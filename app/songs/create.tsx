@@ -1,5 +1,6 @@
 import ScreenLayout from "@/components/ScreenLayout";
 import MetronomeControls from "@/components/metronome-controls";
+import { TapTempo } from "@/components/tap-tempo";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Note, NOTES } from "@/constants/notes";
@@ -64,7 +65,7 @@ export default function CreateSong() {
     timeSignature: "4/4",
     description: "",
     inspiration: "",
-    lyrics:"",
+    lyrics: "",
     genre: "",
     tags: "",
     isCompleted: false,
@@ -108,8 +109,10 @@ export default function CreateSong() {
         tags: tagsArray,
         chordProgressions: [],
         isCompleted: formData.isCompleted,
+        isFavorite: false,
       });
 
+      Haptics("success");
       router.back();
     } catch (error) {
       console.error("Error creating song:", error);
@@ -254,6 +257,12 @@ export default function CreateSong() {
                 </View>
               </View>
             </View>
+
+            {/* Tap Tempo */}
+            <TapTempo
+              onBpmChange={(bpm) => handleInputChange("bpm", bpm)}
+              currentBpm={formData.bpm}
+            />
 
             {/* Metronome */}
             <MetronomeControls

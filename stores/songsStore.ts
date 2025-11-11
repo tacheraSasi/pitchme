@@ -317,7 +317,8 @@ export const useCurrentSong = () => useSongsStore((state) => state.currentSong);
 export const useCreateSong = () => useSongsStore((state) => state.createSong);
 export const useUpdateSong = () => useSongsStore((state) => state.updateSong);
 export const useDeleteSong = () => useSongsStore((state) => state.deleteSong);
-export const useToggleFavorite = () => useSongsStore((state) => state.toggleFavorite);
+export const useToggleFavorite = () =>
+  useSongsStore((state) => state.toggleFavorite);
 export const useGetSong = () => useSongsStore((state) => state.getSong);
 export const useSetCurrentSong = () =>
   useSongsStore((state) => state.setCurrentSong);
