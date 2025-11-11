@@ -7,7 +7,7 @@ export function useTapTempo() {
   const [bpm, setBpm] = useState<number | null>(null);
   const [tapCount, setTapCount] = useState(0);
   const tapTimes = useRef<number[]>([]);
-  const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const resetTimeoutRef = useRef<number | null>(null);
 
   const tap = useCallback(() => {
     const now = Date.now();
