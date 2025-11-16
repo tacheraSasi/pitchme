@@ -4,3 +4,5 @@ voice or instruments, view the detected notes, and manage their recordings
 with features like playback, title editing, and organization. It's designed 
 for musicians, singers, and music students who want to analyze and track
 their pitch accuracy.
+- chord tracking
+- tempo and metronome tool
