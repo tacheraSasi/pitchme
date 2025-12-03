@@ -1,3 +1,5 @@
+import { VoicePreset } from "@/stores/settingsStore";
+
 export enum Note {
   C = "C",
   CSharp = "C#",
@@ -18,18 +20,28 @@ export const NOTES: Note[] = Object.values(Note);
 export function getNote(note: Note) {
   return NOTES.find((n) => n.toLowerCase() === note.toLowerCase());
 }
-const defaultPath = "../assets/notes/tach/";
-export const noteAssets: Record<Note, NodeJS.Require> = {
-  [Note.C]: require(defaultPath+"/C.m4a"),
-  [Note.CSharp]: require(defaultPath+"/CSharp.m4a"),
-  [Note.D]: require(defaultPath+"/D.m4a"),
-  [Note.DSharp]: require(defaultPath+"/DSharp.m4a"),
-  [Note.E]: require(defaultPath+"/E.m4a"),
-  [Note.F]: require(defaultPath+"/F.m4a"),
-  [Note.FSharp]: require(defaultPath+"/FSharp.m4a"),
-  [Note.G]: require(defaultPath+"/G.m4a"),
-  [Note.GSharp]: require(defaultPath+"/GSharp.m4a"),
-  [Note.A]: require(defaultPath+"/A.m4a"),
-  [Note.ASharp]: require(defaultPath+"/ASharp.m4a"),
-  [Note.B]: require(defaultPath+"/B.m4a"),
+
+// Voice preset paths
+const getVoicePresetPath = (preset: VoicePreset): string => {
+  return `../assets/notes/${preset}/`;
 };
+
+export const getNoteAssets = (preset: VoicePreset): Record<Note, any> => {
+  const basePath = getVoicePresetPath(preset);
+  return {
+    [Note.C]: require(basePath + "C.m4a"),
+    [Note.CSharp]: require(basePath + "CSharp.m4a"),
+    [Note.D]: require(basePath + "D.m4a"),
+    [Note.DSharp]: require(basePath + "DSharp.m4a"),
+    [Note.E]: require(basePath + "E.m4a"),
+    [Note.F]: require(basePath + "F.m4a"),
+    [Note.FSharp]: require(basePath + "FSharp.m4a"),
+    [Note.G]: require(basePath + "G.m4a"),
+    [Note.GSharp]: require(basePath + "GSharp.m4a"),
+    [Note.A]: require(basePath + "A.m4a"),
+    [Note.ASharp]: require(basePath + "ASharp.m4a"),
+    [Note.B]: require(basePath + "B.m4a"),
+  };
+};
+
+export const noteAssets: Record<Note, any> = getNoteAssets("tach");
