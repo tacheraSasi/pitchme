@@ -19,7 +19,7 @@ export function getNote(note: Note) {
   return NOTES.find((n) => n.toLowerCase() === note.toLowerCase());
 }
 const defaultPath = "../assets/notes/tach/";
-export const noteAssets: Record<Note, any> = {
+export const noteAssets: Record<Note, NodeJS.Require> = {
   [Note.C]: require(defaultPath+"/C.m4a"),
   [Note.CSharp]: require(defaultPath+"/CSharp.m4a"),
   [Note.D]: require(defaultPath+"/D.m4a"),
