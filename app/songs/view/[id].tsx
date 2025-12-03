@@ -3,10 +3,11 @@ import MetronomeControls from "@/components/metronome-controls";
 import SongRecordModal from "@/components/song-record-modal";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
-import { noteAssets } from "@/constants/notes";
+import { getNoteAssets, Note } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audio-player";
+import { useVoicePreset } from "@/stores/settingsStore";
 import {
   SongRecording,
   useAddToRecentlyViewed,
@@ -16,7 +17,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -120,8 +121,14 @@ export default function SongScreen() {
     string | null
   >(null);
   const recordModalRef = useRef<BottomSheet>(null);
+  const voicePreset = useVoicePreset();
 
-  const keyPlayer = useGlobalAudioPlayer(noteAssets[song?.key || "C"]);
+  // Get note assets based on selected voice preset
+  const noteAssets = useMemo(() => getNoteAssets(voicePreset), [voicePreset]);
+  
+  // Get the key note, defaulting to C if not found
+  const keyNote = (song?.key as Note) || Note.C;
+  const keyPlayer = useGlobalAudioPlayer(noteAssets[keyNote]);
 
   useEffect(() => {
     if (song) {

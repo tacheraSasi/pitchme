@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export type ThemeMode = "system" | "light" | "dark";
 export type RecordingQuality = "low" | "medium" | "high";
+export type VoicePreset = "tach" | "jonah" | "eliada";
 
 interface SettingsState {
   // Theme settings
@@ -15,6 +16,8 @@ interface SettingsState {
   setLoopNotes: (enabled: boolean) => void;
   recordingQuality: RecordingQuality;
   setRecordingQuality: (quality: RecordingQuality) => void;
+  voicePreset: VoicePreset;
+  setVoicePreset: (preset: VoicePreset) => void;
 
   // Interface settings
   notifications: boolean;
@@ -32,6 +35,7 @@ const defaultSettings = {
   themeMode: "system" as ThemeMode,
   loopNotes: false,
   recordingQuality: "high" as RecordingQuality,
+  voicePreset: "tach" as VoicePreset,
   notifications: true,
   hapticFeedback: true,
 };
@@ -59,6 +63,7 @@ export const useSettingsStore = create<SettingsState>()(
         const nextIndex = (currentIndex + 1) % qualities.length;
         set({ recordingQuality: qualities[nextIndex] });
       },
+      setVoicePreset: (voicePreset) => set({ voicePreset }),
 
       // Interface actions
       setNotifications: (notifications) => set({ notifications }),
@@ -108,6 +113,11 @@ export const useSetNotifications = () =>
   useSettingsStore((state) => state.setNotifications);
 export const useSetHapticFeedback = () =>
   useSettingsStore((state) => state.setHapticFeedback);
+
+export const useVoicePreset = () =>
+  useSettingsStore((state) => state.voicePreset);
+export const useSetVoicePreset = () =>
+  useSettingsStore((state) => state.setVoicePreset);
 
 export const useResetSettings = () =>
   useSettingsStore((state) => state.resetSettings);

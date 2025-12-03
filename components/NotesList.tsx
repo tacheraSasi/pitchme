@@ -1,19 +1,23 @@
 import { NoteCell } from "@/components/NoteCell";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
-import { NOTES, Note, noteAssets } from "@/constants/notes";
+import { NOTES, Note, getNoteAssets } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useSettingsStore } from "@/stores/settingsStore";
+import { useSettingsStore, useVoicePreset } from "@/stores/settingsStore";
 import { useAudioPlayer } from "expo-audio";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { ScrollView, StyleSheet, useWindowDimensions } from "react-native";
 
 export const NotesList = () => {
   const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
-  const { loopNotes } = useSettingsStore()
+  const { loopNotes } = useSettingsStore();
+  const voicePreset = useVoicePreset();
+
+  // Get note assets based on selected voice preset
+  const noteAssets = useMemo(() => getNoteAssets(voicePreset), [voicePreset]);
 
   const playerC = useAudioPlayer(noteAssets[Note.C]);
   const playerCSharp = useAudioPlayer(noteAssets[Note.CSharp]);

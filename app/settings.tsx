@@ -10,10 +10,14 @@ import {
   useSetLoopNotes,
   useSetNotifications,
   useSettingsStore,
+  useSetVoicePreset,
+  useVoicePreset,
+  VoicePreset,
 } from "@/stores/settingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Link } from "expo-router";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
 
 export default function SettingsScreen() {
@@ -27,6 +31,10 @@ export default function SettingsScreen() {
     recordingQuality,
     themeMode,
   } = useSettingsStore();
+
+  const voicePreset = useVoicePreset();
+  const setVoicePreset = useSetVoicePreset();
+  const [showVoicePresets, setShowVoicePresets] = useState(false);
 
   const cycleTheme = useCycleTheme();
   const setLoopNotes = useSetLoopNotes();
@@ -70,6 +78,16 @@ export default function SettingsScreen() {
   const SectionHeader = ({ title }: { title: string }) => (
     <ThemedText style={styles.sectionHeader}>{title}</ThemedText>
   );
+
+  const voicePresets: { value: VoicePreset; label: string; emoji: string }[] = [
+    { value: "tach", label: "Tach", emoji: "🎵" },
+    { value: "jonah", label: "Jonah", emoji: "🎸" },
+    { value: "eliada", label: "Eliada", emoji: "🎹" },
+  ];
+
+  const getPresetLabel = (preset: VoicePreset) => {
+    return voicePresets.find((p) => p.value === preset)?.label || preset;
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -164,6 +182,79 @@ export default function SettingsScreen() {
             />
           }
         />
+
+        <SettingItem
+          icon="record-voice-over"
+          title="Voice Preset"
+          subtitle={`Current: ${getPresetLabel(voicePreset)}`}
+          onPress={() => setShowVoicePresets(!showVoicePresets)}
+          rightElement={
+            <View style={styles.themeIndicator}>
+              <ThemedText style={styles.presetBadge}>
+                {voicePresets.find((p) => p.value === voicePreset)?.emoji}
+              </ThemedText>
+              <Entypo
+                name={showVoicePresets ? "chevron-up" : "chevron-down"}
+                size={20}
+                color={Colors[colorScheme ?? "light"].text}
+                opacity={0.5}
+              />
+            </View>
+          }
+        />
+
+        {showVoicePresets && (
+          <View style={styles.presetContainer}>
+            {voicePresets.map((preset) => (
+              <Pressable
+                key={preset.value}
+                style={[
+                  styles.presetCard,
+                  voicePreset === preset.value && styles.presetCardActive,
+                ]}
+                onPress={() => {
+                  setVoicePreset(preset.value);
+                  setShowVoicePresets(false);
+                }}
+              >
+                <View style={styles.presetCardContent}>
+                  <View style={styles.presetEmojiContainer}>
+                    <ThemedText style={styles.presetEmoji}>
+                      {preset.emoji}
+                    </ThemedText>
+                  </View>
+                  <View style={styles.presetCardText}>
+                    <ThemedText
+                      style={[
+                        styles.presetCardTitle,
+                        voicePreset === preset.value &&
+                          styles.presetCardTitleActive,
+                      ]}
+                    >
+                      {preset.label}
+                    </ThemedText>
+                    <ThemedText style={styles.presetCardSubtitle}>
+                      {preset.value === "tach"
+                        ? "Default voice"
+                        : preset.value === "jonah"
+                        ? "Alternative voice"
+                        : "Alternative voice"}
+                    </ThemedText>
+                  </View>
+                  {voicePreset === preset.value && (
+                    <View style={styles.presetCheckmark}>
+                      <MaterialIcons
+                        name="check-circle"
+                        size={24}
+                        color={Colors[colorScheme ?? "light"].tint}
+                      />
+                    </View>
+                  )}
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        )}
 
         <SettingItem
           icon="high-quality"
@@ -326,5 +417,63 @@ const getStyles = (colorScheme: "light" | "dark") =>
       color: Colors[colorScheme].text,
       opacity: 0.5,
       fontStyle: "italic",
+    },
+    presetBadge: {
+      fontSize: 20,
+      marginRight: 4,
+    },
+    presetContainer: {
+      marginTop: 8,
+      marginBottom: 8,
+      gap: 10,
+    },
+    presetCard: {
+      backgroundColor: Colors[colorScheme].background,
+      borderRadius: 16,
+      borderWidth: 2,
+      borderColor: Colors[colorScheme].text + "10",
+      overflow: "hidden",
+      marginHorizontal: 4,
+    },
+    presetCardActive: {
+      borderColor: Colors[colorScheme].tint + "40",
+      backgroundColor: Colors[colorScheme].tint + "08",
+    },
+    presetCardContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: 16,
+    },
+    presetEmojiContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: Colors[colorScheme].tint + "15",
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 16,
+    },
+    presetEmoji: {
+      fontSize: 28,
+    },
+    presetCardText: {
+      flex: 1,
+    },
+    presetCardTitle: {
+      fontSize: 17,
+      fontWeight: "600",
+      color: Colors[colorScheme].text,
+      marginBottom: 4,
+    },
+    presetCardTitleActive: {
+      color: Colors[colorScheme].tint,
+    },
+    presetCardSubtitle: {
+      fontSize: 14,
+      color: Colors[colorScheme].text,
+      opacity: 0.6,
+    },
+    presetCheckmark: {
+      marginLeft: 8,
     },
   });
