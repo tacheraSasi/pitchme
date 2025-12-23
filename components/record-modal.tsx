@@ -4,7 +4,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useRecordingsStore } from "@/stores/recordingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import {
   RecordingPresets,
   requestRecordingPermissionsAsync,
@@ -165,6 +165,7 @@ const RecordModal = ({ bottomSheetRef }: RecordModalProps) => {
       index={-1}
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
+      backdropComponent={BottomSheetBackdrop}
       enablePanDownToClose={true}
       backgroundStyle={styles.bottomSheetBackground}
       handleIndicatorStyle={styles.handleIndicator}

@@ -6,7 +6,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useCallback, useMemo, useEffect, useRef } from "react";
 import { 
   Pressable, 
@@ -110,6 +110,7 @@ const NoteDetectorBottomSheet = ({
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
       backgroundStyle={styles.bottomSheetBackground}
+      backdropComponent={BottomSheetBackdrop}
       handleIndicatorStyle={styles.handleIndicator}
     >
       <BottomSheetView style={styles.contentContainer}>
