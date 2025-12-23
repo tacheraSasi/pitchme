@@ -36,7 +36,7 @@ const defaultSettings = {
   loopNotes: false,
   recordingQuality: "high" as RecordingQuality,
   voicePreset: "tach" as VoicePreset,
-  notifications: true,
+  notifications: false,
   hapticFeedback: true,
 };
 

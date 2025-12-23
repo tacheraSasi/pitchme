@@ -5,6 +5,7 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import ConfettiCannon from "react-native-confetti-cannon";
 import {
   useCycleRecordingQuality,
   useCycleTheme,
@@ -25,6 +26,7 @@ import BottomSheet, {
 import { Link } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
+import { HapticFeedback } from "@/utils/haptics";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -49,6 +51,9 @@ export default function SettingsScreen() {
   const cycleRecordingQuality = useCycleRecordingQuality();
   const setNotifications = useSetNotifications();
   const setHapticFeedback = useSetHapticFeedback();
+
+
+  const confettiRef = useRef<ConfettiCannon | null>(null);
 
   const openVoiceSheet = useCallback(() => {
     voiceSheetRef.current?.snapToIndex(1);
@@ -339,6 +344,11 @@ export default function SettingsScreen() {
                 ]}
                 onPress={() => {
                   setVoicePreset(preset.value);
+
+                  if (preset.value === "tach") {
+                    confettiRef.current?.start();
+                    HapticFeedback("success");
+                  }
                   closeVoiceSheet();
                 }}
               >
@@ -379,6 +389,13 @@ export default function SettingsScreen() {
           </View>
         </BottomSheetView>
       </BottomSheet>
+      <ConfettiCannon
+        ref={confettiRef}
+        count={200}
+        origin={{ x: -10, y: 0 }}
+        autoStart={false}
+        fadeOut={true}
+      />
     </ThemedView>
     </ScreenLayout>
   );
