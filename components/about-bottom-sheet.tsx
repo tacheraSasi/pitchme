@@ -47,7 +47,7 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
               Record, tag & share ideas
             </ThemedText>
             <ThemedText style={styles.desc}>
-              PitchMe is your personal musical idea companion. Capture
+              PitchMe is your musical idea companion. Capture
               inspiration whenever it strikes with seamless audio recording,
               organize your creative thoughts with tags, and never lose a melody
               again.

@@ -32,7 +32,7 @@ export function RecordingListItem({
 }) {
   const { player, playExclusive, pause } = useGlobalAudioPlayer(recording.uri);
   const playerStatus = useAudioPlayerStatus(player);
-  const { removeRecording } = useRecordingsStore();
+  const { removeRecording, toggleFavorite } = useRecordingsStore();
 
   const translateX = useRef(new Animated.Value(0)).current;
   const panRef = useRef(null);
@@ -246,23 +246,47 @@ export function RecordingListItem({
               <ThemedText style={recordingItemStyles.title} numberOfLines={1}>
                 {recording.title}
               </ThemedText>
-              {playerStatus.playing && (
-                <View style={recordingItemStyles.playingIndicator}>
-                  <View
-                    style={[
-                      recordingItemStyles.playingDot,
-                      {
-                        backgroundColor: isDark
+              <View style={recordingItemStyles.titleRight}>
+                {playerStatus.playing && (
+                  <View style={recordingItemStyles.playingIndicator}>
+                    <View
+                      style={[
+                        recordingItemStyles.playingDot,
+                        {
+                          backgroundColor: isDark
+                            ? Colors.dark.tint
+                            : Colors.light.tint,
+                        },
+                      ]}
+                    />
+                    <ThemedText style={recordingItemStyles.playingText}>
+                      Playing
+                    </ThemedText>
+                  </View>
+                )}
+                <Pressable
+                  onPress={() => {
+                    toggleFavorite(recording.id);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  style={recordingItemStyles.favoriteButton}
+                >
+                  <Entypo
+                    name={recording.isFavorite ? "star" : "star-outlined"}
+                    size={20}
+                    color={
+                      recording.isFavorite
+                        ? isDark
                           ? Colors.dark.tint
-                          : Colors.light.tint,
-                      },
-                    ]}
+                          : Colors.light.tint
+                        : isDark
+                        ? Colors.dark.icon
+                        : Colors.light.icon
+                    }
                   />
-                  <ThemedText style={recordingItemStyles.playingText}>
-                    Playing
-                  </ThemedText>
-                </View>
-              )}
+                </Pressable>
+              </View>
             </View>
 
             <View style={recordingItemStyles.metadataContainer}>
@@ -409,6 +433,14 @@ const recordingItemStyles = StyleSheet.create({
     fontWeight: "600",
     flex: 1,
     marginRight: 8,
+  },
+  titleRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  favoriteButton: {
+    padding: 4,
   },
   playingIndicator: {
     flexDirection: "row",

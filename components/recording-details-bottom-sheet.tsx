@@ -46,7 +46,7 @@ const RecordingDetailsBottomSheet = ({
     exists: boolean;
   } | null>(null);
 
-  const { updateRecordingTitle, removeRecording } = useRecordingsStore();
+  const { updateRecordingTitle, removeRecording, toggleFavorite } = useRecordingsStore();
   const { player, playExclusive, pause } = useGlobalAudioPlayer(
     recording?.uri || ""
   );
@@ -324,41 +324,62 @@ const RecordingDetailsBottomSheet = ({
         <ThemedView style={styles.section}>
           <ThemedView style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>Title</ThemedText>
-            {!isEditing ? (
+            <ThemedView style={styles.titleActions}>
               <Pressable
-                onPress={() => setIsEditing(true)}
-                style={styles.editButton}
+                onPress={() => {
+                  if (recording) {
+                    toggleFavorite(recording.id);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }
+                }}
+                style={styles.favoriteButton}
               >
-                <MaterialIcons
-                  name="edit"
-                  size={18}
-                  color={Colors[colorScheme ?? "light"].tint}
+                <Entypo
+                  name={recording.isFavorite ? "star" : "star-outlined"}
+                  size={22}
+                  color={
+                    recording.isFavorite
+                      ? Colors[colorScheme ?? "light"].tint
+                      : Colors[colorScheme ?? "light"].text
+                  }
                 />
               </Pressable>
-            ) : (
-              <ThemedView style={styles.editActions}>
+              {!isEditing ? (
                 <Pressable
-                  onPress={handleCancelEdit}
-                  style={styles.actionButton}
+                  onPress={() => setIsEditing(true)}
+                  style={styles.editButton}
                 >
                   <MaterialIcons
-                    name="close"
-                    size={18}
-                    color={Colors[colorScheme ?? "light"].text}
-                  />
-                </Pressable>
-                <Pressable
-                  onPress={handleSaveTitle}
-                  style={styles.actionButton}
-                >
-                  <MaterialIcons
-                    name="check"
+                    name="edit"
                     size={18}
                     color={Colors[colorScheme ?? "light"].tint}
                   />
                 </Pressable>
-              </ThemedView>
-            )}
+              ) : (
+                <ThemedView style={styles.editActions}>
+                  <Pressable
+                    onPress={handleCancelEdit}
+                    style={styles.actionButton}
+                  >
+                    <MaterialIcons
+                      name="close"
+                      size={18}
+                      color={Colors[colorScheme ?? "light"].text}
+                    />
+                  </Pressable>
+                  <Pressable
+                    onPress={handleSaveTitle}
+                    style={styles.actionButton}
+                  >
+                    <MaterialIcons
+                      name="check"
+                      size={18}
+                      color={Colors[colorScheme ?? "light"].tint}
+                    />
+                  </Pressable>
+                </ThemedView>
+              )}
+            </ThemedView>
           </ThemedView>
 
           {isEditing ? (
@@ -578,6 +599,14 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 16,
       fontWeight: "600",
       color: Colors[colorScheme].text,
+    },
+    titleActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    favoriteButton: {
+      padding: 6,
     },
     editButton: {
       padding: 6,

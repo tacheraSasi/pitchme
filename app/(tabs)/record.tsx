@@ -19,9 +19,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RecordScreen() {
   const colorScheme = useColorScheme();
-  const recordings = useRecordingsList();
+  const allRecordings = useRecordingsList();
   const styles = getStyles(colorScheme ?? "light");
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+
+  // Filter recordings based on favorites filter
+  const recordings = showFavoritesOnly
+    ? allRecordings.filter((r) => r.isFavorite ?? false)
+    : allRecordings;
 
   // I State for selected recording ID (instead of full recording object)
   const [selectedRecordingId, setSelectedRecordingId] = useState<string | null>(
@@ -83,9 +89,32 @@ export default function RecordScreen() {
           </ThemedView>
 
           <ThemedView style={styles.listContainer}>
-            <ThemedText style={styles.listTitle}>
-              Your Recordings ({recordings.length})
-            </ThemedText>
+            <ThemedView style={styles.listHeader}>
+              <ThemedText style={styles.listTitle}>
+                {showFavoritesOnly ? "Favorites" : "Your Recordings"} ({recordings.length})
+              </ThemedText>
+              {allRecordings.some((r) => r.isFavorite) && (
+                <Pressable
+                  onPress={() => {
+                    setShowFavoritesOnly(!showFavoritesOnly);
+                  }}
+                  style={[
+                    styles.filterButton,
+                    showFavoritesOnly && styles.filterButtonActive,
+                  ]}
+                >
+                  <Entypo
+                    name={showFavoritesOnly ? "star" : "star-outlined"}
+                    size={18}
+                    color={
+                      showFavoritesOnly
+                        ? Colors[colorScheme ?? "light"].tint
+                        : Colors[colorScheme ?? "light"].text
+                    }
+                  />
+                </Pressable>
+              )}
+            </ThemedView>
             {recordings.length === 0 ? (
               <ThemedView style={styles.emptyState}>
                 <Entypo
@@ -190,12 +219,29 @@ export const getStyles = (colorScheme: "light" | "dark" = "light") =>
       flex: 1,
       paddingHorizontal: 16,
     },
+    listHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 16,
+      paddingHorizontal: 4,
+    },
     listTitle: {
       fontSize: 18,
       fontWeight: "600",
-      marginBottom: 16,
-      paddingHorizontal: 4,
       color: Colors[colorScheme].text,
+    },
+    filterButton: {
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor:
+        colorScheme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+    },
+    filterButtonActive: {
+      backgroundColor:
+        colorScheme === "dark"
+          ? Colors[colorScheme].tint + "20"
+          : Colors[colorScheme].tint + "15",
     },
     listContent: {
       paddingBottom: 20,

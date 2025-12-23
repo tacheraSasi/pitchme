@@ -8,6 +8,7 @@ export interface RecordingItem {
   uri: string;
   durationMillis: number;
   date: string; // ISO string
+  isFavorite?: boolean; // Optional to maintain backward compatibility
 }
 
 interface RecordingsState {
@@ -16,6 +17,7 @@ interface RecordingsState {
     r: Omit<RecordingItem, "id" | "date"> & { title?: string }
   ) => Promise<void>;
   updateRecordingTitle: (id: string, title: string) => Promise<void>;
+  toggleFavorite: (id: string) => Promise<void>;
   removeRecording: (id: string) => Promise<void>;
   clearAll: () => Promise<void>;
 }
@@ -33,6 +35,7 @@ export const useRecordingsStore = create<RecordingsState>()(
           uri: r.uri,
           durationMillis: r.durationMillis ?? 0,
           date,
+          isFavorite: false,
         };
         set((s) => ({ recordings: [item, ...s.recordings] }));
       },
@@ -40,6 +43,13 @@ export const useRecordingsStore = create<RecordingsState>()(
         set((s) => ({
           recordings: s.recordings.map((r) =>
             r.id === id ? { ...r, title } : r
+          ),
+        }));
+      },
+      toggleFavorite: async (id) => {
+        set((s) => ({
+          recordings: s.recordings.map((r) =>
+            r.id === id ? { ...r, isFavorite: !(r.isFavorite ?? false) } : r
           ),
         }));
       },
@@ -59,5 +69,8 @@ export const useRecordingsStore = create<RecordingsState>()(
 );
 
 export const useRecordingsList = () => useRecordingsStore((s) => s.recordings);
+export const useToggleFavorite = () => useRecordingsStore((s) => s.toggleFavorite);
+export const useFavoriteRecordings = () =>
+  useRecordingsStore((s) => s.recordings.filter((r) => r.isFavorite ?? false));
 
 export default useRecordingsStore;
