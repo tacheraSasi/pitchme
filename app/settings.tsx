@@ -1,3 +1,4 @@
+import Avatar from "@/components/avatar";
 import ScreenLayout from "@/components/ScreenLayout";
 import { StatusBarPresets } from "@/components/themed/themed-status-bar";
 import { ThemedText } from "@/components/themed/themed-text";
@@ -98,10 +99,26 @@ export default function SettingsScreen() {
     <ThemedText style={styles.sectionHeader}>{title}</ThemedText>
   );
 
-  const voicePresets: { value: VoicePreset; label: string; emoji: string }[] = [
-    { value: "tach", label: "Tach", emoji: "🎵" },
-    { value: "jonah", label: "Jonah", emoji: "🎸" },
-    { value: "eliada", label: "Eliada", emoji: "🎹" },
+  const voicePresets: {
+    value: VoicePreset;
+    label: string;
+    avatar: any;
+  }[] = [
+    {
+      value: "tach",
+      label: "Tach",
+      avatar: require("../assets/images/avatars/tach.jpg"),
+    },
+    {
+      value: "jonah",
+      label: "Jonah",
+      avatar: require("../assets/images/avatars/jonah.jpg"),
+    },
+    {
+      value: "eliada",
+      label: "Eliada",
+      avatar: require("../assets/images/avatars/eliada.jpg"),
+    },
   ];
 
   const getPresetLabel = (preset: VoicePreset) => {
@@ -211,9 +228,12 @@ export default function SettingsScreen() {
           onPress={openVoiceSheet}
           rightElement={
             <View style={styles.themeIndicator}>
-              <ThemedText style={styles.presetBadge}>
-                {voicePresets.find((p) => p.value === voicePreset)?.emoji}
-              </ThemedText>
+              <Avatar
+                source={
+                  voicePresets.find((p) => p.value === voicePreset)?.avatar
+                }
+                size={28}
+              />
               <Entypo
                 name={isVoiceSheetOpen ? "chevron-down" : "chevron-right"}
                 size={20}
@@ -323,10 +343,8 @@ export default function SettingsScreen() {
                 }}
               >
                 <View style={styles.presetCardContent}>
-                  <View style={styles.presetEmojiContainer}>
-                    <ThemedText style={styles.presetEmoji}>
-                      {preset.emoji}
-                    </ThemedText>
+                  <View style={styles.presetAvatarContainer}>
+                    <Avatar source={preset.avatar} size={56} />
                   </View>
                   <View style={styles.presetCardText}>
                     <ThemedText
@@ -457,7 +475,6 @@ const getStyles = (colorScheme: "light" | "dark") =>
       fontStyle: "italic",
     },
     presetBadge: {
-      fontSize: 20,
       marginRight: 4,
     },
     bottomSheetBackground: {
@@ -504,17 +521,8 @@ const getStyles = (colorScheme: "light" | "dark") =>
       alignItems: "center",
       padding: 16,
     },
-    presetEmojiContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: Colors[colorScheme].tint + "15",
-      alignItems: "center",
-      justifyContent: "center",
+    presetAvatarContainer: {
       marginRight: 16,
-    },
-    presetEmoji: {
-      fontSize: 28,
     },
     presetCardText: {
       flex: 1,
