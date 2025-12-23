@@ -1,13 +1,13 @@
 import AboutBottomSheet from "@/components/about-bottom-sheet";
 import BottomSheet from "@gorhom/bottom-sheet";
 import React from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Toaster } from "yooo-native";
 
 interface ScreenLayoutProps {
-  styles: object;
-  aboutBottomSheetRef: React.RefObject<BottomSheet | null>;
+  styles?: object;
+  aboutBottomSheetRef?: React.RefObject<BottomSheet | null>;
   children: React.ReactNode;
 }
 const ScreenLayout = ({
@@ -15,6 +15,14 @@ const ScreenLayout = ({
   aboutBottomSheetRef,
   children,
 }: ScreenLayoutProps) => {
+
+  if (!aboutBottomSheetRef) {
+    return (
+      <GestureHandlerRootView style={styles}>
+        {children}
+      </GestureHandlerRootView>
+    );
+  }
   return (
     <GestureHandlerRootView style={styles}>
       <KeyboardAvoidingView
@@ -24,7 +32,7 @@ const ScreenLayout = ({
         {children}
       </KeyboardAvoidingView>
       <Toaster />
-      <AboutBottomSheet bottomSheetRef={aboutBottomSheetRef} />
+      <AboutBottomSheet bottomSheetRef={aboutBottomSheetRef as React.RefObject<BottomSheet>} />
     </GestureHandlerRootView>
   );
 };

@@ -1,3 +1,4 @@
+import ScreenLayout from "@/components/ScreenLayout";
 import { StatusBarPresets } from "@/components/themed/themed-status-bar";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
@@ -16,8 +17,12 @@ import {
 } from "@/stores/settingsStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
 
 export default function SettingsScreen() {
@@ -34,13 +39,27 @@ export default function SettingsScreen() {
 
   const voicePreset = useVoicePreset();
   const setVoicePreset = useSetVoicePreset();
-  const [showVoicePresets, setShowVoicePresets] = useState(false);
+  const [isVoiceSheetOpen, setIsVoiceSheetOpen] = useState(false);
+  const voiceSheetRef = useRef<BottomSheet>(null);
+  const voiceSnapPoints = useMemo(() => ["30%", "55%"], []);
 
   const cycleTheme = useCycleTheme();
   const setLoopNotes = useSetLoopNotes();
   const cycleRecordingQuality = useCycleRecordingQuality();
   const setNotifications = useSetNotifications();
   const setHapticFeedback = useSetHapticFeedback();
+
+  const openVoiceSheet = useCallback(() => {
+    voiceSheetRef.current?.snapToIndex(1);
+  }, []);
+
+  const closeVoiceSheet = useCallback(() => {
+    voiceSheetRef.current?.close();
+  }, []);
+
+  const handleVoiceSheetChange = useCallback((index: number) => {
+    setIsVoiceSheetOpen(index >= 0);
+  }, []);
 
   const SettingItem = ({
     icon,
@@ -90,6 +109,8 @@ export default function SettingsScreen() {
   };
 
   return (
+    <ScreenLayout styles={styles.container}>
+
     <ThemedView style={styles.container}>
       {StatusBarPresets.modal()}
       <ScrollView
@@ -187,14 +208,14 @@ export default function SettingsScreen() {
           icon="record-voice-over"
           title="Voice Preset"
           subtitle={`Current: ${getPresetLabel(voicePreset)}`}
-          onPress={() => setShowVoicePresets(!showVoicePresets)}
+          onPress={openVoiceSheet}
           rightElement={
             <View style={styles.themeIndicator}>
               <ThemedText style={styles.presetBadge}>
                 {voicePresets.find((p) => p.value === voicePreset)?.emoji}
               </ThemedText>
               <Entypo
-                name={showVoicePresets ? "chevron-up" : "chevron-down"}
+                name={isVoiceSheetOpen ? "chevron-down" : "chevron-right"}
                 size={20}
                 color={Colors[colorScheme ?? "light"].text}
                 opacity={0.5}
@@ -202,59 +223,6 @@ export default function SettingsScreen() {
             </View>
           }
         />
-
-        {showVoicePresets && (
-          <View style={styles.presetContainer}>
-            {voicePresets.map((preset) => (
-              <Pressable
-                key={preset.value}
-                style={[
-                  styles.presetCard,
-                  voicePreset === preset.value && styles.presetCardActive,
-                ]}
-                onPress={() => {
-                  setVoicePreset(preset.value);
-                  setShowVoicePresets(false);
-                }}
-              >
-                <View style={styles.presetCardContent}>
-                  <View style={styles.presetEmojiContainer}>
-                    <ThemedText style={styles.presetEmoji}>
-                      {preset.emoji}
-                    </ThemedText>
-                  </View>
-                  <View style={styles.presetCardText}>
-                    <ThemedText
-                      style={[
-                        styles.presetCardTitle,
-                        voicePreset === preset.value &&
-                          styles.presetCardTitleActive,
-                      ]}
-                    >
-                      {preset.label}
-                    </ThemedText>
-                    <ThemedText style={styles.presetCardSubtitle}>
-                      {preset.value === "tach"
-                        ? "Default voice"
-                        : preset.value === "jonah"
-                        ? "Alternative voice"
-                        : "Alternative voice"}
-                    </ThemedText>
-                  </View>
-                  {voicePreset === preset.value && (
-                    <View style={styles.presetCheckmark}>
-                      <MaterialIcons
-                        name="check-circle"
-                        size={24}
-                        color={Colors[colorScheme ?? "light"].tint}
-                      />
-                    </View>
-                  )}
-                </View>
-              </Pressable>
-            ))}
-          </View>
-        )}
 
         <SettingItem
           icon="high-quality"
@@ -324,7 +292,77 @@ export default function SettingsScreen() {
           </ThemedText> */}
         </View>
       </ScrollView>
+
+      <BottomSheet
+        ref={voiceSheetRef}
+        index={-1}
+        snapPoints={voiceSnapPoints}
+        enablePanDownToClose={true}
+        onChange={handleVoiceSheetChange}
+        backdropComponent={BottomSheetBackdrop}
+        backgroundStyle={styles.bottomSheetBackground}
+        handleIndicatorStyle={styles.handleIndicator}
+      >
+        <BottomSheetView style={styles.presetSheetContent}>
+          <ThemedText style={styles.sheetTitle}>Choose Voice Preset</ThemedText>
+          <ThemedText style={styles.sheetSubtitle}>
+            Pick the voice that feels right for you.
+          </ThemedText>
+
+          <View style={styles.presetContainer}>
+            {voicePresets.map((preset) => (
+              <Pressable
+                key={preset.value}
+                style={[
+                  styles.presetCard,
+                  voicePreset === preset.value && styles.presetCardActive,
+                ]}
+                onPress={() => {
+                  setVoicePreset(preset.value);
+                  closeVoiceSheet();
+                }}
+              >
+                <View style={styles.presetCardContent}>
+                  <View style={styles.presetEmojiContainer}>
+                    <ThemedText style={styles.presetEmoji}>
+                      {preset.emoji}
+                    </ThemedText>
+                  </View>
+                  <View style={styles.presetCardText}>
+                    <ThemedText
+                      style={[
+                        styles.presetCardTitle,
+                        voicePreset === preset.value &&
+                          styles.presetCardTitleActive,
+                      ]}
+                    >
+                      {preset.label}
+                    </ThemedText>
+                    <ThemedText style={styles.presetCardSubtitle}>
+                      {preset.value === "tach"
+                        ? "Default voice"
+                        : preset.value === "jonah"
+                        ? "Alternative voice"
+                        : "Alternative voice"}
+                    </ThemedText>
+                  </View>
+                  {voicePreset === preset.value && (
+                    <View style={styles.presetCheckmark}>
+                      <MaterialIcons
+                        name="check-circle"
+                        size={24}
+                        color={Colors[colorScheme ?? "light"].tint}
+                      />
+                    </View>
+                  )}
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </ThemedView>
+    </ScreenLayout>
   );
 }
 
@@ -421,6 +459,28 @@ const getStyles = (colorScheme: "light" | "dark") =>
     presetBadge: {
       fontSize: 20,
       marginRight: 4,
+    },
+    bottomSheetBackground: {
+      backgroundColor: Colors[colorScheme].background,
+    },
+    handleIndicator: {
+      backgroundColor: colorScheme === "dark" ? "#444444" : "#cccccc",
+    },
+    presetSheetContent: {
+      flex: 1,
+      padding: 20,
+      gap: 12,
+    },
+    sheetTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: Colors[colorScheme].text,
+    },
+    sheetSubtitle: {
+      fontSize: 14,
+      opacity: 0.7,
+      color: Colors[colorScheme].text,
+      marginBottom: 4,
     },
     presetContainer: {
       marginTop: 8,
