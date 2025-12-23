@@ -18,31 +18,63 @@ export function useGlobalAudioPlayer(source: string | number) {
   const player = useAudioPlayer(audioSource);
 
   const playExclusive = async () => {
-    if (currentPlayer && currentPlayer !== player) {
-      currentPlayer.pause();
+    try {
+      if (currentPlayer && currentPlayer !== player) {
+        try {
+          currentPlayer.pause();
+        } catch (error) {
+          // Player might have been released, just clear the reference
+          console.warn("Failed to pause previous player:", error);
+        }
+        currentPlayer = null;
+      }
+      currentPlayer = player;
+      player.play();
+    } catch (error) {
+      console.error("Error in playExclusive:", error);
+      currentPlayer = null;
+      throw error;
     }
-    currentPlayer = player;
-    player.play();
   };
 
   const pause = async () => {
-    player.pause();
-    if (currentPlayer === player) currentPlayer = null;
+    try {
+      player.pause();
+      if (currentPlayer === player) currentPlayer = null;
+    } catch (error) {
+      console.error("Error pausing player:", error);
+      if (currentPlayer === player) currentPlayer = null;
+    }
   };
 
   const stop = async () => {
-    player.pause();
-    player.seekTo(0)
-    if (currentPlayer === player) currentPlayer = null;
-  }
+    try {
+      player.pause();
+      player.seekTo(0);
+      if (currentPlayer === player) currentPlayer = null;
+    } catch (error) {
+      console.error("Error stopping player:", error);
+      if (currentPlayer === player) currentPlayer = null;
+    }
+  };
 
-  const stopAll  = async ()=>{
-    if (currentPlayer) {
-      currentPlayer.pause();
-      currentPlayer.seekTo(0);
+  const stopAll = async () => {
+    try {
+      if (currentPlayer) {
+        try {
+          currentPlayer.pause();
+          currentPlayer.seekTo(0);
+        } catch (error) {
+          // Player might have been released, just clear the reference
+          console.warn("Failed to stop current player:", error);
+        }
+        currentPlayer = null;
+      }
+    } catch (error) {
+      console.error("Error in stopAll:", error);
       currentPlayer = null;
     }
-  }
+  };
 
   return { player, playExclusive, pause, stop, stopAll };
 }

@@ -12,8 +12,11 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, TextInput } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import {
+  PanGestureHandler,
+} from "react-native-gesture-handler";
 import { alert, toast } from "yooo-native";
 
 interface RecordingDetailsBottomSheetProps {
@@ -32,6 +35,12 @@ const RecordingDetailsBottomSheet = ({
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
+  const [isLooping, setIsLooping] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [seekPosition, setSeekPosition] = useState(0);
+  const seekBarRef = useRef<View>(null);
+  const [seekBarWidth, setSeekBarWidth] = useState(0);
+  const initialSeekProgress = useRef(0);
   const [fileInfo, setFileInfo] = useState<{
     size: number;
     exists: boolean;
@@ -42,6 +51,18 @@ const RecordingDetailsBottomSheet = ({
     recording?.uri || ""
   );
   const playerStatus = useAudioPlayerStatus(player);
+
+  // Update loop state on player
+  useEffect(() => {
+    if (player) {
+      player.loop = isLooping;
+    }
+  }, [player, isLooping]);
+
+  // Update current time display
+  const currentTime = isSeeking ? seekPosition : playerStatus.currentTime;
+  const duration = playerStatus.duration || (recording?.durationMillis ? recording.durationMillis / 1000 : 0) || 0;
+  const progress = duration > 0 ? currentTime / duration : 0;
 
   // Snap points for the bottom sheet
   const snapPoints = useMemo(() => ["50%", "75%"], []);
@@ -200,6 +221,55 @@ const RecordingDetailsBottomSheet = ({
     }
   };
 
+  const handleSeekBarLayout = (event: any) => {
+    const { width } = event.nativeEvent.layout;
+    setSeekBarWidth(width);
+  };
+
+  const handleSeekPress = (event: any) => {
+    if (!seekBarWidth || !recording) return;
+    
+    const { locationX } = event.nativeEvent;
+    const newPosition = Math.max(0, Math.min(1, locationX / seekBarWidth));
+    const seekTime = newPosition * duration;
+    
+    setSeekPosition(seekTime);
+    player.seekTo(seekTime);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const onSeekGestureEvent = useCallback((event: any) => {
+    if (!seekBarWidth || !recording) return;
+    
+    const { translationX, x } = event.nativeEvent;
+    // Use x if available (relative to view), otherwise use translationX
+    const locationX = x !== undefined ? x : (initialSeekProgress.current * seekBarWidth + translationX);
+    const newProgress = Math.max(0, Math.min(1, locationX / seekBarWidth));
+    const seekTime = newProgress * duration;
+    
+    setSeekPosition(seekTime);
+  }, [seekBarWidth, recording, duration]);
+
+  const onSeekHandlerStateChange = useCallback((event: any) => {
+    if (event.nativeEvent.state === 2) {
+      // ACTIVE - dragging started
+      setIsSeeking(true);
+      initialSeekProgress.current = progress;
+      setSeekPosition(playerStatus.currentTime);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } else if (event.nativeEvent.state === 5) {
+      // END - dragging ended
+      setIsSeeking(false);
+      player.seekTo(seekPosition);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+  }, [progress, playerStatus.currentTime, seekPosition, player]);
+
+  const toggleLoop = () => {
+    setIsLooping(!isLooping);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -309,25 +379,87 @@ const RecordingDetailsBottomSheet = ({
         {/* Playback Section */}
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Playback</ThemedText>
-          <Pressable style={styles.playbackButton} onPress={togglePlayback}>
-            <ThemedView style={styles.playbackIcon}>
-              <Entypo
-                name={
-                  playerStatus.playing ? "controller-paus" : "controller-play"
-                }
-                size={24}
-                color={colorScheme === "dark" ? "black" : "white"}
+          
+          {/* Seekable Progress Bar */}
+          <View style={styles.seekBarContainer}>
+            <View
+              ref={seekBarRef}
+              onLayout={handleSeekBarLayout}
+              style={styles.seekBarBackground}
+            >
+              {/* Progress Fill */}
+              <ThemedView
+                style={[
+                  styles.seekBarProgress,
+                  { width: `${progress * 100}%` },
+                ]}
               />
+              
+              {/* Play Button */}
+              <Pressable
+                style={[styles.playButtonContainer, { left: `${progress * 100}%` }]}
+                onPress={togglePlayback}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <ThemedView style={styles.playButton}>
+                  <Entypo
+                    name={
+                      playerStatus.playing
+                        ? "controller-paus"
+                        : "controller-play"
+                    }
+                    size={20}
+                    color={colorScheme === "dark" ? "black" : "white"}
+                  />
+                </ThemedView>
+              </Pressable>
+              
+              {/* Seekable Area */}
+              <PanGestureHandler
+                onGestureEvent={onSeekGestureEvent}
+                onHandlerStateChange={onSeekHandlerStateChange}
+                activeOffsetX={[-10, 10]}
+              >
+                <View style={styles.seekableArea}>
+                  <Pressable
+                    style={styles.seekablePressArea}
+                    onPress={handleSeekPress}
+                  />
+                </View>
+              </PanGestureHandler>
+            </View>
+          </View>
+
+          {/* Time Display and Controls */}
+          <ThemedView style={styles.playbackControls}>
+            <ThemedText style={styles.timeText}>
+              {formatTime(Math.floor(currentTime * 1000))}
+            </ThemedText>
+            
+            <ThemedView style={styles.controlButtons}>
+              <Pressable
+                style={[
+                  styles.controlButton,
+                  isLooping && styles.controlButtonActive,
+                ]}
+                onPress={toggleLoop}
+              >
+                <MaterialIcons
+                  name="repeat"
+                  size={20}
+                  color={
+                    isLooping
+                      ? Colors[colorScheme ?? "light"].tint
+                      : Colors[colorScheme ?? "light"].text
+                  }
+                />
+              </Pressable>
             </ThemedView>
-            <ThemedView style={styles.playbackInfo}>
-              <ThemedText style={styles.playbackStatus}>
-                {playerStatus.playing ? "Playing..." : "Tap to play"}
-              </ThemedText>
-              <ThemedText style={styles.playbackDuration}>
-                {formatTime(recording.durationMillis)}
-              </ThemedText>
-            </ThemedView>
-          </Pressable>
+            
+            <ThemedText style={styles.timeText}>
+              {formatTime(recording.durationMillis)}
+            </ThemedText>
+          </ThemedView>
         </ThemedView>
 
         {/* Information Section */}
@@ -471,36 +603,78 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       color: Colors[colorScheme].text,
       fontWeight: "500",
     },
-    playbackButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: 16,
+    seekBarContainer: {
+      marginBottom: 12,
+    },
+    seekBarBackground: {
+      height: 60,
       backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f5f5f5",
       borderRadius: 12,
-      gap: 16,
+      position: "relative",
+      overflow: "visible",
     },
-    playbackIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+    seekableArea: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 12,
+    },
+    seekablePressArea: {
+      flex: 1,
+    },
+    seekBarProgress: {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: Colors[colorScheme].tint + "40",
+      borderRadius: 12,
+    },
+    playButtonContainer: {
+      position: "absolute",
+      top: "50%",
+      transform: [{ translateX: -20 }, { translateY: -20 }],
+      zIndex: 10,
+    },
+    playButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
       backgroundColor: Colors[colorScheme].tint,
       alignItems: "center",
       justifyContent: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
-    playbackInfo: {
-      flex: 1,
-      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f5f5f5",
+    playbackControls: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 4,
     },
-    playbackStatus: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: Colors[colorScheme].text,
-      marginBottom: 4,
-    },
-    playbackDuration: {
-      fontSize: 14,
+    timeText: {
+      fontSize: 12,
       color: Colors[colorScheme].text,
       opacity: 0.7,
+      fontWeight: "500",
+      minWidth: 50,
+    },
+    controlButtons: {
+      flexDirection: "row",
+      gap: 8,
+    },
+    controlButton: {
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#e8e8e8",
+    },
+    controlButtonActive: {
+      backgroundColor: Colors[colorScheme].tint + "20",
     },
     infoGrid: {
       gap: 12,
