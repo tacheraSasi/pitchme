@@ -125,7 +125,7 @@ export default function SongScreen() {
 
   // Get note assets based on selected voice preset
   const noteAssets = useMemo(() => getNoteAssets(voicePreset), [voicePreset]);
-  
+
   // Get the key note, defaulting to C if not found
   const keyNote = (song?.key as Note) || Note.C;
   const keyPlayer = useGlobalAudioPlayer(noteAssets[keyNote]);

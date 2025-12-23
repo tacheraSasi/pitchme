@@ -3,7 +3,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import Entypo from "@expo/vector-icons/Entypo";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 
@@ -26,6 +26,7 @@ const AboutBottomSheet = ({ bottomSheetRef }: AboutBottomSheetProps) => {
       snapPoints={["40%"]}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
+      backdropComponent={BottomSheetBackdrop}
       backgroundStyle={styles.bottomSheetBackground}
       handleIndicatorStyle={styles.handleIndicator}
     >
