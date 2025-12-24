@@ -25,8 +25,9 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { Link } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
+import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
 import { HapticFeedback } from "@/utils/haptics";
+import { privacyPolicyUrl } from "@/constants/external-urls";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -294,7 +295,10 @@ export default function SettingsScreen() {
           icon="privacy-tip"
           title="Privacy Policy"
           subtitle="Learn about your privacy"
-          onPress={() => {}}
+          onPress={() => {
+            HapticFeedback("success");
+            Linking.openURL(privacyPolicyUrl);
+          }}
           rightElement={
             <Entypo
               name="chevron-right"
