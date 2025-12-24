@@ -4,7 +4,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHaptics } from "@/hooks/useHaptics";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
+import { Image, Pressable, StyleSheet } from "react-native";
 
 export default function Step1() {
   const router = useRouter();
@@ -20,6 +20,14 @@ export default function Step1() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.content}>
+        <ThemedView style={styles.header}>
+          <Image
+            source={require("../../assets/images/icons/android/play_store_512.png")}
+            style={styles.logo}
+          />
+          <ThemedText style={styles.appName}>PitchMe</ThemedText>
+        </ThemedView>
+
         <ThemedView style={styles.textContainer}>
           <ThemedText style={styles.hookText}>
             Everyone can hear pitch.
@@ -64,8 +72,24 @@ const getStyles = (colorScheme: "light" | "dark") =>
       justifyContent: "space-between",
       alignItems: "center",
       paddingHorizontal: 32,
-      paddingTop: 120,
+      paddingTop: 60,
       paddingBottom: 60,
+    },
+    header: {
+      alignItems: "center",
+      paddingTop: 20,
+    },
+    logo: {
+      width: 150,
+      height: 150,
+      borderRadius: 20,
+      marginBottom: 12,
+    },
+    appName: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: Colors[colorScheme].text,
+      letterSpacing: -0.5,
     },
     textContainer: {
       alignItems: "center",
