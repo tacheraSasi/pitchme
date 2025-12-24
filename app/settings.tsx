@@ -27,7 +27,7 @@ import { Link } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
 import { HapticFeedback } from "@/utils/haptics";
-import { privacyPolicyUrl } from "@/constants/external-urls";
+import { privacyPolicyUrl, supportUrl } from "@/constants/external-urls";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -280,7 +280,10 @@ export default function SettingsScreen() {
           icon="help"
           title="Help & Support"
           subtitle="Get help with the app"
-          onPress={() => {}}
+          onPress={() => {
+            HapticFeedback("success");
+            Linking.openURL(supportUrl);
+          }}
           rightElement={
             <Entypo
               name="chevron-right"
