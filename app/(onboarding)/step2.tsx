@@ -1,14 +1,13 @@
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
+import { getNoteAssets, Note } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
-import { getNoteAssets } from "@/constants/notes";
-import { Note } from "@/constants/notes";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHaptics } from "@/hooks/useHaptics";
 import { useVoicePreset } from "@/stores/settingsStore";
 import { useAudioPlayer } from "expo-audio";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
 
 export default function Step2() {

@@ -4,8 +4,8 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHaptics } from "@/hooks/useHaptics";
 import {
-  requestRecordingPermissionsAsync,
-  setAudioModeAsync,
+    requestRecordingPermissionsAsync,
+    setAudioModeAsync,
 } from "expo-audio";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
