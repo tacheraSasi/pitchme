@@ -241,14 +241,9 @@ export default function Step1() {
               ]}
               onPress={handleNext}
             >
-              <ThemedView style={styles.buttonContent}>
-                <ThemedText style={styles.nextButtonText}>
-                  Let's get started
-                </ThemedText>
-                <ThemedView style={styles.arrowContainer}>
-                  <ThemedText style={styles.arrow}>→</ThemedText>
-                </ThemedView>
-              </ThemedView>
+              <ThemedText style={styles.nextButtonText}>
+                Let's Find Out
+              </ThemedText>
             </Pressable>
           </Animated.View>
 
@@ -435,51 +430,19 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     nextButton: {
       backgroundColor: Colors[colorScheme].tint,
-      borderRadius: 20,
-      width: '100%',
-      maxWidth: 320,
-      paddingVertical: 20,
-      paddingHorizontal: 24,
-      shadowColor: Colors[colorScheme].tint,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.25,
-      shadowRadius: 16,
-      elevation: 8,
+      paddingVertical: 18,
+      paddingHorizontal: 48,
+      borderRadius: 16,
+      width: "100%",
+      alignItems: "center",
     },
     nextButtonPressed: {
-      opacity: 0.9,
-      transform: [{ scale: 0.98 }],
-    },
-    buttonContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: 8,
+      opacity: 0.7,
     },
     nextButtonText: {
-      fontSize: 18,
-      fontWeight: "700",
+      fontSize: 17,
+      fontWeight: "600",
       color: colorScheme === "dark" ? "#000000" : "#ffffff",
-      letterSpacing: 0.5,
-    },
-    arrowContainer: {
-      backgroundColor: colorScheme === "dark" ? "#00000020" : "#ffffff40",
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    arrow: {
-      fontSize: 18,
-      fontWeight: "300",
-      color: colorScheme === "dark" ? "#000000" : "#ffffff",
-    },
-    buttonSubtext: {
-      fontSize: 13,
-      fontWeight: "500",
-      color: colorScheme === "dark" ? "#00000080" : "#ffffff80",
-      textAlign: 'center',
     },
     stepIndicatorContainer: {
       alignItems: 'center',
