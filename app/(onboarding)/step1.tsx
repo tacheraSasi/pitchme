@@ -4,7 +4,8 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHaptics } from "@/hooks/useHaptics";
 import { useRouter } from "expo-router";
-import { Image, Pressable, StyleSheet } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Easing, Image, Pressable, StyleSheet } from "react-native";
 
 export default function Step1() {
   const router = useRouter();
@@ -12,52 +13,261 @@ export default function Step1() {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 
+  // Animation values
+  const logoScale = useRef(new Animated.Value(0.5)).current;
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const textFade = useRef(new Animated.Value(0)).current;
+  const textSlide = useRef(new Animated.Value(20)).current;
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const buttonOpacity = useRef(new Animated.Value(0)).current;
+  const bgPulse = useRef(new Animated.Value(0)).current;
+
+  // Entry animations
+  useEffect(() => {
+    // Background pulse animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(bgPulse, {
+          toValue: 1,
+          duration: 3000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+        Animated.timing(bgPulse, {
+          toValue: 0,
+          duration: 3000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+
+    // Logo entry with spring effect
+    Animated.sequence([
+      Animated.delay(200),
+      Animated.parallel([
+        Animated.spring(logoScale, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+        Animated.timing(logoOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+
+    // Text entry with slight delay
+    Animated.sequence([
+      Animated.delay(800),
+      Animated.parallel([
+        Animated.timing(textFade, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(textSlide, {
+          toValue: 0,
+          duration: 800,
+          easing: Easing.out(Easing.back(1)),
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+
+    // Button entry
+    Animated.sequence([
+      Animated.delay(1200),
+      Animated.parallel([
+        Animated.timing(buttonOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(buttonScale, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+          delay: 100,
+        }),
+      ]),
+    ]).start();
+  }, []);
+
   const handleNext = () => {
     haptics("light");
-    router.push("./step2");
+    
+    // Button press animation
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // Exit animations before navigation
+      Animated.parallel([
+        Animated.timing(logoOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(textFade, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(buttonOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        router.push("./step2");
+      });
+    });
   };
 
+  // Interpolate background color based on pulse animation
+  const animatedBgColor = bgPulse.interpolate({
+    inputRange: [0, 1],
+    outputRange: [
+      Colors[colorScheme ?? "light"].background,
+      colorScheme === 'dark' ? '#1a1a2e' : '#f8f9ff'
+    ],
+  });
+
   return (
-    <ThemedView style={styles.container}>
+    <Animated.View style={[styles.container, { backgroundColor: animatedBgColor }]}>
       <ThemedView style={styles.content}>
-        <ThemedView style={styles.header}>
-          <Image
-            source={require("../../assets/images/icons/android/play_store_512.png")}
-            style={styles.logo}
-          />
-          <ThemedText style={styles.appName}>PitchMe</ThemedText>
+        {/* Decorative elements */}
+        <ThemedView style={styles.decorativeCircles}>
+          <Animated.View style={[styles.circle1, {
+            transform: [{ scale: bgPulse.interpolate({
+              inputRange: [0, 1],
+              outputRange: [1, 1.1]
+            })}]
+          }]} />
+          <Animated.View style={[styles.circle2, {
+            transform: [{ scale: bgPulse.interpolate({
+              inputRange: [0, 1],
+              outputRange: [1, 1.05]
+            })}]
+          }]} />
+          <Animated.View style={[styles.circle3, {
+            transform: [{ scale: bgPulse.interpolate({
+              inputRange: [0, 1],
+              outputRange: [1, 1.08]
+            })}]
+          }]} />
         </ThemedView>
 
-        <ThemedView style={styles.textContainer}>
+        {/* Header with Logo */}
+        <ThemedView style={styles.header}>
+          <Animated.View 
+            style={[
+              styles.logoContainer,
+              {
+                opacity: logoOpacity,
+                transform: [{ scale: logoScale }],
+              }
+            ]}
+          >
+            <Image
+              source={require("../../assets/images/icons/android/play_store_512.png")}
+              style={styles.logo}
+            />
+            <ThemedView style={styles.logoGlow} />
+          </Animated.View>
+          
+          <ThemedText style={styles.appName}>PitchMe</ThemedText>
+          <ThemedText style={styles.tagline}>
+            Master Your Musical Ear
+          </ThemedText>
+        </ThemedView>
+
+        {/* Main Content */}
+        <Animated.View 
+          style={[
+            styles.textContainer,
+            {
+              opacity: textFade,
+              transform: [{ translateY: textSlide }],
+            }
+          ]}
+        >
           <ThemedText style={styles.hookText}>
             Everyone can hear pitch.
           </ThemedText>
           <ThemedText style={styles.hookTextAccent}>
             Few can control it.
           </ThemedText>
-        </ThemedView>
+          
+          <ThemedView style={styles.divider} />
+          
+          <ThemedText style={styles.description}>
+            Discover your natural ability to recognize and reproduce musical pitches through guided exercises.
+          </ThemedText>
 
+          <ThemedView style={styles.featureHighlights}>
+            
+          </ThemedView>
+        </Animated.View>
+
+        {/* Bottom Section */}
         <ThemedView style={styles.bottomSection}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.nextButton,
-              pressed && styles.nextButtonPressed,
+          <Animated.View 
+            style={[
+              styles.buttonContainer,
+              {
+                opacity: buttonOpacity,
+                transform: [{ scale: buttonScale }],
+              }
             ]}
-            onPress={handleNext}
           >
-            <ThemedText style={styles.nextButtonText}>
-              Let's Find Out
-            </ThemedText>
-          </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.nextButton,
+                pressed && styles.nextButtonPressed,
+              ]}
+              onPress={handleNext}
+            >
+              <ThemedView style={styles.buttonContent}>
+                <ThemedText style={styles.nextButtonText}>
+                  Discover Your Pitch
+                </ThemedText>
+                <ThemedView style={styles.arrowContainer}>
+                  <ThemedText style={styles.arrow}>→</ThemedText>
+                </ThemedView>
+              </ThemedView>
+              <ThemedText style={styles.buttonSubtext}>
+                Takes just 2 minutes
+              </ThemedText>
+            </Pressable>
+          </Animated.View>
 
-          <ThemedView style={styles.stepIndicator}>
-            <ThemedView style={styles.activeStep} />
-            <ThemedView style={styles.inactiveStep} />
-            <ThemedView style={styles.inactiveStep} />
+          <ThemedView style={styles.stepIndicatorContainer}>
+            <ThemedView style={styles.stepIndicator}>
+              <ThemedView style={styles.activeStep} />
+              <ThemedView style={styles.inactiveStep} />
+              <ThemedView style={styles.inactiveStep} />
+            </ThemedView>
+            <ThemedText style={styles.stepText}>
+              Step 1 of 3
+            </ThemedText>
           </ThemedView>
         </ThemedView>
       </ThemedView>
-    </ThemedView>
+    </Animated.View>
   );
 }
 
@@ -71,68 +281,212 @@ const getStyles = (colorScheme: "light" | "dark") =>
       flex: 1,
       justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: 32,
-      paddingTop: 60,
-      paddingBottom: 60,
+      paddingHorizontal: 24,
+      paddingTop: 40,
+      paddingBottom: 40,
+      overflow: 'hidden',
+    },
+    decorativeCircles: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      top: 0,
+      left: 0,
+    },
+    circle1: {
+      position: 'absolute',
+      width: 300,
+      height: 300,
+      borderRadius: 150,
+      backgroundColor: Colors[colorScheme].tint + '08',
+      top: -150,
+      right: -150,
+    },
+    circle2: {
+      position: 'absolute',
+      width: 200,
+      height: 200,
+      borderRadius: 100,
+      backgroundColor: Colors[colorScheme].tint + '05',
+      bottom: -80,
+      left: -80,
+    },
+    circle3: {
+      position: 'absolute',
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor: Colors[colorScheme].tint + '03',
+      top: '30%',
+      left: -75,
     },
     header: {
       alignItems: "center",
-      paddingTop: 20,
+      paddingTop: 40,
+      marginBottom: 20,
+    },
+    logoContainer: {
+      position: 'relative',
+      marginBottom: 16,
     },
     logo: {
-      width: 150,
-      height: 150,
-      borderRadius: 20,
-      marginBottom: 12,
+      width: 120,
+      height: 120,
+      borderRadius: 24,
+      zIndex: 2,
+    },
+    logoGlow: {
+      position: 'absolute',
+      width: 140,
+      height: 140,
+      borderRadius: 28,
+      backgroundColor: Colors[colorScheme].tint + '30',
+      top: -10,
+      left: -10,
+      zIndex: 1,
     },
     appName: {
-      fontSize: 28,
-      fontWeight: "700",
+      fontSize: 36,
+      fontWeight: "800",
       color: Colors[colorScheme].text,
-      letterSpacing: -0.5,
+      letterSpacing: -0.8,
+      marginBottom: 4,
+    },
+    tagline: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: Colors[colorScheme].text + '70',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
     },
     textContainer: {
       alignItems: "center",
       flex: 1,
       justifyContent: "center",
+      maxWidth: 400,
     },
     hookText: {
-      fontSize: 36,
-      fontWeight: "400",
+      fontSize: 40,
+      fontWeight: "300",
       textAlign: "center",
       color: Colors[colorScheme].text,
       marginBottom: 8,
-      letterSpacing: -0.5,
-      lineHeight: 44,
+      letterSpacing: -1,
+      lineHeight: 48,
     },
     hookTextAccent: {
-      fontSize: 36,
-      fontWeight: "700",
+      fontSize: 40,
+      fontWeight: "800",
       textAlign: "center",
       color: Colors[colorScheme].tint,
-      letterSpacing: -0.5,
-      lineHeight: 44,
+      letterSpacing: -1,
+      lineHeight: 48,
+      marginBottom: 32,
+    },
+    divider: {
+      width: 60,
+      height: 3,
+      backgroundColor: Colors[colorScheme].tint + '40',
+      borderRadius: 2,
+      marginBottom: 32,
+    },
+    description: {
+      fontSize: 16,
+      fontWeight: "400",
+      textAlign: "center",
+      color: Colors[colorScheme].text + '80',
+      lineHeight: 24,
+      marginBottom: 32,
+      maxWidth: 300,
+    },
+    featureHighlights: {
+      width: '100%',
+      maxWidth: 280,
+      gap: 16,
+    },
+    feature: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    featureIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: Colors[colorScheme].tint + '15',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    icon: {
+      fontSize: 20,
+    },
+    featureText: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: Colors[colorScheme].text + '90',
+      flex: 1,
     },
     bottomSection: {
       width: "100%",
       alignItems: "center",
+      paddingTop: 20,
+    },
+    buttonContainer: {
+      width: '100%',
+      alignItems: 'center',
+      marginBottom: 24,
     },
     nextButton: {
       backgroundColor: Colors[colorScheme].tint,
-      paddingVertical: 18,
-      paddingHorizontal: 48,
-      borderRadius: 16,
-      width: "100%",
-      alignItems: "center",
-      marginBottom: 24,
+      borderRadius: 20,
+      width: '100%',
+      maxWidth: 320,
+      paddingVertical: 20,
+      paddingHorizontal: 24,
+      shadowColor: Colors[colorScheme].tint,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+      elevation: 8,
     },
     nextButtonPressed: {
-      opacity: 0.7,
+      opacity: 0.9,
+      transform: [{ scale: 0.98 }],
+    },
+    buttonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 8,
     },
     nextButtonText: {
-      fontSize: 17,
-      fontWeight: "600",
+      fontSize: 18,
+      fontWeight: "700",
       color: colorScheme === "dark" ? "#000000" : "#ffffff",
+      letterSpacing: 0.5,
+    },
+    arrowContainer: {
+      backgroundColor: colorScheme === "dark" ? "#00000020" : "#ffffff40",
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    arrow: {
+      fontSize: 18,
+      fontWeight: "300",
+      color: colorScheme === "dark" ? "#000000" : "#ffffff",
+    },
+    buttonSubtext: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colorScheme === "dark" ? "#00000080" : "#ffffff80",
+      textAlign: 'center',
+    },
+    stepIndicatorContainer: {
+      alignItems: 'center',
+      gap: 12,
     },
     stepIndicator: {
       flexDirection: "row",
@@ -141,7 +495,7 @@ const getStyles = (colorScheme: "light" | "dark") =>
       gap: 8,
     },
     activeStep: {
-      width: 24,
+      width: 28,
       height: 6,
       borderRadius: 3,
       backgroundColor: Colors[colorScheme].tint,
@@ -150,6 +504,12 @@ const getStyles = (colorScheme: "light" | "dark") =>
       width: 6,
       height: 6,
       borderRadius: 3,
-      backgroundColor: Colors[colorScheme].text + "20",
+      backgroundColor: Colors[colorScheme].text + '20',
+    },
+    stepText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: Colors[colorScheme].text + '40',
+      letterSpacing: 0.5,
     },
   });
