@@ -243,15 +243,12 @@ export default function Step1() {
             >
               <ThemedView style={styles.buttonContent}>
                 <ThemedText style={styles.nextButtonText}>
-                  Discover Your Pitch
+                  Let's get started
                 </ThemedText>
                 <ThemedView style={styles.arrowContainer}>
                   <ThemedText style={styles.arrow}>→</ThemedText>
                 </ThemedView>
               </ThemedView>
-              <ThemedText style={styles.buttonSubtext}>
-                Takes just 2 minutes
-              </ThemedText>
             </Pressable>
           </Animated.View>
 
