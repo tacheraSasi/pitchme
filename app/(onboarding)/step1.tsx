@@ -215,7 +215,7 @@ export default function Step1() {
           <ThemedView style={styles.divider} />
           
           <ThemedText style={styles.description}>
-            Discover your natural ability to recognize and reproduce musical pitches through guided exercises.
+            Capture inspiration whenever it strikes. Record, detect pitch, and never lose a melody again.
           </ThemedText>
 
           <ThemedView style={styles.featureHighlights}>
