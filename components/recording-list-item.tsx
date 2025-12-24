@@ -247,23 +247,23 @@ export function RecordingListItem({
                 {recording.title}
               </ThemedText>
               <View style={recordingItemStyles.titleRight}>
-                {playerStatus.playing && (
-                  <View style={recordingItemStyles.playingIndicator}>
-                    <View
-                      style={[
-                        recordingItemStyles.playingDot,
-                        {
-                          backgroundColor: isDark
-                            ? Colors.dark.tint
-                            : Colors.light.tint,
-                        },
-                      ]}
-                    />
-                    <ThemedText style={recordingItemStyles.playingText}>
-                      Playing
-                    </ThemedText>
-                  </View>
-                )}
+              {playerStatus.playing && (
+                <View style={recordingItemStyles.playingIndicator}>
+                  <View
+                    style={[
+                      recordingItemStyles.playingDot,
+                      {
+                        backgroundColor: isDark
+                          ? Colors.dark.tint
+                          : Colors.light.tint,
+                      },
+                    ]}
+                  />
+                  <ThemedText style={recordingItemStyles.playingText}>
+                    Playing
+                  </ThemedText>
+                </View>
+              )}
                 <Pressable
                   onPress={() => {
                     toggleFavorite(recording.id);

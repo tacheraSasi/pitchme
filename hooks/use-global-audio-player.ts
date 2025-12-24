@@ -19,17 +19,17 @@ export function useGlobalAudioPlayer(source: string | number) {
 
   const playExclusive = async () => {
     try {
-      if (currentPlayer && currentPlayer !== player) {
+    if (currentPlayer && currentPlayer !== player) {
         try {
-          currentPlayer.pause();
+      currentPlayer.pause();
         } catch (error) {
           // Player might have been released, just clear the reference
           console.warn("Failed to pause previous player:", error);
         }
         currentPlayer = null;
-      }
-      currentPlayer = player;
-      player.play();
+    }
+    currentPlayer = player;
+    player.play();
     } catch (error) {
       console.error("Error in playExclusive:", error);
       currentPlayer = null;
@@ -39,8 +39,8 @@ export function useGlobalAudioPlayer(source: string | number) {
 
   const pause = async () => {
     try {
-      player.pause();
-      if (currentPlayer === player) currentPlayer = null;
+    player.pause();
+    if (currentPlayer === player) currentPlayer = null;
     } catch (error) {
       console.error("Error pausing player:", error);
       if (currentPlayer === player) currentPlayer = null;
@@ -49,21 +49,21 @@ export function useGlobalAudioPlayer(source: string | number) {
 
   const stop = async () => {
     try {
-      player.pause();
+    player.pause();
       player.seekTo(0);
       if (currentPlayer === player) currentPlayer = null;
     } catch (error) {
       console.error("Error stopping player:", error);
-      if (currentPlayer === player) currentPlayer = null;
-    }
+    if (currentPlayer === player) currentPlayer = null;
+  }
   };
 
   const stopAll = async () => {
     try {
-      if (currentPlayer) {
+    if (currentPlayer) {
         try {
-          currentPlayer.pause();
-          currentPlayer.seekTo(0);
+      currentPlayer.pause();
+      currentPlayer.seekTo(0);
         } catch (error) {
           // Player might have been released, just clear the reference
           console.warn("Failed to stop current player:", error);

@@ -344,41 +344,41 @@ const RecordingDetailsBottomSheet = ({
                   }
                 />
               </Pressable>
-              {!isEditing ? (
+            {!isEditing ? (
+              <Pressable
+                onPress={() => setIsEditing(true)}
+                style={styles.editButton}
+              >
+                <MaterialIcons
+                  name="edit"
+                  size={18}
+                  color={Colors[colorScheme ?? "light"].tint}
+                />
+              </Pressable>
+            ) : (
+              <ThemedView style={styles.editActions}>
                 <Pressable
-                  onPress={() => setIsEditing(true)}
-                  style={styles.editButton}
+                  onPress={handleCancelEdit}
+                  style={styles.actionButton}
                 >
                   <MaterialIcons
-                    name="edit"
+                    name="close"
+                    size={18}
+                    color={Colors[colorScheme ?? "light"].text}
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={handleSaveTitle}
+                  style={styles.actionButton}
+                >
+                  <MaterialIcons
+                    name="check"
                     size={18}
                     color={Colors[colorScheme ?? "light"].tint}
                   />
                 </Pressable>
-              ) : (
-                <ThemedView style={styles.editActions}>
-                  <Pressable
-                    onPress={handleCancelEdit}
-                    style={styles.actionButton}
-                  >
-                    <MaterialIcons
-                      name="close"
-                      size={18}
-                      color={Colors[colorScheme ?? "light"].text}
-                    />
-                  </Pressable>
-                  <Pressable
-                    onPress={handleSaveTitle}
-                    style={styles.actionButton}
-                  >
-                    <MaterialIcons
-                      name="check"
-                      size={18}
-                      color={Colors[colorScheme ?? "light"].tint}
-                    />
-                  </Pressable>
-                </ThemedView>
-              )}
+              </ThemedView>
+            )}
             </ThemedView>
           </ThemedView>
 
@@ -423,15 +423,15 @@ const RecordingDetailsBottomSheet = ({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <ThemedView style={styles.playButton}>
-                  <Entypo
-                    name={
+              <Entypo
+                name={
                       playerStatus.playing
                         ? "controller-paus"
                         : "controller-play"
-                    }
+                }
                     size={20}
-                    color={colorScheme === "dark" ? "black" : "white"}
-                  />
+                color={colorScheme === "dark" ? "black" : "white"}
+              />
                 </ThemedView>
               </Pressable>
               
@@ -478,9 +478,9 @@ const RecordingDetailsBottomSheet = ({
             </ThemedView>
             
             <ThemedText style={styles.timeText}>
-              {formatTime(recording.durationMillis)}
-            </ThemedText>
-          </ThemedView>
+                {formatTime(recording.durationMillis)}
+              </ThemedText>
+            </ThemedView>
         </ThemedView>
 
         {/* Information Section */}
