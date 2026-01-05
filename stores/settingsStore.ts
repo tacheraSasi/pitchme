@@ -25,6 +25,10 @@ interface SettingsState {
   hapticFeedback: boolean;
   setHapticFeedback: (enabled: boolean) => void;
 
+  // Onboarding
+  hasCompletedOnboarding: boolean;
+  setHasCompletedOnboarding: (completed: boolean) => void;
+
   // Utility functions
   resetSettings: () => void;
   cycleTheme: () => void;
@@ -38,6 +42,7 @@ const defaultSettings = {
   voicePreset: "tach" as VoicePreset,
   notifications: false,
   hapticFeedback: true,
+  hasCompletedOnboarding: false,
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -68,6 +73,10 @@ export const useSettingsStore = create<SettingsState>()(
       // Interface actions
       setNotifications: (notifications) => set({ notifications }),
       setHapticFeedback: (hapticFeedback) => set({ hapticFeedback }),
+
+      // Onboarding actions
+      setHasCompletedOnboarding: (hasCompletedOnboarding) =>
+        set({ hasCompletedOnboarding }),
 
       // Utility actions
       resetSettings: () => set(defaultSettings),
@@ -113,6 +122,11 @@ export const useSetNotifications = () =>
   useSettingsStore((state) => state.setNotifications);
 export const useSetHapticFeedback = () =>
   useSettingsStore((state) => state.setHapticFeedback);
+
+export const useHasCompletedOnboarding = () =>
+  useSettingsStore((state) => state.hasCompletedOnboarding);
+export const useSetHasCompletedOnboarding = () =>
+  useSettingsStore((state) => state.setHasCompletedOnboarding);
 
 export const useVoicePreset = () =>
   useSettingsStore((state) => state.voicePreset);

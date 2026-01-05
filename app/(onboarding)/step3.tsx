@@ -3,9 +3,10 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHaptics } from "@/hooks/useHaptics";
+import { useSetHasCompletedOnboarding } from "@/stores/settingsStore";
 import {
-  requestRecordingPermissionsAsync,
-  setAudioModeAsync,
+    requestRecordingPermissionsAsync,
+    setAudioModeAsync,
 } from "expo-audio";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -18,6 +19,7 @@ export default function Step3() {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
   const [isRequesting, setIsRequesting] = useState(false);
+  const setHasCompletedOnboarding = useSetHasCompletedOnboarding();
 
   const handleLetsRecord = async () => {
     if (isRequesting) return;
@@ -43,7 +45,9 @@ export default function Step3() {
       });
 
       haptics("success");
+HasCompletedOnboarding(true);
 
+      set
       setTimeout(() => {
     router.replace("/(tabs)");
       }, 300);
