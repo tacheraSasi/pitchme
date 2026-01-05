@@ -191,7 +191,7 @@ export default function Step1() {
           
           <ThemedText style={styles.appName}>PitchMe</ThemedText>
           <ThemedText style={styles.tagline}>
-            Master Your Musical Ear
+            A home for your music ideas
           </ThemedText>
         </ThemedView>
 

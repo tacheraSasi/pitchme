@@ -31,7 +31,7 @@ export default function Step2() {
     async (note: "A" | "B") => {
       if (isPlaying) return;
       setIsPlaying(true);
-    haptics("light");
+      haptics("light");
 
       try {
         const player = note === "A" ? playerA : playerB;
@@ -106,7 +106,7 @@ export default function Step2() {
               styles.noteButton,
               selectedAnswer === "A" && styles.noteButtonSelected,
               selectedAnswer === "A" && correctAnswer === "B" &&
-                styles.noteButtonWrong,
+              styles.noteButtonWrong,
               pressed && styles.noteButtonPressed,
             ]}
             onPress={() => handleAnswer("A")}
@@ -121,7 +121,7 @@ export default function Step2() {
               styles.noteButton,
               selectedAnswer === "B" && styles.noteButtonSelected,
               selectedAnswer === "B" && correctAnswer === "B" &&
-                styles.noteButtonCorrect,
+              styles.noteButtonCorrect,
               pressed && styles.noteButtonPressed,
             ]}
             onPress={() => handleAnswer("B")}
@@ -175,37 +175,37 @@ export default function Step2() {
 
 const getStyles = (colorScheme: "light" | "dark") =>
   StyleSheet.create({
-  container: {
-    flex: 1,
+    container: {
+      flex: 1,
       backgroundColor: Colors[colorScheme].background,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
+    },
+    content: {
+      flex: 1,
+      justifyContent: "space-between",
+      alignItems: "center",
       paddingHorizontal: 32,
       paddingTop: 100,
       paddingBottom: 60,
-  },
+    },
     header: {
-    alignItems: "center",
-  },
+      alignItems: "center",
+    },
     promptText: {
       fontSize: 28,
       fontWeight: "600",
-    textAlign: "center",
+      textAlign: "center",
       color: Colors[colorScheme].text,
       marginBottom: 8,
     },
     promptSubtext: {
       fontSize: 15,
       fontWeight: "400",
-    textAlign: "center",
+      textAlign: "center",
       color: Colors[colorScheme].text + "60",
-  },
+    },
     buttonsContainer: {
-    flexDirection: "row",
-    gap: 16,
+      flexDirection: "row",
+      gap: 16,
       width: "100%",
       justifyContent: "center",
     },
@@ -217,8 +217,8 @@ const getStyles = (colorScheme: "light" | "dark") =>
       borderRadius: 20,
       borderWidth: 2,
       borderColor: Colors[colorScheme].text + "15",
-    alignItems: "center",
-    justifyContent: "center",
+      alignItems: "center",
+      justifyContent: "center",
     },
     noteButtonPressed: {
       opacity: 0.7,
@@ -237,7 +237,8 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     noteButtonLabel: {
       fontSize: 48,
-    fontWeight: "600",
+      fontWeight: "600",
+      padding: 20,
       color: Colors[colorScheme].text,
     },
     playBothButton: {
@@ -254,11 +255,11 @@ const getStyles = (colorScheme: "light" | "dark") =>
     },
     playBothText: {
       fontSize: 15,
-    fontWeight: "600",
+      fontWeight: "600",
       color: Colors[colorScheme].tint,
     },
     feedbackContainer: {
-    alignItems: "center",
+      alignItems: "center",
     },
     feedbackText: {
       fontSize: 22,
@@ -272,8 +273,8 @@ const getStyles = (colorScheme: "light" | "dark") =>
       color: Colors[colorScheme].isRecording,
     },
     stepIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
+      flexDirection: "row",
+      alignItems: "center",
       justifyContent: "center",
       gap: 8,
     },
@@ -288,5 +289,5 @@ const getStyles = (colorScheme: "light" | "dark") =>
       height: 6,
       borderRadius: 3,
       backgroundColor: Colors[colorScheme].text + "20",
-  },
-});
+    },
+  });
