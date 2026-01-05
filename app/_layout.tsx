@@ -15,11 +15,15 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const onboardingGuard = true
+
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        <Stack.Protected guard={onboardingGuard}>
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        </Stack.Protected>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="songs" options={{ headerShown: false }} />
         <Stack.Screen name="recordings" options={{ headerShown: false }} />
