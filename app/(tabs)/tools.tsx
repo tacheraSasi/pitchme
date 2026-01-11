@@ -5,6 +5,7 @@ import { RecentlyViewed } from "@/components/recently-viewed";
 import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
 import { ThemedView } from "@/components/themed/themed-view";
+import { ToolsList } from "@/components/tools/tools-list";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRef } from "react";
 import { StyleSheet } from "react-native";
@@ -23,6 +24,7 @@ export default function ToolsScreen() {
             title="PitchMe"
             aboutBottomSheetRef={aboutBottomSheetRef}
           />
+          <ToolsList />
         </SafeAreaView>
       </ThemedView>
     </ScreenLayout>
