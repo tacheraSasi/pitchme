@@ -1,18 +1,21 @@
-import NoteDetectorBottomSheet from "@/components/note-detector/bottom-sheet";
-import NoteDetectorButton from "@/components/note-detector/button";
-import { NotesList } from "@/components/NotesList";
-import { RecentlyViewed } from "@/components/recently-viewed";
 import ScreenLayout from "@/components/ScreenLayout";
 import TabsHeader from "@/components/tabs-header";
+import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { ToolsList } from "@/components/tools/tools-list";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRef } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ToolsScreen() {
   const aboutBottomSheetRef = useRef<BottomSheet>(null);
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme ?? "light");
+
   return (
     <ScreenLayout
       styles={styles.container}
@@ -24,6 +27,27 @@ export default function ToolsScreen() {
             title="PitchMe"
             aboutBottomSheetRef={aboutBottomSheetRef}
           />
+
+          <ThemedView style={styles.headerSection}>
+            <View style={styles.headerContent}>
+              <View style={styles.iconWrapper}>
+                <Ionicons
+                  name="construct-outline"
+                  size={28}
+                  color={Colors[colorScheme ?? "light"].tint}
+                />
+              </View>
+              <View style={styles.headerTextContainer}>
+                <ThemedText style={styles.headerTitle}>
+                  Practice Tools
+                </ThemedText>
+                <ThemedText style={styles.headerSubtitle}>
+                  Essential tools to enhance your practice sessions
+                </ThemedText>
+              </View>
+            </View>
+          </ThemedView>
+
           <ToolsList />
         </SafeAreaView>
       </ThemedView>
@@ -31,15 +55,44 @@ export default function ToolsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // backgroundColor: "grey",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginVertical: 16,
-    alignItems: "center",
-  },
-});
+const getStyles = (colorScheme: "light" | "dark") =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    headerSection: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      marginBottom: 8,
+    },
+    headerContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    iconWrapper: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor:
+        colorScheme === "dark"
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(150, 89, 151, 0.1)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerTextContainer: {
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: Colors[colorScheme].text,
+      marginBottom: 2,
+    },
+    headerSubtitle: {
+      fontSize: 13,
+      color: Colors[colorScheme].icon,
+      lineHeight: 18,
+    },
+  });

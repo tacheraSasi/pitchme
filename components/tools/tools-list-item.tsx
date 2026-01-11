@@ -1,5 +1,4 @@
 import { Tool } from "@/utils/tools";
-import { ThemedView } from "../themed/themed-view";
 import { ThemedText } from "../themed/themed-text";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -7,7 +6,6 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { router } from "expo-router";
 
 export interface ToolsListItemProps extends Tool {
   size?: number;
@@ -20,6 +18,8 @@ const getIconName = (iconKey: string): keyof typeof Ionicons.glyphMap => {
     tuner: "radio-outline",
     recorder: "mic-outline",
     scales: "musical-notes-outline",
+    "chord-finder": "musical-note-outline",
+    "ear-training": "ear-outline",
   };
   return iconMap[iconKey] || "apps-outline";
 };
