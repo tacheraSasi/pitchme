@@ -54,6 +54,15 @@ export default function TabLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="tools"
+          options={{
+            title: "Tools",
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name="tools" color={color} focused={focused} />
+            ),
+          }}
+        />
       </Tabs>
     </>
   );
