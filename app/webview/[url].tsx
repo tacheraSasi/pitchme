@@ -1,7 +1,7 @@
 import { WebView } from "react-native-webview"
 import { StyleSheet, ActivityIndicator, View } from "react-native"
 import { useLocalSearchParams } from "expo-router"
-import { use, useState } from "react"
+import { useState } from "react"
 import { useColorScheme } from "@/hooks/use-color-scheme"
 import { Colors } from "@/constants/theme"
 
