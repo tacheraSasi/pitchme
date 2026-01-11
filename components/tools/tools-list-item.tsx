@@ -48,7 +48,7 @@ export function ToolsListItem({
       onPress={handlePress}
       style={[
         styles.card,
-        { width: size, height: size },
+        { width: size, height: size * 1.1 },
         pressed && styles.cardPressed,
       ]}
     >
@@ -58,7 +58,7 @@ export function ToolsListItem({
         >
           <Ionicons
             name={getIconName(icon)}
-            size={32}
+            size={36}
             color={
               pressed
                 ? Colors[colorScheme].background
@@ -80,7 +80,7 @@ export function ToolsListItem({
 const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     card: {
-      borderRadius: 18,
+      borderRadius: 20,
       backgroundColor:
         colorScheme === "dark"
           ? Colors.dark.background
@@ -89,33 +89,48 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       justifyContent: "center",
       borderWidth: 1,
       borderColor: colorScheme === "dark" ? "#444" : "#e0e0e0",
-      padding: 12,
+      padding: 16,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
     },
     cardPressed: {
       backgroundColor: Colors[colorScheme].tint,
       transform: [{ scale: 0.96 }],
+      shadowOpacity: 0.15,
+      elevation: 5,
     },
     innerCard: {
       alignItems: "center",
       justifyContent: "center",
-      gap: 8,
+      gap: 12,
+      flex: 1,
     },
     iconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+      width: 64,
+      height: 64,
+      borderRadius: 32,
       backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f8f9fa",
       alignItems: "center",
       justifyContent: "center",
+      borderWidth: 1,
+      borderColor: colorScheme === "dark" ? "#3a3a3a" : "#e8e8e8",
     },
     iconContainerPressed: {
       backgroundColor: Colors[colorScheme].buttonOverlay,
+      borderColor: Colors[colorScheme].buttonOverlay,
     },
     title: {
       fontWeight: "600",
-      fontSize: 14,
+      fontSize: 15,
       textAlign: "center",
       color: colorScheme === "dark" ? Colors.dark.text : Colors.light.text,
+      lineHeight: 20,
     },
     titlePressed: {
       color: Colors[colorScheme].background,

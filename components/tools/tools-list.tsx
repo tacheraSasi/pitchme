@@ -12,13 +12,16 @@ export function ToolsList() {
   const styles = getStyles(colorScheme ?? "light");
 
   const columns = width < 400 ? 2 : 3;
-  const itemSize = (width - (columns + 1) * 12) / columns;
+  const gap = 16;
+  const horizontalPadding = 16;
+  const itemSize =
+    (width - horizontalPadding * 2 - gap * (columns - 1)) / columns;
 
   return (
     <ThemedView style={styles.wrapper}>
       <ThemedText style={styles.listTitle}>Practice Tools</ThemedText>
       <ScrollView
-        contentContainerStyle={[styles.container, { gap: 12 }]}
+        contentContainerStyle={[styles.container, { gap }]}
         showsVerticalScrollIndicator={false}
         bounces={true}
         style={{ flex: 1 }}
@@ -47,9 +50,9 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     container: {
       flexDirection: "row",
       flexWrap: "wrap",
-      justifyContent: "center",
-      paddingHorizontal: 8,
+      justifyContent: "flex-start",
+      paddingHorizontal: 16,
       paddingVertical: 10,
-      paddingBottom: 20,
+      paddingBottom: 40,
     },
   });
