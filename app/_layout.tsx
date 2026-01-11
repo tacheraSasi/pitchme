@@ -28,6 +28,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="songs" options={{ headerShown: false }} />
         <Stack.Screen name="recordings" options={{ headerShown: false }} />
+        <Stack.Screen name="webview/[url]" options={{ headerShown: true, headerTitle: "PitchMe" }} />
         <Stack.Screen
           name="settings"
           options={{ presentation: "modal", title: "Settings" }}

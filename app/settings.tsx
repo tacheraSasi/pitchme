@@ -28,6 +28,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
 import { HapticFeedback } from "@/utils/haptics";
 import { privacyPolicyUrl, supportUrl } from "@/constants/external-urls";
+import { router } from "expo-router";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -300,7 +301,9 @@ export default function SettingsScreen() {
           subtitle="Learn about your privacy"
           onPress={() => {
             HapticFeedback("success");
-            Linking.openURL(privacyPolicyUrl);
+            const encodedUrl = encodeURIComponent(privacyPolicyUrl)
+            console.log(`webview/${encodedUrl}`);
+            router.push(`webview/${encodedUrl}`);
           }}
           rightElement={
             <Entypo
