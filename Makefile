@@ -1,5 +1,5 @@
 run:
-	bun start
+	bun start -c
 
 	
 build-apk:
