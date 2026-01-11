@@ -28,26 +28,6 @@ export default function ToolsScreen() {
             aboutBottomSheetRef={aboutBottomSheetRef}
           />
 
-          <ThemedView style={styles.headerSection}>
-            <View style={styles.headerContent}>
-              <View style={styles.iconWrapper}>
-                <Ionicons
-                  name="construct-outline"
-                  size={28}
-                  color={Colors[colorScheme ?? "light"].tint}
-                />
-              </View>
-              <View style={styles.headerTextContainer}>
-                <ThemedText style={styles.headerTitle}>
-                  Practice Tools
-                </ThemedText>
-                <ThemedText style={styles.headerSubtitle}>
-                  Essential tools to enhance your practice sessions
-                </ThemedText>
-              </View>
-            </View>
-          </ThemedView>
-
           <ToolsList />
         </SafeAreaView>
       </ThemedView>

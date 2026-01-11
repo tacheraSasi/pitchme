@@ -81,6 +81,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     card: {
       borderRadius: 20,
+      width:'100%',
       backgroundColor:
         colorScheme === "dark"
           ? Colors.dark.background

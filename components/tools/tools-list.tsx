@@ -1,7 +1,6 @@
 import { Tool, toolsList } from "@/utils/tools";
 import { ToolsListItem } from "./tools-list-item";
 import { ThemedView } from "../themed/themed-view";
-import { ThemedText } from "../themed/themed-text";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ScrollView, StyleSheet, useWindowDimensions } from "react-native";
@@ -11,7 +10,7 @@ export function ToolsList() {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 
-  const columns = width < 400 ? 2 : 3;
+  const columns = width < 400 ? 1 : 2;
   const gap = 16;
   const horizontalPadding = 16;
   const itemSize =
@@ -19,7 +18,6 @@ export function ToolsList() {
 
   return (
     <ThemedView style={styles.wrapper}>
-      <ThemedText style={styles.listTitle}>Practice Tools</ThemedText>
       <ScrollView
         contentContainerStyle={[styles.container, { gap }]}
         showsVerticalScrollIndicator={false}
@@ -39,6 +37,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     wrapper: {
       flex: 1,
       minHeight: 300,
+      width:'100%',
     },
     listTitle: {
       fontSize: 18,
@@ -48,8 +47,9 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       color: Colors[colorScheme].text,
     },
     container: {
-      flexDirection: "row",
+      flexDirection: "column",
       flexWrap: "wrap",
+      width:'100%',
       justifyContent: "flex-start",
       paddingHorizontal: 16,
       paddingVertical: 10,
