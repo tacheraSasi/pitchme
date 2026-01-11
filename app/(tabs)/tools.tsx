@@ -24,7 +24,7 @@ export default function ToolsScreen() {
       <ThemedView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
           <TabsHeader
-            title="PitchMe"
+            title="Tools"
             aboutBottomSheetRef={aboutBottomSheetRef}
           />
 

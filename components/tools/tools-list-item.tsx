@@ -98,13 +98,12 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      elevation: 3,
+      elevation: 0.2,
     },
     cardPressed: {
       backgroundColor: Colors[colorScheme].tint,
-      transform: [{ scale: 0.96 }],
       shadowOpacity: 0.15,
-      elevation: 5,
+      elevation: 0.2,
     },
     innerCard: {
       alignItems: "center",
