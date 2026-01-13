@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import { router } from "expo-router";
 
 export interface ToolsListItemProps extends Tool {
   size?: number;
@@ -37,8 +38,7 @@ export function ToolsListItem({
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     console.log(`Pressed tool: ${id}`);
-    // TODO: Navigate to tool screen when implemented
-    // router.push(`/tools/${id}` as any);
+    router.push(`/tools/${id}` as any);
   };
 
   return (
