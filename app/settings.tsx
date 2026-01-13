@@ -302,7 +302,7 @@ export default function SettingsScreen() {
           onPress={() => {
             HapticFeedback("success");
             const encodedUrl = encodeURIComponent(privacyPolicyUrl)
-            router.push(`webview/${encodedUrl}`);
+            router.push(`webview/${encodedUrl}` as any);
           }}
           rightElement={
             <Entypo
