@@ -27,8 +27,36 @@ func main() {
 	}
 
 	m := t.(map[string]any)
-	version := m["version"].(string)
+	version := m["expo"].(map[string]any)["version"].(string)
 
 	fmt.Println("Version:", version)
+
+	// I need to increment the patch version
+	var major, minor, patch int
+	_, err = fmt.Sscanf(version, "%d.%d.%d", &major, &minor, &patch)
+	if err != nil {
+		fmt.Printf("Error parsing version: %v\n", err)
+		os.Exit(1)
+	}
+
+	patch++
+	newVersion := fmt.Sprintf("%d.%d.%d", major, minor, patch)
+	m["expo"].(map[string]any)["version"] = newVersion
+
+	fmt.Println("New Version:", newVersion)
+
+	updatedJsonData, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		fmt.Printf("Error marshaling JSON: %v\n", err)
+		os.Exit(1)
+	}
+
+	err = os.WriteFile(APP_JSON_PATH, updatedJsonData, 0644)
+	if err != nil {
+		fmt.Printf("Error writing file: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("app.json updated successfully")
 
 }
