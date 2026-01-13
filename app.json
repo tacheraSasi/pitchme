@@ -4,24 +4,18 @@
     "slug": "pitchme",
     "version": "1.0.0",
     "orientation": "portrait",
-    // App icons (shared)
-    // Using the exported 1024px marketing icon; Expo will generate sizes.
     "icon": "./assets/images/icons/ios/AppIcon~ios-marketing.png",
     "scheme": "pitchme",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      // Explicitly set iOS app icon (falls back to "icon" if omitted)
       "icon": "./assets/images/icons/ios/AppIcon~ios-marketing.png"
     },
     "android": {
       "adaptiveIcon": {
-        // Foreground: exported adaptive foreground (512px works; Expo will resize)
         "foregroundImage": "./assets/images/icons/android/play_store_512.png",
-        // Background color from design guide
         "backgroundColor": "#E6F4FE",
-        // Monochrome icon for Android 13+ (uses provided monochrome asset)
         "monochromeImage": "./assets/images/icons/android/res/mipmap-hdpi/ic_launcher_monochrome.png"
       },
       "edgeToEdgeEnabled": true,
