@@ -290,7 +290,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             borderRadius: 25,
         },
         infoCard: {
-            backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#f8f9fa',
+            // backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#f8f9fa',
             borderRadius: 12,
             padding: 16,
             marginTop: 20,
@@ -327,7 +327,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             textAlign: 'right',
         },
         instructionCard: {
-            backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#f8f9fa',
+            // backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#f8f9fa',
             borderRadius: 12,
             padding: 16,
             marginTop: 20,
