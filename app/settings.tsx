@@ -3,9 +3,9 @@ import ScreenLayout from "@/components/ScreenLayout";
 import { StatusBarPresets } from "@/components/themed/themed-status-bar";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
+import { privacyPolicyUrl, supportUrl } from "@/constants/external-urls";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import ConfettiCannon from "react-native-confetti-cannon";
 import {
   useCycleRecordingQuality,
   useCycleTheme,
@@ -17,18 +17,18 @@ import {
   useVoicePreset,
   VoicePreset,
 } from "@/stores/settingsStore";
+import { HapticFeedback } from "@/utils/haptics";
+import { APP_VERSION } from "@/version/version";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
-import { HapticFeedback } from "@/utils/haptics";
-import { privacyPolicyUrl, supportUrl } from "@/constants/external-urls";
-import { router } from "expo-router";
+import ConfettiCannon from "react-native-confetti-cannon";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -273,7 +273,7 @@ export default function SettingsScreen() {
         <SettingItem
           icon="info"
           title="App Version"
-          subtitle="1.0.0 (Build 1)"
+          subtitle={`Version ${APP_VERSION}`}
           onPress={() => {}}
         />
 
@@ -302,7 +302,7 @@ export default function SettingsScreen() {
           onPress={() => {
             HapticFeedback("success");
             const encodedUrl = encodeURIComponent(privacyPolicyUrl)
-            router.push(`webview/${encodedUrl}`);
+            router.push(`webview/${encodedUrl}` as any);
           }}
           rightElement={
             <Entypo
