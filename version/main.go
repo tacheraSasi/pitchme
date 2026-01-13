@@ -9,17 +9,35 @@ import (
 )
 
 const APP_JSON_PATH = "../app.json"
+const PACKAGE_JSON_PATH = "../package.json"
 
 func main() {
+	// Update app.json version
+	if err := updateAppJsonVersion(); err != nil {
+		fmt.Printf("Error updating app.json: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("app.json updated successfully")
+
+	// Update package.json version
+	if err := updatePackageJsonVersion(); err != nil {
+		fmt.Printf("Error updating package.json: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("package.json updated successfully")
+}
+
+func updateAppJsonVersion() error {
 	appJson, err := os.ReadFile(APP_JSON_PATH)
 	if err != nil {
-		fmt.Printf("Error opening file: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("error opening file: %v", err)
 	}
 
 	fmt.Println("app.json opened successfully")
 
-	// I Remove comments for parsing (but i keep original for writing back)
+	// Remove comments for parsing (but keep original for writing back)
 	original := string(appJson)
 	cleaned := removeJSONComments(original)
 
@@ -27,51 +45,93 @@ func main() {
 	var t any
 	err = json.Unmarshal([]byte(cleaned), &t)
 	if err != nil {
-		fmt.Printf("Error parsing JSON: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("error parsing JSON: %v", err)
 	}
 
 	// Get current version
 	m := t.(map[string]any)
 	expo, ok := m["expo"].(map[string]any)
 	if !ok {
-		fmt.Println("Error: 'expo' field not found")
-		os.Exit(1)
+		return fmt.Errorf("'expo' field not found")
 	}
 
 	version, ok := expo["version"].(string)
 	if !ok {
-		fmt.Println("Error: 'version' field not found")
-		os.Exit(1)
+		return fmt.Errorf("'version' field not found")
 	}
 
-	fmt.Println("Current Version:", version)
+	fmt.Println("Current App Version:", version)
 
 	// Parse and increment patch version
-	var major, minor, patch int
-	_, err = fmt.Sscanf(version, "%d.%d.%d", &major, &minor, &patch)
+	newVersion, err := bumpPatchVersion(version)
 	if err != nil {
-		fmt.Printf("Error parsing version: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
-	patch++
-	newVersion := fmt.Sprintf("%d.%d.%d", major, minor, patch)
+	fmt.Println("New App Version:", newVersion)
 
-	fmt.Println("New Version:", newVersion)
-
-	// I update version in original file
+	// Update version in original file
 	versionRegex := regexp.MustCompile(`("version"\s*:\s*)"` + regexp.QuoteMeta(version) + `"`)
 	updated := versionRegex.ReplaceAllString(original, `$1"`+newVersion+`"`)
 
 	// Write back to file
 	err = os.WriteFile(APP_JSON_PATH, []byte(updated), 0644)
+	return err
+}
+
+func updatePackageJsonVersion() error {
+	packageJson, err := os.ReadFile(PACKAGE_JSON_PATH)
 	if err != nil {
-		fmt.Printf("Error writing file: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("error opening file: %v", err)
 	}
 
-	fmt.Println("app.json updated successfully")
+	fmt.Println("package.json opened successfully")
+
+	// Remove comments for parsing (but keep original for writing back)
+	original := string(packageJson)
+	cleaned := removeJSONComments(original)
+
+	// Parse JSON
+	var t any
+	err = json.Unmarshal([]byte(cleaned), &t)
+	if err != nil {
+		return fmt.Errorf("error parsing JSON: %v", err)
+	}
+
+	// Get current version (directly from root in package.json)
+	m := t.(map[string]any)
+	version, ok := m["version"].(string)
+	if !ok {
+		return fmt.Errorf("'version' field not found in package.json")
+	}
+
+	fmt.Println("Current Package Version:", version)
+
+	// Parse and increment patch version
+	newVersion, err := bumpPatchVersion(version)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("New Package Version:", newVersion)
+
+	// Update version in original file
+	versionRegex := regexp.MustCompile(`("version"\s*:\s*)"` + regexp.QuoteMeta(version) + `"`)
+	updated := versionRegex.ReplaceAllString(original, `$1"`+newVersion+`"`)
+
+	// Write back to file
+	err = os.WriteFile(PACKAGE_JSON_PATH, []byte(updated), 0644)
+	return err
+}
+
+func bumpPatchVersion(version string) (string, error) {
+	var major, minor, patch int
+	_, err := fmt.Sscanf(version, "%d.%d.%d", &major, &minor, &patch)
+	if err != nil {
+		return "", fmt.Errorf("error parsing version: %v", err)
+	}
+	patch++
+	return fmt.Sprintf("%d.%d.%d", major, minor, patch), nil
 }
 
 // removeJSONComments strips // comments from JSON content
@@ -123,6 +183,7 @@ func removeJSONComments(content string) string {
 func setVersion(major, minor, patch int) string {
 	return fmt.Sprintf("%d.%d.%d", major, minor, patch)
 }
+
 func bumpMajor(version string) (string, error) {
 	var major, minor, patch int
 	_, err := fmt.Sscanf(version, "%d.%d.%d", &major, &minor, &patch)
