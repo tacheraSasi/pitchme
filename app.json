@@ -52,10 +52,11 @@
       "expo-web-browser",
       "expo-asset"
     ],
+    //chuiw
     "scheme": "pitchme",
     "slug": "pitchme",
     "userInterfaceStyle": "automatic",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "web": {
       "favicon": "./assets/images/icon.png",
       "output": "static"
