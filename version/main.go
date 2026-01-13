@@ -76,7 +76,17 @@ func updateAppJsonVersion() error {
 
 	// Write back to file
 	err = os.WriteFile(APP_JSON_PATH, []byte(updated), 0644)
-	return err
+	if err != nil {
+		return fmt.Errorf("error writing app.json: %v", err)
+	}
+
+	// Also update version.ts
+	err = updateVersionTS(newVersion)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func updatePackageJsonVersion() error {
@@ -122,6 +132,20 @@ func updatePackageJsonVersion() error {
 	// Write back to file
 	err = os.WriteFile(PACKAGE_JSON_PATH, []byte(updated), 0644)
 	return err
+}
+
+func updateVersionTS(newVersion string) error {
+	versionTSPath := "../version/version.ts"
+	content := fmt.Sprintf(`export const APP_VERSION = "%s";
+`, newVersion)
+
+	err := os.WriteFile(versionTSPath, []byte(content), 0644)
+	if err != nil {
+		return fmt.Errorf("error writing version.ts: %v", err)
+	}
+
+	fmt.Println("version.ts updated successfully")
+	return nil
 }
 
 func bumpPatchVersion(version string) (string, error) {
