@@ -27,6 +27,7 @@ export default function RootLayout() {
         </Stack.Protected>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="songs" options={{ headerShown: false }} />
+        <Stack.Screen name="tools" options={{ headerShown: false }} />
         <Stack.Screen name="recordings" options={{ headerShown: false }} />
         <Stack.Screen name="webview/[url]" options={{ headerShown: true, headerTitle: "PitchMe" }} />
         <Stack.Screen
