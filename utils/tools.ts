@@ -12,7 +12,7 @@ export const toolsList: Tool[] = [
     title: "Metronome",
     icon: "metronome",
     description: "Keep time with precision",
-    screen: "metronome",
+    screen: "coming-soon",
   },
   {
     id: "circle-of-fifths",
