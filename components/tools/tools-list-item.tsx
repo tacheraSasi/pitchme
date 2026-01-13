@@ -1,12 +1,13 @@
-import { Tool } from "@/utils/tools";
-import { ThemedText } from "../themed/themed-text";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Tool } from "@/utils/tools";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { router } from "expo-router";
+import { ThemedText } from "../themed/themed-text";
+import { toast } from "yooo-native";
 
 export interface ToolsListItemProps extends Tool {
   size?: number;
@@ -29,6 +30,7 @@ export function ToolsListItem({
   id,
   title,
   icon,
+  screen,
   size = 100,
 }: ToolsListItemProps) {
   const [pressed, setPressed] = useState(false);
@@ -38,7 +40,8 @@ export function ToolsListItem({
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     console.log(`Pressed tool: ${id}`);
-    router.push(`/tools/${id}` as any);
+    if (!screen) return toast.info("This tool is coming soon!");
+    router.push(`/tools/${screen}` as any);
   };
 
   return (
@@ -81,7 +84,7 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
   StyleSheet.create({
     card: {
       borderRadius: 20,
-      width:'100%',
+      width: '100%',
       backgroundColor:
         colorScheme === "dark"
           ? Colors.dark.background

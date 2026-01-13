@@ -12,13 +12,13 @@ export const toolsList: Tool[] = [
     title: "Metronome",
     icon: "metronome",
     description: "Keep time with precision",
-    screen: "tools/metronome",
+    screen: "metronome",
   },
   {
     id: "circle-of-fifths",
     title: "Circle of Fifths",
     icon: "circle-of-fifths",
     description: "Explore music theory",
-    screen: "tools/circle-of-fifths",
+    screen: "circle-of-fifths",
   },
 ];
