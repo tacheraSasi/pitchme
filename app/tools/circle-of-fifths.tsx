@@ -4,11 +4,11 @@ import { ThemedView } from '@/components/themed/themed-view'
 import { Colors } from '@/constants/theme'
 import { useColorScheme } from '@/hooks/use-color-scheme'
 import { useHaptics } from '@/hooks/useHaptics'
-import React, { useState } from 'react'
-import { Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import Svg, { Circle, G, Text as SvgText, Line } from 'react-native-svg'
 import { Ionicons } from '@expo/vector-icons'
+import React, { useState } from 'react'
+import { Dimensions, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg'
 
 interface Key {
     major: string
@@ -139,13 +139,13 @@ const CircleOfFifthsScreen = () => {
     const styles = getStyles(colorScheme ?? 'light')
 
     const screenWidth = Dimensions.get('window').width
-    const circleSize = Math.min(screenWidth - 40, 350)
+    const circleSize = Math.min(screenWidth - 40, 380)
     const radius = circleSize / 2
     const centerX = radius
     const centerY = radius
-    const keyRadius = radius * 0.35
-    const innerRadius = radius * 0.6
-    const outerRadius = radius - 20
+    const keyRadius = radius * 0.38
+    const innerRadius = radius * 0.65
+    const outerRadius = radius - 15
 
     const handleKeyPress = (key: Key) => {
         haptics.light()
@@ -180,33 +180,46 @@ const CircleOfFifthsScreen = () => {
         const y = centerY + Math.sin(angleRad) * keyRadius
 
         const isSelected = selectedKey?.major === key.major
+        const buttonRadius = 32
 
         return (
             <G key={index}>
+                {/* Shadow circle for depth */}
+                <Circle
+                    cx={x + 1}
+                    cy={y + 1}
+                    r={buttonRadius}
+                    fill={colorScheme === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)'}
+                />
+                {/* Main circle */}
                 <Circle
                     cx={x}
                     cy={y}
-                    r={28}
+                    r={buttonRadius}
                     fill={isSelected ? Colors[colorScheme ?? 'light'].tint : Colors[colorScheme ?? 'light'].background}
-                    stroke={Colors[colorScheme ?? 'light'].tint}
-                    strokeWidth={isSelected ? 3 : 1}
+                    stroke={isSelected ? Colors[colorScheme ?? 'light'].tint : Colors[colorScheme ?? 'light'].borderColor}
+                    strokeWidth={isSelected ? 3 : 2}
                 />
+                {/* Major key text */}
                 <SvgText
                     x={x}
-                    y={y - 4}
-                    fontSize={12}
-                    fontWeight="600"
+                    y={y - 3}
+                    fontSize={14}
+                    fontWeight="700"
                     textAnchor="middle"
                     fill={isSelected ? Colors[colorScheme ?? 'light'].background : Colors[colorScheme ?? 'light'].text}
                 >
                     {key.major}
                 </SvgText>
+                {/* Minor key text */}
                 <SvgText
                     x={x}
-                    y={y + 8}
-                    fontSize={10}
+                    y={y + 12}
+                    fontSize={11}
+                    fontWeight="600"
                     textAnchor="middle"
-                    fill={isSelected ? Colors[colorScheme ?? 'light'].background : Colors[colorScheme ?? 'light'].icon}
+                    fill={isSelected ? Colors[colorScheme ?? 'light'].background :
+                        colorScheme === 'dark' ? Colors[colorScheme].text + 'CC' : Colors[colorScheme].text + '88'}
                 >
                     {key.minor}
                 </SvgText>
@@ -226,8 +239,8 @@ const CircleOfFifthsScreen = () => {
                     style={[
                         styles.touchArea,
                         {
-                            left: x - 28,
-                            top: y - 28,
+                            left: x - 32,
+                            top: y - 32,
                         }
                     ]}
                     onPress={() => handleKeyPress(key)}
@@ -246,7 +259,7 @@ const CircleOfFifthsScreen = () => {
                         cy={centerY}
                         r={outerRadius}
                         fill="transparent"
-                        stroke={Colors[colorScheme ?? 'light'].borderColor}
+                        stroke={Colors[colorScheme ?? 'light'].tint + '40'}
                         strokeWidth={2}
                     />
 
@@ -256,9 +269,9 @@ const CircleOfFifthsScreen = () => {
                         cy={centerY}
                         r={innerRadius}
                         fill="transparent"
-                        stroke={Colors[colorScheme ?? 'light'].borderColor}
+                        stroke={Colors[colorScheme ?? 'light'].tint + '30'}
                         strokeWidth={1}
-                        strokeDasharray="5,5"
+                        strokeDasharray="8,4"
                     />
 
                     {/* Draw lines for perfect fifths */}
@@ -276,17 +289,26 @@ const CircleOfFifthsScreen = () => {
                                 y1={y1}
                                 x2={x2}
                                 y2={y2}
-                                stroke={Colors[colorScheme ?? 'light'].borderColor}
-                                strokeWidth={1}
+                                stroke={Colors[colorScheme ?? 'light'].tint + '25'}
+                                strokeWidth={1.5}
                             />
                         )
                     })}
 
+                    {/* Center background circle */}
+                    <Circle
+                        cx={centerX}
+                        cy={centerY}
+                        r={55}
+                        fill={Colors[colorScheme ?? 'light'].background}
+                        stroke={Colors[colorScheme ?? 'light'].tint + '20'}
+                        strokeWidth={1}
+                    />
                     {/* Center labels */}
                     <SvgText
                         x={centerX}
-                        y={centerY - 20}
-                        fontSize={16}
+                        y={centerY - 18}
+                        fontSize={14}
                         fontWeight="700"
                         textAnchor="middle"
                         fill={Colors[colorScheme ?? 'light'].tint}
@@ -295,8 +317,8 @@ const CircleOfFifthsScreen = () => {
                     </SvgText>
                     <SvgText
                         x={centerX}
-                        y={centerY + 5}
-                        fontSize={20}
+                        y={centerY + 2}
+                        fontSize={18}
                         fontWeight="800"
                         textAnchor="middle"
                         fill={Colors[colorScheme ?? 'light'].text}
@@ -305,11 +327,11 @@ const CircleOfFifthsScreen = () => {
                     </SvgText>
                     <SvgText
                         x={centerX}
-                        y={centerY + 25}
+                        y={centerY + 20}
                         fontSize={10}
-                        fontWeight="500"
+                        fontWeight="600"
                         textAnchor="middle"
-                        fill={Colors[colorScheme ?? 'light'].icon}
+                        fill={Colors[colorScheme ?? 'light'].tint + 'AA'}
                     >
                         & FOURTHS
                     </SvgText>
@@ -533,30 +555,50 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
         circleContainer: {
             alignItems: 'center',
             justifyContent: 'center',
-            paddingVertical: 20,
+            paddingVertical: 24,
+            backgroundColor: Colors[colorScheme].background,
+            marginHorizontal: 16,
+            borderRadius: 20,
+            shadowColor: Colors[colorScheme].text,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 4,
         },
         svgContainer: {
             position: 'relative',
         },
         svg: {
-            
+
         },
         touchArea: {
             position: 'absolute',
-            width: 56,
-            height: 56,
-            borderRadius: 28,
+            width: 64,
+            height: 64,
+            borderRadius: 32,
         },
         infoContainer: {
             margin: 16,
-            borderRadius: 16,
+            borderRadius: 20,
             overflow: 'hidden',
-            borderWidth: 1,
+            borderWidth: 1.5,
             borderColor: Colors[colorScheme].borderColor,
+            backgroundColor: Colors[colorScheme].background,
+            shadowColor: Colors[colorScheme].text,
+            shadowOffset: {
+                width: 0,
+                height: 4,
+            },
+            shadowOpacity: 0.08,
+            shadowRadius: 12,
+            elevation: 6,
         },
         tabContainer: {
             flexDirection: 'row',
-            
+
             borderBottomWidth: 1,
             borderBottomColor: Colors[colorScheme].borderColor,
         },
@@ -601,7 +643,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
         },
         infoCell: {
             flex: 1,
-            
+
             padding: 12,
             borderRadius: 8,
             alignItems: 'center',
@@ -628,7 +670,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             marginTop: 8,
         },
         accidentalBadge: {
-            
+
             paddingHorizontal: 10,
             paddingVertical: 6,
             borderRadius: 12,
@@ -649,7 +691,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             gap: 12,
         },
         chordCard: {
-            
+
             padding: 12,
             borderRadius: 8,
             borderLeftWidth: 3,
@@ -689,7 +731,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
         },
         modeCard: {
             width: 200,
-            
+
             padding: 16,
             borderRadius: 12,
             marginRight: 12,
@@ -709,7 +751,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             flex: 1,
         },
         modeDegree: {
-            
+
             paddingHorizontal: 8,
             paddingVertical: 4,
             borderRadius: 6,
@@ -726,7 +768,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             marginBottom: 12,
         },
         noteBadge: {
-            
+
             paddingHorizontal: 8,
             paddingVertical: 4,
             borderRadius: 4,
@@ -748,7 +790,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             marginBottom: 20,
         },
         theoryCard: {
-            
+
             padding: 16,
             borderRadius: 12,
             borderWidth: 1,
@@ -767,7 +809,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             lineHeight: 18,
         },
         quickFacts: {
-            
+
             padding: 16,
             borderRadius: 12,
             borderWidth: 1,
@@ -788,7 +830,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             width: 6,
             height: 6,
             borderRadius: 3,
-            
+
             marginTop: 6,
             marginRight: 10,
         },
@@ -801,7 +843,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
         theoryNote: {
             flexDirection: 'row',
             alignItems: 'flex-start',
-            
+
             padding: 12,
             borderRadius: 8,
             marginTop: 16,
