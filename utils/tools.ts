@@ -3,6 +3,7 @@ export interface Tool {
   title: string;
   icon: string;
   description?: string;
+  screen?: string;
 }
 
 export const toolsList: Tool[] = [
@@ -11,35 +12,13 @@ export const toolsList: Tool[] = [
     title: "Metronome",
     icon: "metronome",
     description: "Keep time with precision",
+    screen: "coming-soon",
   },
   {
     id: "circle-of-fifths",
     title: "Circle of Fifths",
     icon: "circle-of-fifths",
     description: "Explore music theory",
-  },
-  {
-    id: "tuner",
-    title: "Tuner",
-    icon: "tuner",
-    description: "Tune your instrument",
-  },
-  {
-    id: "scales",
-    title: "Scales",
-    icon: "scales",
-    description: "Practice scales & modes",
-  },
-  {
-    id: "chord-finder",
-    title: "Chord Finder",
-    icon: "chord-finder",
-    description: "Find chord progressions",
-  },
-  {
-    id: "ear-training",
-    title: "Ear Training",
-    icon: "ear-training",
-    description: "Develop your musical ear",
+    screen: "circle-of-fifths",
   },
 ];
