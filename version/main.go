@@ -17,6 +17,7 @@ func main() {
 		fmt.Printf("Error updating app.json: %v\n", err)
 		os.Exit(1)
 	}
+	println("Small change")
 
 	fmt.Println("app.json updated successfully")
 
