@@ -18,7 +18,7 @@ import {
   VoicePreset,
 } from "@/stores/settingsStore";
 import { HapticFeedback } from "@/utils/haptics";
-import { APP_VERSION } from "@/version/version";
+import { APP_VERSION } from "@/constants/version";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import BottomSheet, {
