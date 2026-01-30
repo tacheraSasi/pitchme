@@ -219,7 +219,7 @@ const CircleOfFifthsScreen = () => {
                     fontWeight="600"
                     textAnchor="middle"
                     fill={isSelected ? Colors[colorScheme ?? 'light'].background :
-                        colorScheme === 'dark' ? Colors[colorScheme].text + 'CC' : Colors[colorScheme].text + '88'}
+                        Colors[(colorScheme ?? 'light')].text + (colorScheme === 'dark' ? 'CC' : '88')}
                 >
                     {key.minor}
                 </SvgText>
