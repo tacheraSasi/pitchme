@@ -2,6 +2,7 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ChordProgression, useSongsStore } from "@/stores/songsStore";
+import { HapticFeedback } from "@/utils/haptics";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
@@ -78,12 +79,18 @@ export default function ChordProgressionManager({
 
   const handleSaveProgression = async () => {
     if (!newProgression.name.trim()) {
-      alert.dialog("Error", "Please enter a name for the progression");
+      HapticFeedback("error");
+      alert.dialog("Error", "Please enter a name for the progression",[
+        { text: "OK", style: "default" },
+      ]);
       return;
     }
 
     if (newProgression.chords.length === 0) {
-      alert.dialog("Error", "Please add at least one chord");
+      HapticFeedback("error");
+      alert.dialog("Error", "Please add at least one chord",[
+        { text: "OK", style: "default" },
+      ]);
       return;
     }
 
@@ -99,7 +106,9 @@ export default function ChordProgressionManager({
       setIsAdding(false);
     } catch (error) {
       console.error("Error saving progression:", error);
-      alert.dialog("Error", "Failed to save chord progression");
+      alert.dialog("Error", "Failed to save chord progression",[
+        { text: "OK", style: "default" },
+      ]);
     }
   };
 
