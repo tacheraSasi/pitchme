@@ -13,34 +13,31 @@ interface ChordProgressionManagerProps {
 }
 
 const COMMON_CHORDS = [
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "A",
-  "B",
-  "Cm",
-  "Dm",
-  "Em",
-  "Fm",
-  "Gm",
-  "Am",
-  "Bm",
-  "C7",
-  "D7",
-  "E7",
-  "F7",
-  "G7",
-  "A7",
-  "B7",
-  "Cmaj7",
-  "Dmaj7",
-  "Emaj7",
-  "Fmaj7",
-  "Gmaj7",
-  "Amaj7",
-  "Bmaj7",
+  // Original natural / white-key chords
+  "C", "D", "E", "F", "G", "A", "B",
+  "Cm", "Dm", "Em", "Fm", "Gm", "Am", "Bm",
+
+  // 7ths you already have
+  "C7", "D7", "E7", "F7", "G7", "A7", "B7",
+  "Cmaj7", "Dmaj7", "Emaj7", "Fmaj7", "Gmaj7", "Amaj7", "Bmaj7",
+
+  // ─────────────────────────────────────────────
+  // Very common flat chords (highest priority)
+  "Bb", "Eb", "Ab", "Db", "Gb",           // major flats
+  "Bbm", "Ebm", "Abm", "Dbm", "Gbm",      // minor flats
+  "Bb7", "Eb7", "Ab7", "Db7",             // dominant 7ths
+  "Bbmaj7", "Ebmaj7", "Abmaj7",           // major 7ths (less common but nice)
+
+  // Super frequent borrowed flats (as symbols)
+  "bVII",  // often Bb in C, G in D, etc.
+  "bVI",   // often Ab in C, F in D
+  "bIII",  // often Eb in C, B in D
+  "iv",    // Fm in C major songs
+
+  // Some sharp chords (less frequent but useful)
+  "C#", "D#", "F#", "G#", "A#",           // sharp majors
+  "C#m", "D#m", "F#m", "G#m", "A#m",      // sharp minors
+  "C#7", "F#7", "G#7",                    // sharp dominants
 ];
 
 export default function ChordProgressionManager({
