@@ -556,7 +556,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             alignItems: 'center',
             justifyContent: 'center',
             paddingVertical: 24,
-            backgroundColor: Colors[colorScheme].background,
+            // backgroundColor: Colors[colorScheme].background,
             marginHorizontal: 16,
             borderRadius: 20,
             shadowColor: Colors[colorScheme].text,
@@ -586,7 +586,7 @@ const getStyles = (colorScheme: 'light' | 'dark') =>
             overflow: 'hidden',
             borderWidth: 1.5,
             borderColor: Colors[colorScheme].borderColor,
-            backgroundColor: Colors[colorScheme].background,
+            // backgroundColor: Colors[colorScheme].background,
             shadowColor: Colors[colorScheme].text,
             shadowOffset: {
                 width: 0,
