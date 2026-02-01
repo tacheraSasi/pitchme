@@ -1,14 +1,21 @@
 import { ThemedView } from "@/components/themed/themed-view";
-import Entypo from "@expo/vector-icons/Entypo";
 
-export default function TabBarIcon(props: {
-  name: React.ComponentProps<typeof Entypo>["name"];
+type IconProps = {
+  name: string;
   color: string;
   focused: boolean;
-}) {
+  IconComponent: React.ComponentType<any>;
+};
+
+export default function TabBarIcon({
+  name,
+  color,
+  focused,
+  IconComponent,
+}: IconProps) {
   return (
     <ThemedView>
-      <Entypo size={28} style={{ marginBottom: -3 }} {...props} />
+      <IconComponent size={28} style={{ marginBottom: -3 }} name={name} color={color} />
     </ThemedView>
   );
 }

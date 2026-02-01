@@ -5,6 +5,7 @@ import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import TabBarIcon from "@/components/ui/tab-icon";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -32,7 +33,7 @@ export default function TabLayout() {
           options={{
             title: "Home",
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="folder-music" color={color} focused={focused} />
+              <TabBarIcon name="folder-music" color={color} focused={focused} IconComponent={Entypo}/>
             ),
           }}
         />
@@ -41,7 +42,7 @@ export default function TabLayout() {
           options={{
             title: "Studio",
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="mic" color={color} focused={focused} />
+              <TabBarIcon name="mic" color={color} focused={focused} IconComponent={Entypo}/>
             ),
           }}
         />
@@ -50,7 +51,7 @@ export default function TabLayout() {
           options={{
             title: "Songs",
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="music" color={color} focused={focused} />
+              <TabBarIcon name="music" color={color} focused={focused} IconComponent={Entypo}/>
             ),
           }}
         />
@@ -59,7 +60,7 @@ export default function TabLayout() {
           options={{
             title: "Tools",
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="tools" color={color} focused={focused} />
+              <TabBarIcon name="music-accidental-sharp" color={color} focused={focused} IconComponent={MaterialCommunityIcons}/>
             ),
           }}
         />
