@@ -56,7 +56,7 @@
     "scheme": "pitchme",
     "slug": "pitchme",
     "userInterfaceStyle": "automatic",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "web": {
       "favicon": "./assets/images/icon.png",
       "output": "static"

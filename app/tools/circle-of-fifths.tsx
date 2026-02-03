@@ -79,13 +79,11 @@ const getMajorKeyChords = (key: string): Chord[] => {
             { romanNumeral: 'vi', type: 'minor', notes: ['B', 'D', 'F#'], function: 'Submediant' },
             { romanNumeral: 'vii°', type: 'diminished', notes: ['C#', 'E', 'G'], function: 'Leading Tone' },
         ],
-        // Add other keys similarly
     }
 
     return chords[key.split('/')[0]] || chords.C
 }
 
-// Get modes for a major key
 const getModes = (key: string): Mode[] => [
     {
         name: 'Ionian (Major)',
