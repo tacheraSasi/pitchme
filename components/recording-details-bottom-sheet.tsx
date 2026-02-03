@@ -8,12 +8,12 @@ import { exportAudio } from "@/utils/exporter";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useAudioPlayerStatus } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, TextInput, View, ScrollView } from "react-native";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import {
   PanGestureHandler,
 } from "react-native-gesture-handler";
@@ -260,11 +260,11 @@ const RecordingDetailsBottomSheet = ({
 
   const handleSeekPress = (event: any) => {
     if (!seekBarWidth || !recording) return;
-    
+
     const { locationX } = event.nativeEvent;
     const newPosition = Math.max(0, Math.min(1, locationX / seekBarWidth));
     const seekTime = newPosition * duration;
-    
+
     setSeekPosition(seekTime);
     player.seekTo(seekTime);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -272,13 +272,13 @@ const RecordingDetailsBottomSheet = ({
 
   const onSeekGestureEvent = useCallback((event: any) => {
     if (!seekBarWidth || !recording) return;
-    
+
     const { translationX, x } = event.nativeEvent;
     // Use x if available (relative to view), otherwise use translationX
     const locationX = x !== undefined ? x : (initialSeekProgress.current * seekBarWidth + translationX);
     const newProgress = Math.max(0, Math.min(1, locationX / seekBarWidth));
     const seekTime = newProgress * duration;
-    
+
     setSeekPosition(seekTime);
   }, [seekBarWidth, recording, duration]);
 
@@ -348,10 +348,14 @@ const RecordingDetailsBottomSheet = ({
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
       backgroundStyle={styles.bottomSheetBackground}
+      backdropComponent={BottomSheetBackdrop}
       handleIndicatorStyle={styles.handleIndicator}
     >
-      <BottomSheetView style={styles.contentContainer}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+      <BottomSheetScrollView
+        style={styles.contentContainer}
+        contentContainerStyle={styles.scrollContentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <ThemedView style={styles.header}>
           <ThemedView style={styles.titleSection}>
@@ -399,41 +403,41 @@ const RecordingDetailsBottomSheet = ({
                   }
                 />
               </Pressable>
-            {!isEditing ? (
-              <Pressable
-                onPress={() => setIsEditing(true)}
-                style={styles.editButton}
-              >
-                <MaterialIcons
-                  name="edit"
-                  size={18}
-                  color={Colors[colorScheme ?? "light"].tint}
-                />
-              </Pressable>
-            ) : (
-              <ThemedView style={styles.editActions}>
+              {!isEditing ? (
                 <Pressable
-                  onPress={handleCancelEdit}
-                  style={styles.actionButton}
+                  onPress={() => setIsEditing(true)}
+                  style={styles.editButton}
                 >
                   <MaterialIcons
-                    name="close"
-                    size={18}
-                    color={Colors[colorScheme ?? "light"].text}
-                  />
-                </Pressable>
-                <Pressable
-                  onPress={handleSaveTitle}
-                  style={styles.actionButton}
-                >
-                  <MaterialIcons
-                    name="check"
+                    name="edit"
                     size={18}
                     color={Colors[colorScheme ?? "light"].tint}
                   />
                 </Pressable>
-              </ThemedView>
-            )}
+              ) : (
+                <ThemedView style={styles.editActions}>
+                  <Pressable
+                    onPress={handleCancelEdit}
+                    style={styles.actionButton}
+                  >
+                    <MaterialIcons
+                      name="close"
+                      size={18}
+                      color={Colors[colorScheme ?? "light"].text}
+                    />
+                  </Pressable>
+                  <Pressable
+                    onPress={handleSaveTitle}
+                    style={styles.actionButton}
+                  >
+                    <MaterialIcons
+                      name="check"
+                      size={18}
+                      color={Colors[colorScheme ?? "light"].tint}
+                    />
+                  </Pressable>
+                </ThemedView>
+              )}
             </ThemedView>
           </ThemedView>
 
@@ -455,7 +459,7 @@ const RecordingDetailsBottomSheet = ({
         {/* Playback Section */}
         <ThemedView style={styles.section}>
           <ThemedText style={styles.sectionTitle}>Playback</ThemedText>
-          
+
           {/* Seekable Progress Bar */}
           <View style={styles.seekBarContainer}>
             <View
@@ -470,7 +474,7 @@ const RecordingDetailsBottomSheet = ({
                   { width: `${progress * 100}%` },
                 ]}
               />
-              
+
               {/* Play Button */}
               <Pressable
                 style={[styles.playButtonContainer, { left: `${progress * 100}%` }]}
@@ -478,18 +482,18 @@ const RecordingDetailsBottomSheet = ({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <ThemedView style={styles.playButton}>
-              <Entypo
-                name={
+                  <Entypo
+                    name={
                       playerStatus.playing
                         ? "controller-paus"
                         : "controller-play"
-                }
+                    }
                     size={20}
-                color={colorScheme === "dark" ? "black" : "white"}
-              />
+                    color={colorScheme === "dark" ? "black" : "white"}
+                  />
                 </ThemedView>
               </Pressable>
-              
+
               {/* Seekable Area */}
               <PanGestureHandler
                 onGestureEvent={onSeekGestureEvent}
@@ -511,7 +515,7 @@ const RecordingDetailsBottomSheet = ({
             <ThemedText style={styles.timeText}>
               {formatTime(Math.floor(currentTime * 1000))}
             </ThemedText>
-            
+
             <ThemedView style={styles.controlButtons}>
               <Pressable
                 style={styles.controlButton}
@@ -570,11 +574,11 @@ const RecordingDetailsBottomSheet = ({
                 />
               </Pressable>
             </ThemedView>
-            
+
             <ThemedText style={styles.timeText}>
-                {formatTime(recording.durationMillis)}
-              </ThemedText>
-            </ThemedView>
+              {formatTime(recording.durationMillis)}
+            </ThemedText>
+          </ThemedView>
         </ThemedView>
 
         {/* Notes Section */}
@@ -694,8 +698,7 @@ const RecordingDetailsBottomSheet = ({
             </ThemedText>
           </Pressable>
         </ThemedView>
-        </ScrollView>
-      </BottomSheetView>
+      </BottomSheetScrollView>
     </BottomSheet>
   );
 };
@@ -710,7 +713,10 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     },
     contentContainer: {
       flex: 1,
+    },
+    scrollContentContainer: {
       padding: 20,
+      paddingBottom: 40,
     },
     header: {
       flexDirection: "row",
