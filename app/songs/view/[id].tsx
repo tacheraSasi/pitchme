@@ -1,6 +1,7 @@
 import ChordProgressionManager from "@/components/chord-progression-manager";
 import MetronomeControls from "@/components/metronome-controls";
 import SongRecordModal from "@/components/song-record-modal";
+import SongTakeDetailsBottomSheet from "@/components/song-take-details-bottom-sheet";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { getNoteAssets, Note } from "@/constants/notes";
@@ -30,6 +31,7 @@ import { alert } from "yooo-native";
 
 interface RecordingItemProps {
   recording: SongRecording;
+  onPress: () => void;
   onPlay: () => void;
   onDelete: () => void;
   isPlaying?: boolean;
@@ -37,6 +39,7 @@ interface RecordingItemProps {
 
 const RecordingItem = ({
   recording,
+  onPress,
   onPlay,
   onDelete,
   isPlaying,
@@ -72,7 +75,7 @@ const RecordingItem = ({
   };
 
   return (
-    <View style={styles.recordingItem}>
+    <Pressable onPress={onPress} style={styles.recordingItem}>
       <View style={styles.recordingHeader}>
         <View style={styles.recordingInfo}>
           <ThemedText style={styles.recordingTitle} numberOfLines={1}>
@@ -85,23 +88,22 @@ const RecordingItem = ({
           </ThemedText>
         </View>
         <View style={styles.recordingActions}>
-          <Pressable onPress={handlePlay} style={styles.playButton}>
+          <Pressable
+            onPress={(e) => {
+              e.stopPropagation();
+              handlePlay();
+            }}
+            style={styles.playButton}
+          >
             <Ionicons
               name={isPlaying ? "pause" : "play"}
               size={20}
               color={Colors[colorScheme ?? "light"].tint}
             />
           </Pressable>
-          <Pressable onPress={onDelete} style={styles.deleteButton}>
-            <Ionicons
-              name="trash-outline"
-              size={18}
-              color={Colors[colorScheme ?? "light"].icon}
-            />
-          </Pressable>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
@@ -120,7 +122,9 @@ export default function SongScreen() {
   const [currentPlayingRecording, setCurrentPlayingRecording] = useState<
     string | null
   >(null);
+  const [selectedRecording, setSelectedRecording] = useState<SongRecording | null>(null);
   const recordModalRef = useRef<BottomSheet>(null);
+  const takeDetailsRef = useRef<BottomSheet>(null);
   const voicePreset = useVoicePreset();
 
   // Get note assets based on selected voice preset
@@ -157,6 +161,14 @@ export default function SongScreen() {
       );
     },
     [currentPlayingRecording]
+  );
+
+  const handleRecordingPress = useCallback(
+    (recording: SongRecording) => {
+      setSelectedRecording(recording);
+      takeDetailsRef.current?.expand();
+    },
+    []
   );
 
   const handleDeleteRecording = useCallback(
@@ -407,6 +419,7 @@ export default function SongScreen() {
                 renderItem={({ item }) => (
                   <RecordingItem
                     recording={item}
+                    onPress={() => handleRecordingPress(item)}
                     onPlay={() => handlePlayRecording(item.id)}
                     onDelete={() => handleDeleteRecording(item.id)}
                     isPlaying={currentPlayingRecording === item.id}
@@ -436,6 +449,17 @@ export default function SongScreen() {
         bottomSheetRef={recordModalRef}
         songId={song.id}
         songTitle={song.title}
+      />
+
+      <SongTakeDetailsBottomSheet
+        bottomSheetRef={takeDetailsRef}
+        recording={selectedRecording}
+        songId={song.id}
+        onChange={(index) => {
+          if (index === -1) {
+            setSelectedRecording(null);
+          }
+        }}
       />
     </ThemedView>
   );
@@ -674,6 +698,7 @@ const getRecordingItemStyles = (colorScheme: "light" | "dark") =>
       padding: 16,
       borderWidth: 1,
       borderColor: Colors[colorScheme].borderColor,
+      cursor: "pointer",
     },
     recordingHeader: {
       flexDirection: "row",
@@ -704,8 +729,5 @@ const getRecordingItemStyles = (colorScheme: "light" | "dark") =>
       padding: 8,
       borderRadius: 20,
       backgroundColor: Colors[colorScheme].tint + "20",
-    },
-    deleteButton: {
-      padding: 8,
     },
   });

@@ -3,7 +3,7 @@ import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audio-player";
-import { RecordingItem, useRecordingsStore } from "@/stores/recordingsStore";
+import { SongRecording, useSongsStore } from "@/stores/songsStore";
 import { exportAudio } from "@/utils/exporter";
 import { formatDate, formatTime } from "@/utils/lib";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -19,17 +19,19 @@ import {
 } from "react-native-gesture-handler";
 import { alert, toast } from "yooo-native";
 
-interface RecordingDetailsBottomSheetProps {
+interface SongTakeDetailsBottomSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
-  recording: RecordingItem | null;
+  recording: SongRecording | null;
+  songId: string | null;
   onChange?: (index: number) => void;
 }
 
-const RecordingDetailsBottomSheet = ({
+const SongTakeDetailsBottomSheet = ({
   bottomSheetRef,
   recording,
+  songId,
   onChange,
-}: RecordingDetailsBottomSheetProps) => {
+}: SongTakeDetailsBottomSheetProps) => {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
 
@@ -49,7 +51,7 @@ const RecordingDetailsBottomSheet = ({
     exists: boolean;
   } | null>(null);
 
-  const { updateRecordingTitle, removeRecording, toggleFavorite } = useRecordingsStore();
+  const { updateSongRecording, deleteSongRecording } = useSongsStore();
   const { player, playExclusive, pause } = useGlobalAudioPlayer(
     recording?.uri || ""
   );
@@ -84,7 +86,7 @@ const RecordingDetailsBottomSheet = ({
   // callbacks
   const handleSheetChanges = useCallback(
     (index: number) => {
-      console.log("RecordingDetailsBottomSheet handleSheetChanges", index);
+      console.log("SongTakeDetailsBottomSheet handleSheetChanges", index);
       if (index === -1) {
         // Sheet closed, reset editing state
         setIsEditing(false);
@@ -133,14 +135,13 @@ const RecordingDetailsBottomSheet = ({
   }, [recording, loadFileInfo, isEditing]);
 
   const handleSaveTitle = async () => {
-    if (!recording || !editedTitle.trim()) {
+    if (!recording || !editedTitle.trim() || !songId) {
       return;
     }
 
     try {
-      await updateRecordingTitle(recording.id, editedTitle.trim());
+      await updateSongRecording(songId, recording.id, { title: editedTitle.trim() });
       setIsEditing(false);
-      // The editedTitle will be updated automatically when the recording prop updates from the store
       toast.success("Recording title updated!");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
@@ -156,12 +157,12 @@ const RecordingDetailsBottomSheet = ({
   };
 
   const handleSaveNotes = async () => {
-    if (!recording) {
+    if (!recording || !songId) {
       return;
     }
 
     try {
-      // Note: You can extend RecordingItem interface to include notes field
+      // Note: You'll need to add notes field to SongRecording interface
       setIsEditingNotes(false);
       toast.success("Notes saved!");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -173,7 +174,7 @@ const RecordingDetailsBottomSheet = ({
   };
 
   const handleDeleteRecording = () => {
-    if (!recording) return;
+    if (!recording || !songId) return;
 
     alert.dialog(
       "Delete Recording",
@@ -195,7 +196,7 @@ const RecordingDetailsBottomSheet = ({
               }
 
               // Remove from store
-              await removeRecording(recording.id);
+              await deleteSongRecording(songId, recording.id);
 
               // Close the bottom sheet
               bottomSheetRef.current?.close();
@@ -352,348 +353,335 @@ const RecordingDetailsBottomSheet = ({
     >
       <BottomSheetView style={styles.contentContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <ThemedView style={styles.header}>
-          <ThemedView style={styles.titleSection}>
-            <ThemedView style={styles.titleIconContainer}>
-              <Entypo
-                name="sound-mix"
-                size={24}
-                color={Colors[colorScheme ?? "light"].tint}
-              />
-            </ThemedView>
-            <ThemedText type="subtitle" style={styles.modalTitle}>
-              Recording Details
-            </ThemedText>
-          </ThemedView>
-          <Pressable onPress={closeSheet} style={styles.closeButton}>
-            <Entypo
-              name="cross"
-              size={24}
-              color={Colors[colorScheme ?? "light"].text}
-            />
-          </Pressable>
-        </ThemedView>
-
-        {/* Title Section */}
-        <ThemedView style={styles.section}>
-          <ThemedView style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Title</ThemedText>
-            <ThemedView style={styles.titleActions}>
-              <Pressable
-                onPress={() => {
-                  if (recording) {
-                    toggleFavorite(recording.id);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  }
-                }}
-                style={styles.favoriteButton}
-              >
+          {/* Header */}
+          <ThemedView style={styles.header}>
+            <ThemedView style={styles.titleSection}>
+              <ThemedView style={styles.titleIconContainer}>
                 <Entypo
-                  name={recording.isFavorite ? "star" : "star-outlined"}
-                  size={22}
-                  color={
-                    recording.isFavorite
-                      ? Colors[colorScheme ?? "light"].tint
-                      : Colors[colorScheme ?? "light"].text
-                  }
-                />
-              </Pressable>
-            {!isEditing ? (
-              <Pressable
-                onPress={() => setIsEditing(true)}
-                style={styles.editButton}
-              >
-                <MaterialIcons
-                  name="edit"
-                  size={18}
+                  name="music"
+                  size={24}
                   color={Colors[colorScheme ?? "light"].tint}
                 />
-              </Pressable>
-            ) : (
-              <ThemedView style={styles.editActions}>
-                <Pressable
-                  onPress={handleCancelEdit}
-                  style={styles.actionButton}
-                >
-                  <MaterialIcons
-                    name="close"
-                    size={18}
-                    color={Colors[colorScheme ?? "light"].text}
-                  />
-                </Pressable>
-                <Pressable
-                  onPress={handleSaveTitle}
-                  style={styles.actionButton}
-                >
-                  <MaterialIcons
-                    name="check"
-                    size={18}
-                    color={Colors[colorScheme ?? "light"].tint}
-                  />
-                </Pressable>
               </ThemedView>
-            )}
-            </ThemedView>
-          </ThemedView>
-
-          {isEditing ? (
-            <TextInput
-              style={styles.titleInput}
-              value={editedTitle}
-              onChangeText={setEditedTitle}
-              placeholder="Enter recording title"
-              placeholderTextColor={Colors[colorScheme ?? "light"].text + "80"}
-              autoFocus
-              selectTextOnFocus
-            />
-          ) : (
-            <ThemedText style={styles.titleText}>{recording.title}</ThemedText>
-          )}
-        </ThemedView>
-
-        {/* Playback Section */}
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Playback</ThemedText>
-          
-          {/* Seekable Progress Bar */}
-          <View style={styles.seekBarContainer}>
-            <View
-              ref={seekBarRef}
-              onLayout={handleSeekBarLayout}
-              style={styles.seekBarBackground}
-            >
-              {/* Progress Fill */}
-              <ThemedView
-                style={[
-                  styles.seekBarProgress,
-                  { width: `${progress * 100}%` },
-                ]}
-              />
-              
-              {/* Play Button */}
-              <Pressable
-                style={[styles.playButtonContainer, { left: `${progress * 100}%` }]}
-                onPress={togglePlayback}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <ThemedView style={styles.playButton}>
-              <Entypo
-                name={
-                      playerStatus.playing
-                        ? "controller-paus"
-                        : "controller-play"
-                }
-                    size={20}
-                color={colorScheme === "dark" ? "black" : "white"}
-              />
-                </ThemedView>
-              </Pressable>
-              
-              {/* Seekable Area */}
-              <PanGestureHandler
-                onGestureEvent={onSeekGestureEvent}
-                onHandlerStateChange={onSeekHandlerStateChange}
-                activeOffsetX={[-10, 10]}
-              >
-                <View style={styles.seekableArea}>
-                  <Pressable
-                    style={styles.seekablePressArea}
-                    onPress={handleSeekPress}
-                  />
-                </View>
-              </PanGestureHandler>
-            </View>
-          </View>
-
-          {/* Time Display and Controls */}
-          <ThemedView style={styles.playbackControls}>
-            <ThemedText style={styles.timeText}>
-              {formatTime(Math.floor(currentTime * 1000))}
-            </ThemedText>
-            
-            <ThemedView style={styles.controlButtons}>
-              <Pressable
-                style={styles.controlButton}
-                onPress={skipBackward}
-              >
-                <MaterialIcons
-                  name="replay-10"
-                  size={20}
-                  color={Colors[colorScheme ?? "light"].text}
-                />
-              </Pressable>
-
-              <Pressable
-                style={[
-                  styles.controlButton,
-                  isLooping && styles.controlButtonActive,
-                ]}
-                onPress={toggleLoop}
-              >
-                <MaterialIcons
-                  name="repeat"
-                  size={20}
-                  color={
-                    isLooping
-                      ? Colors[colorScheme ?? "light"].tint
-                      : Colors[colorScheme ?? "light"].text
-                  }
-                />
-              </Pressable>
-
-              <Pressable
-                style={[
-                  styles.controlButton,
-                  playbackSpeed !== 1.0 && styles.controlButtonActive,
-                ]}
-                onPress={cyclePlaybackSpeed}
-              >
-                <ThemedText
-                  style={[
-                    styles.speedText,
-                    playbackSpeed !== 1.0 && styles.speedTextActive,
-                  ]}
-                >
-                  {playbackSpeed}x
-                </ThemedText>
-              </Pressable>
-
-              <Pressable
-                style={styles.controlButton}
-                onPress={skipForward}
-              >
-                <MaterialIcons
-                  name="forward-10"
-                  size={20}
-                  color={Colors[colorScheme ?? "light"].text}
-                />
-              </Pressable>
-            </ThemedView>
-            
-            <ThemedText style={styles.timeText}>
-                {formatTime(recording.durationMillis)}
+              <ThemedText type="subtitle" style={styles.modalTitle}>
+                Take {recording.version}
               </ThemedText>
             </ThemedView>
-        </ThemedView>
+            <Pressable onPress={closeSheet} style={styles.closeButton}>
+              <Entypo
+                name="cross"
+                size={24}
+                color={Colors[colorScheme ?? "light"].text}
+              />
+            </Pressable>
+          </ThemedView>
 
-        {/* Notes Section */}
-        <ThemedView style={styles.section}>
-          <ThemedView style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Notes</ThemedText>
-            <ThemedView style={styles.titleActions}>
-              {!isEditingNotes ? (
-                <Pressable
-                  onPress={() => setIsEditingNotes(true)}
-                  style={styles.editButton}
-                >
-                  <MaterialIcons
-                    name="edit"
-                    size={18}
-                    color={Colors[colorScheme ?? "light"].tint}
-                  />
-                </Pressable>
-              ) : (
-                <ThemedView style={styles.editActions}>
+          {/* Title Section */}
+          <ThemedView style={styles.section}>
+            <ThemedView style={styles.sectionHeader}>
+              <ThemedText style={styles.sectionTitle}>Title</ThemedText>
+              <ThemedView style={styles.titleActions}>
+                {!isEditing ? (
                   <Pressable
-                    onPress={() => setIsEditingNotes(false)}
-                    style={styles.actionButton}
+                    onPress={() => setIsEditing(true)}
+                    style={styles.editButton}
                   >
                     <MaterialIcons
-                      name="close"
-                      size={18}
-                      color={Colors[colorScheme ?? "light"].text}
-                    />
-                  </Pressable>
-                  <Pressable
-                    onPress={handleSaveNotes}
-                    style={styles.actionButton}
-                  >
-                    <MaterialIcons
-                      name="check"
+                      name="edit"
                       size={18}
                       color={Colors[colorScheme ?? "light"].tint}
                     />
                   </Pressable>
-                </ThemedView>
-              )}
+                ) : (
+                  <ThemedView style={styles.editActions}>
+                    <Pressable
+                      onPress={handleCancelEdit}
+                      style={styles.actionButton}
+                    >
+                      <MaterialIcons
+                        name="close"
+                        size={18}
+                        color={Colors[colorScheme ?? "light"].text}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={handleSaveTitle}
+                      style={styles.actionButton}
+                    >
+                      <MaterialIcons
+                        name="check"
+                        size={18}
+                        color={Colors[colorScheme ?? "light"].tint}
+                      />
+                    </Pressable>
+                  </ThemedView>
+                )}
+              </ThemedView>
             </ThemedView>
+
+            {isEditing ? (
+              <TextInput
+                style={styles.titleInput}
+                value={editedTitle}
+                onChangeText={setEditedTitle}
+                placeholder="Enter recording title"
+                placeholderTextColor={Colors[colorScheme ?? "light"].text + "80"}
+                autoFocus
+                selectTextOnFocus
+              />
+            ) : (
+              <ThemedText style={styles.titleText}>{recording.title}</ThemedText>
+            )}
           </ThemedView>
 
-          {isEditingNotes ? (
-            <TextInput
-              style={styles.notesInput}
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Add notes about this recording..."
-              placeholderTextColor={Colors[colorScheme ?? "light"].text + "80"}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-          ) : (
-            <ThemedText style={styles.notesText}>
-              {notes || "No notes yet. Tap edit to add notes about this recording."}
-            </ThemedText>
-          )}
-        </ThemedView>
+          {/* Playback Section */}
+          <ThemedView style={styles.section}>
+            <ThemedText style={styles.sectionTitle}>Playback</ThemedText>
+            
+            {/* Seekable Progress Bar */}
+            <View style={styles.seekBarContainer}>
+              <View
+                ref={seekBarRef}
+                onLayout={handleSeekBarLayout}
+                style={styles.seekBarBackground}
+              >
+                {/* Progress Fill */}
+                <ThemedView
+                  style={[
+                    styles.seekBarProgress,
+                    { width: `${progress * 100}%` },
+                  ]}
+                />
+                
+                {/* Play Button */}
+                <Pressable
+                  style={[styles.playButtonContainer, { left: `${progress * 100}%` }]}
+                  onPress={togglePlayback}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <ThemedView style={styles.playButton}>
+                    <Entypo
+                      name={
+                        playerStatus.playing
+                          ? "controller-paus"
+                          : "controller-play"
+                      }
+                      size={20}
+                      color={colorScheme === "dark" ? "black" : "white"}
+                    />
+                  </ThemedView>
+                </Pressable>
+                
+                {/* Seekable Area */}
+                <PanGestureHandler
+                  onGestureEvent={onSeekGestureEvent}
+                  onHandlerStateChange={onSeekHandlerStateChange}
+                  activeOffsetX={[-10, 10]}
+                >
+                  <View style={styles.seekableArea}>
+                    <Pressable
+                      style={styles.seekablePressArea}
+                      onPress={handleSeekPress}
+                    />
+                  </View>
+                </PanGestureHandler>
+              </View>
+            </View>
 
-        {/* Information Section */}
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Information</ThemedText>
-          <ThemedView style={styles.infoGrid}>
-            <ThemedView style={styles.infoItem}>
-              <ThemedText style={styles.infoLabel}>Duration</ThemedText>
-              <ThemedText style={styles.infoValue}>
+            {/* Time Display and Controls */}
+            <ThemedView style={styles.playbackControls}>
+              <ThemedText style={styles.timeText}>
+                {formatTime(Math.floor(currentTime * 1000))}
+              </ThemedText>
+              
+              <ThemedView style={styles.controlButtons}>
+                <Pressable
+                  style={styles.controlButton}
+                  onPress={skipBackward}
+                >
+                  <MaterialIcons
+                    name="replay-10"
+                    size={20}
+                    color={Colors[colorScheme ?? "light"].text}
+                  />
+                </Pressable>
+
+                <Pressable
+                  style={[
+                    styles.controlButton,
+                    isLooping && styles.controlButtonActive,
+                  ]}
+                  onPress={toggleLoop}
+                >
+                  <MaterialIcons
+                    name="repeat"
+                    size={20}
+                    color={
+                      isLooping
+                        ? Colors[colorScheme ?? "light"].tint
+                        : Colors[colorScheme ?? "light"].text
+                    }
+                  />
+                </Pressable>
+
+                <Pressable
+                  style={[
+                    styles.controlButton,
+                    playbackSpeed !== 1.0 && styles.controlButtonActive,
+                  ]}
+                  onPress={cyclePlaybackSpeed}
+                >
+                  <ThemedText
+                    style={[
+                      styles.speedText,
+                      playbackSpeed !== 1.0 && styles.speedTextActive,
+                    ]}
+                  >
+                    {playbackSpeed}x
+                  </ThemedText>
+                </Pressable>
+
+                <Pressable
+                  style={styles.controlButton}
+                  onPress={skipForward}
+                >
+                  <MaterialIcons
+                    name="forward-10"
+                    size={20}
+                    color={Colors[colorScheme ?? "light"].text}
+                  />
+                </Pressable>
+              </ThemedView>
+              
+              <ThemedText style={styles.timeText}>
                 {formatTime(recording.durationMillis)}
               </ThemedText>
             </ThemedView>
-            <ThemedView style={styles.infoItem}>
-              <ThemedText style={styles.infoLabel}>Date Created</ThemedText>
-              <ThemedText style={styles.infoValue}>
-                {formatDate(recording.date)}
-              </ThemedText>
+          </ThemedView>
+
+          {/* Notes Section */}
+          <ThemedView style={styles.section}>
+            <ThemedView style={styles.sectionHeader}>
+              <ThemedText style={styles.sectionTitle}>Notes</ThemedText>
+              <ThemedView style={styles.titleActions}>
+                {!isEditingNotes ? (
+                  <Pressable
+                    onPress={() => setIsEditingNotes(true)}
+                    style={styles.editButton}
+                  >
+                    <MaterialIcons
+                      name="edit"
+                      size={18}
+                      color={Colors[colorScheme ?? "light"].tint}
+                    />
+                  </Pressable>
+                ) : (
+                  <ThemedView style={styles.editActions}>
+                    <Pressable
+                      onPress={() => setIsEditingNotes(false)}
+                      style={styles.actionButton}
+                    >
+                      <MaterialIcons
+                        name="close"
+                        size={18}
+                        color={Colors[colorScheme ?? "light"].text}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={handleSaveNotes}
+                      style={styles.actionButton}
+                    >
+                      <MaterialIcons
+                        name="check"
+                        size={18}
+                        color={Colors[colorScheme ?? "light"].tint}
+                      />
+                    </Pressable>
+                  </ThemedView>
+                )}
+              </ThemedView>
             </ThemedView>
-            {fileInfo && (
+
+            {isEditingNotes ? (
+              <TextInput
+                style={styles.notesInput}
+                value={notes}
+                onChangeText={setNotes}
+                placeholder="Add notes about this take..."
+                placeholderTextColor={Colors[colorScheme ?? "light"].text + "80"}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            ) : (
+              <ThemedText style={styles.notesText}>
+                {notes || "No notes yet. Tap edit to add notes about this take."}
+              </ThemedText>
+            )}
+          </ThemedView>
+
+          {/* Information Section */}
+          <ThemedView style={styles.section}>
+            <ThemedText style={styles.sectionTitle}>Information</ThemedText>
+            <ThemedView style={styles.infoGrid}>
               <ThemedView style={styles.infoItem}>
-                <ThemedText style={styles.infoLabel}>File Size</ThemedText>
+                <ThemedText style={styles.infoLabel}>Duration</ThemedText>
                 <ThemedText style={styles.infoValue}>
-                  {formatFileSize(fileInfo.size)}
+                  {formatTime(recording.durationMillis)}
                 </ThemedText>
               </ThemedView>
-            )}
-            <ThemedView style={styles.infoItem}>
-              <ThemedText style={styles.infoLabel}>Format</ThemedText>
-              <ThemedText style={styles.infoValue}>M4A Audio</ThemedText>
+              <ThemedView style={styles.infoItem}>
+                <ThemedText style={styles.infoLabel}>Date Created</ThemedText>
+                <ThemedText style={styles.infoValue}>
+                  {formatDate(recording.date)}
+                </ThemedText>
+              </ThemedView>
+              <ThemedView style={styles.infoItem}>
+                <ThemedText style={styles.infoLabel}>Version</ThemedText>
+                <ThemedText style={styles.infoValue}>
+                  Take {recording.version}
+                </ThemedText>
+              </ThemedView>
+              {fileInfo && (
+                <ThemedView style={styles.infoItem}>
+                  <ThemedText style={styles.infoLabel}>File Size</ThemedText>
+                  <ThemedText style={styles.infoValue}>
+                    {formatFileSize(fileInfo.size)}
+                  </ThemedText>
+                </ThemedView>
+              )}
+              <ThemedView style={styles.infoItem}>
+                <ThemedText style={styles.infoLabel}>Format</ThemedText>
+                <ThemedText style={styles.infoValue}>M4A Audio</ThemedText>
+              </ThemedView>
             </ThemedView>
           </ThemedView>
-        </ThemedView>
 
-        {/* Actions Section */}
-        <ThemedView style={styles.actionsSection}>
-          <Pressable
-            style={styles.exportButton}
-            onPress={handleExportRecording}
-          >
-            <Entypo
-              name="share"
-              size={20}
-              color={Colors[colorScheme ?? "light"].background}
-            />
-            <ThemedText style={styles.exportButtonText}>
-              Share Recording
-            </ThemedText>
-          </Pressable>
-          <Pressable
-            style={styles.deleteButton}
-            onPress={handleDeleteRecording}
-          >
-            <Entypo name="trash" size={20} color="white" />
-            <ThemedText style={styles.deleteButtonText}>
-              Delete Recording
-            </ThemedText>
-          </Pressable>
-        </ThemedView>
+          {/* Actions Section */}
+          <ThemedView style={styles.actionsSection}>
+            <Pressable
+              style={styles.exportButton}
+              onPress={handleExportRecording}
+            >
+              <Entypo
+                name="share"
+                size={20}
+                color={Colors[colorScheme ?? "light"].background}
+              />
+              <ThemedText style={styles.exportButtonText}>
+                Share Recording
+              </ThemedText>
+            </Pressable>
+            <Pressable
+              style={styles.deleteButton}
+              onPress={handleDeleteRecording}
+            >
+              <Entypo name="trash" size={20} color="white" />
+              <ThemedText style={styles.deleteButtonText}>
+                Delete Recording
+              </ThemedText>
+            </Pressable>
+          </ThemedView>
         </ScrollView>
       </BottomSheetView>
     </BottomSheet>
@@ -761,9 +749,6 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       alignItems: "center",
       gap: 8,
     },
-    favoriteButton: {
-      padding: 6,
-    },
     editButton: {
       padding: 6,
     },
@@ -787,6 +772,23 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 16,
       color: Colors[colorScheme].text,
       fontWeight: "500",
+    },
+    notesInput: {
+      fontSize: 14,
+      color: Colors[colorScheme].text,
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f5f5f5",
+      borderRadius: 8,
+      padding: 12,
+      borderWidth: 1,
+      borderColor: Colors[colorScheme].borderColor,
+      minHeight: 100,
+    },
+    notesText: {
+      fontSize: 14,
+      color: Colors[colorScheme].text,
+      fontWeight: "400",
+      lineHeight: 20,
+      opacity: 0.8,
     },
     seekBarContainer: {
       marginBottom: 12,
@@ -872,23 +874,6 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     speedTextActive: {
       color: Colors[colorScheme].tint,
     },
-    notesInput: {
-      fontSize: 14,
-      color: Colors[colorScheme].text,
-      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f5f5f5",
-      borderRadius: 8,
-      padding: 12,
-      borderWidth: 1,
-      borderColor: Colors[colorScheme].borderColor,
-      minHeight: 100,
-    },
-    notesText: {
-      fontSize: 14,
-      color: Colors[colorScheme].text,
-      fontWeight: "400",
-      lineHeight: 20,
-      opacity: 0.8,
-    },
     infoGrid: {
       gap: 12,
     },
@@ -947,4 +932,4 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
     },
   });
 
-export default RecordingDetailsBottomSheet;
+export default SongTakeDetailsBottomSheet;
