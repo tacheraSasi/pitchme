@@ -50,9 +50,9 @@
       ],
       "expo-audio",
       "expo-web-browser",
-      "expo-asset"
+      "expo-asset",
+      "expo-font"
     ],
-    //chuiw
     "scheme": "pitchme",
     "slug": "pitchme",
     "userInterfaceStyle": "automatic",
