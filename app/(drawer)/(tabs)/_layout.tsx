@@ -5,9 +5,45 @@ import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import TabBarIcon from "@/components/ui/tab-icon";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
+import { supportsGlassEffect } from "@/components/glass";
+import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs";
+import { DynamicColorIOS } from "react-native";
+
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const brandColor = Colors[colorScheme ?? "light"].tint;
+
+  // Use NativeTabs on iOS 26+, fallback to regular Tabs on other platforms
+  if (supportsGlassEffect) {
+    return (
+      <NativeTabs
+        minimizeBehavior="onScrollDown"
+        labelStyle={{
+          color: DynamicColorIOS({
+            dark: "white",
+            light: "black",
+          }),
+        }}
+        tintColor={brandColor}
+      >
+        {/* Home Tab */}
+        <NativeTabs.Trigger name="home">
+          <Label>Home</Label>
+          <Icon sf={{ default: "house", selected: "house.fill" }} />
+        </NativeTabs.Trigger>
+
+        {/* Profile / Account Tab */}
+        <NativeTabs.Trigger name="profile">
+          <Label>Account</Label>
+          <Icon sf={{ default: "person", selected: "person.fill" }} />
+        </NativeTabs.Trigger>
+      </NativeTabs>
+    );
+  }
+
+  // Fallback to regular Tabs for non-iOS 26 devices
 
   return (
     <>
