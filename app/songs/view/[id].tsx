@@ -1,4 +1,5 @@
 import ChordProgressionManager from "@/components/chord-progression-manager";
+import ExportOptionsBottomSheet from "@/components/export-options-bottom-sheet";
 import MetronomeControls from "@/components/metronome-controls";
 import SongRecordModal from "@/components/song-record-modal";
 import SongTakeDetailsBottomSheet from "@/components/song-take-details-bottom-sheet";
@@ -8,6 +9,7 @@ import { getNoteAssets, Note } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useGlobalAudioPlayer } from "@/hooks/use-global-audio-player";
+import { useHaptics } from "@/hooks/useHaptics";
 import { useVoicePreset } from "@/stores/settingsStore";
 import {
   SongRecording,
@@ -15,6 +17,7 @@ import {
   useSetCurrentSong,
   useSongsStore,
 } from "@/stores/songsStore";
+import { SongExportData } from "@/utils/exporter";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
@@ -112,7 +115,8 @@ export default function SongScreen() {
   const colorScheme = useColorScheme();
   const setCurrentSong = useSetCurrentSong();
   const addToRecentlyViewed = useAddToRecentlyViewed();
-  const { deleteSongRecording } = useSongsStore();
+  const { deleteSongRecording, duplicateSong } = useSongsStore();
+  const { trigger: haptics } = useHaptics();
   const styles = getStyles(colorScheme ?? "light");
 
   // Subscribe directly to the song from the store to get automatic updates
@@ -125,6 +129,7 @@ export default function SongScreen() {
   const [selectedRecording, setSelectedRecording] = useState<SongRecording | null>(null);
   const recordModalRef = useRef<BottomSheet>(null);
   const takeDetailsRef = useRef<BottomSheet>(null);
+  const exportOptionsRef = useRef<BottomSheet>(null);
   const voicePreset = useVoicePreset();
 
   // Get note assets based on selected voice preset
@@ -200,6 +205,63 @@ export default function SongScreen() {
     recordModalRef.current?.expand();
   }, []);
 
+  const handleDuplicateSong = useCallback(async () => {
+    if (!song) return;
+
+    try {
+      haptics("selection");
+      const duplicatedSong = await duplicateSong(song.id);
+      if (duplicatedSong) {
+        haptics("success");
+        alert.dialog(
+          "Song Duplicated",
+          `"${duplicatedSong.title}" has been created.`,
+          [
+            { text: "Stay Here", style: "cancel" },
+            {
+              text: "View Copy",
+              onPress: () => router.replace(`/songs/view/${duplicatedSong.id}`),
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error duplicating song:", error);
+      haptics("error");
+      alert.dialog("Error", "Failed to duplicate song. Please try again.");
+    }
+  }, [song, duplicateSong, haptics]);
+
+  const handleExportSong = useCallback(() => {
+    if (!song) return;
+    haptics("selection");
+    exportOptionsRef.current?.expand();
+  }, [song, haptics]);
+
+  // Prepare song data for export
+  const songExportData: SongExportData | null = useMemo(() => {
+    if (!song) return null;
+    return {
+      title: song.title,
+      key: song.key,
+      bpm: song.bpm,
+      timeSignature: song.timeSignature,
+      description: song.description,
+      inspiration: song.inspiration,
+      genre: song.genre,
+      lyrics: song.lyrics,
+      tags: song.tags,
+      isCompleted: song.isCompleted,
+      chordProgressions: song.chordProgressions.map((p) => ({
+        name: p.name,
+        chords: p.chords,
+        bars: p.bars,
+      })),
+      dateCreated: song.dateCreated,
+      dateModified: song.dateModified,
+    };
+  }, [song]);
+
   if (!song) {
     return (
       <ThemedView style={styles.container}>
@@ -250,16 +312,38 @@ export default function SongScreen() {
           >
             {song.title}
           </ThemedText>
-          <Pressable
-            onPress={() => router.push(`/songs/edit?id=${song.id}`)}
-            style={styles.editButton}
-          >
-            <Ionicons
-              name="create-outline"
-              size={24}
-              color={Colors[colorScheme ?? "light"].tint}
-            />
-          </Pressable>
+          <View style={styles.headerActions}>
+            <Pressable
+              onPress={handleExportSong}
+              style={styles.headerActionButton}
+            >
+              <Ionicons
+                name="share-outline"
+                size={22}
+                color={Colors[colorScheme ?? "light"].tint}
+              />
+            </Pressable>
+            <Pressable
+              onPress={handleDuplicateSong}
+              style={styles.headerActionButton}
+            >
+              <Ionicons
+                name="copy-outline"
+                size={22}
+                color={Colors[colorScheme ?? "light"].tint}
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push(`/songs/edit?id=${song.id}`)}
+              style={styles.headerActionButton}
+            >
+              <Ionicons
+                name="create-outline"
+                size={22}
+                color={Colors[colorScheme ?? "light"].tint}
+              />
+            </Pressable>
+          </View>
         </View>
 
         <ScrollView
@@ -461,6 +545,11 @@ export default function SongScreen() {
           }
         }}
       />
+
+      <ExportOptionsBottomSheet
+        bottomSheetRef={exportOptionsRef}
+        song={songExportData}
+      />
     </ThemedView>
   );
 }
@@ -490,7 +579,12 @@ const getStyles = (colorScheme: "light" | "dark") =>
       color: Colors[colorScheme].text,
       marginHorizontal: 16,
     },
-    editButton: {
+    headerActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    headerActionButton: {
       padding: 8,
     },
     scrollView: {

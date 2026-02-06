@@ -1,3 +1,4 @@
+import LyricsEditor from "@/components/lyrics-editor";
 import MetronomeControls from "@/components/metronome-controls";
 import { TapTempo } from "@/components/tap-tempo";
 import { ThemedText } from "@/components/themed/themed-text";
@@ -343,16 +344,11 @@ export default function EditSong() {
           {/* Lyrics */}
           <View style={styles.section}>
             <ThemedText style={styles.sectionLabel}>Lyrics</ThemedText>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
+            <LyricsEditor
               value={formData.lyrics}
               onChangeText={(text) => handleInputChange("lyrics", text)}
               placeholder="Write your lyrics here..."
-              placeholderTextColor={Colors[colorScheme ?? "light"].icon}
-              multiline
-              numberOfLines={6}
-              textAlignVertical="top"
-              maxLength={2000}
+              maxLength={5000}
             />
           </View>
 
