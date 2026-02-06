@@ -16,37 +16,37 @@ export default function TabLayout() {
   const brandColor = Colors[colorScheme ?? "light"].tint;
 
   // Use NativeTabs on iOS with glass effect support
-  if (supportsGlassEffect) {
-    return (
-      <NativeTabs
-        minimizeBehavior="onScrollDown"
-        labelStyle={{
-          color: DynamicColorIOS({
-            dark: "white",
-            light: "black",
-          }),
-        }}
-        tintColor={brandColor}
-      >
-        <NativeTabs.Trigger name="index">
-          <Label>Home</Label>
-          <Icon sf={{ default: "music.note.house", selected: "music.note.house.fill" }} />
-        </NativeTabs.Trigger>
+  // if (supportsGlassEffect) {
+  //   return (
+  //     <NativeTabs
+  //       minimizeBehavior="onScrollDown"
+  //       labelStyle={{
+  //         color: DynamicColorIOS({
+  //           dark: "white",
+  //           light: "black",
+  //         }),
+  //       }}
+  //       tintColor={brandColor}
+  //     >
+  //       <NativeTabs.Trigger name="index">
+  //         <Label>Home</Label>
+  //         <Icon sf={{ default: "music.note.house", selected: "music.note.house.fill" }} />
+  //       </NativeTabs.Trigger>
 
-        {/* Studio/Record Tab */}
-        <NativeTabs.Trigger name="record">
-          <Label>Studio</Label>
-          <Icon sf={{ default: "mic", selected: "mic.fill" }} />
-        </NativeTabs.Trigger>
+  //       {/* Studio/Record Tab */}
+  //       <NativeTabs.Trigger name="record">
+  //         <Label>Studio</Label>
+  //         <Icon sf={{ default: "mic", selected: "mic.fill" }} />
+  //       </NativeTabs.Trigger>
 
-        {/* Songs Tab */}
-        <NativeTabs.Trigger name="songs">
-          <Label>Songs</Label>
-          <Icon sf={{ default: "music.note.list", selected: "music.note.list" }} />
-        </NativeTabs.Trigger>
-      </NativeTabs>
-    );
-  }
+  //       {/* Songs Tab */}
+  //       <NativeTabs.Trigger name="songs">
+  //         <Label>Songs</Label>
+  //         <Icon sf={{ default: "music.note.list", selected: "music.note.list" }} />
+  //       </NativeTabs.Trigger>
+  //     </NativeTabs>
+  //   );
+  // }
 
   // Fallback to regular Tabs for non-iOS devices
   return (
