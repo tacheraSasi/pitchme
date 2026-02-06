@@ -39,7 +39,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                     id: 'tools',
                     label: 'Tools',
                     icon: 'build',
-                    route: '/(tabs)/tools',
+                    route: '/tools/home',
                 },
                 {
                     id: 'search',

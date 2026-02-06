@@ -55,15 +55,6 @@ export default function TabLayout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="tools"
-          options={{
-            title: "Tools",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="music-accidental-sharp" color={color} focused={focused} IconComponent={MaterialCommunityIcons}/>
-            ),
-          }}
-        />
       </Tabs>
     </>
   );
