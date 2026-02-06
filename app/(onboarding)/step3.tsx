@@ -5,8 +5,8 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHaptics } from "@/hooks/useHaptics";
 import { useSetHasCompletedOnboarding } from "@/stores/settingsStore";
 import {
-    requestRecordingPermissionsAsync,
-    setAudioModeAsync,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync,
 } from "expo-audio";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -48,7 +48,7 @@ export default function Step3() {
       setHasCompletedOnboarding(true);
 
       setTimeout(() => {
-    router.replace("/(tabs)");
+        router.replace("/(tabs)");
       }, 300);
     } catch (error) {
       console.error("Error requesting permissions:", error);
@@ -97,36 +97,36 @@ export default function Step3() {
 
 const getStyles = (colorScheme: "light" | "dark") =>
   StyleSheet.create({
-  container: {
-    flex: 1,
+    container: {
+      flex: 1,
       backgroundColor: Colors[colorScheme].background,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
+    },
+    content: {
+      flex: 1,
+      justifyContent: "space-between",
+      alignItems: "center",
       paddingHorizontal: 32,
       paddingTop: 120,
       paddingBottom: 60,
-  },
+    },
     textContainer: {
-    alignItems: "center",
+      alignItems: "center",
       flex: 1,
       justifyContent: "center",
-  },
+    },
     rewardText: {
       fontSize: 36,
       fontWeight: "400",
-    textAlign: "center",
+      textAlign: "center",
       color: Colors[colorScheme].text,
       marginBottom: 8,
-    letterSpacing: -0.5,
+      letterSpacing: -0.5,
       lineHeight: 44,
-  },
+    },
     rewardTextAccent: {
       fontSize: 36,
-    fontWeight: "700",
-    textAlign: "center",
+      fontWeight: "700",
+      textAlign: "center",
       color: Colors[colorScheme].tint,
       letterSpacing: -0.5,
       lineHeight: 44,
@@ -139,38 +139,38 @@ const getStyles = (colorScheme: "light" | "dark") =>
       backgroundColor: Colors[colorScheme].tint,
       paddingVertical: 18,
       paddingHorizontal: 48,
-    borderRadius: 16,
+      borderRadius: 16,
       width: "100%",
-    alignItems: "center",
+      alignItems: "center",
       marginBottom: 24,
     },
     recordButtonPressed: {
       opacity: 0.7,
-  },
+    },
     recordButtonDisabled: {
       opacity: 0.5,
-  },
+    },
     recordButtonText: {
       fontSize: 17,
-    fontWeight: "600",
+      fontWeight: "600",
       color: colorScheme === "dark" ? "#000000" : "#ffffff",
     },
     stepIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
       gap: 8,
-  },
+    },
     activeStep: {
       width: 24,
       height: 6,
       borderRadius: 3,
       backgroundColor: Colors[colorScheme].tint,
-  },
+    },
     inactiveStep: {
       width: 6,
       height: 6,
       borderRadius: 3,
       backgroundColor: Colors[colorScheme].text + "20",
-  },
-});
+    },
+  });
