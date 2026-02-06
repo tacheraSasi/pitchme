@@ -4,8 +4,9 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -26,10 +27,11 @@ const TabsHeader = ({
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme ?? "light");
+  const navigation = useNavigation();
 
-  const openAboutBottomSheet = () => {
+  const openDrawer = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    aboutBottomSheetRef.current?.expand();
+    navigation.dispatch(DrawerActions.toggleDrawer());
   };
 
   return (
@@ -37,9 +39,10 @@ const TabsHeader = ({
       <View style={styles.leftSection}>
         <Pressable
           style={styles.iconWrapper}
-          onPress={() => openAboutBottomSheet()}
+          onPress={() => openDrawer()}
         >
-          <AppIcon backgroundColor={styles.iconWrapper.backgroundColor} />
+          <Entypo name="menu" size={24} color={Colors[colorScheme ?? "light"].text} />
+          {/* <AppIcon backgroundColor={styles.iconWrapper.backgroundColor} /> */}
         </Pressable>
         <View style={styles.titleSection}>
           <ThemedText type="title" style={styles.titleText}>
