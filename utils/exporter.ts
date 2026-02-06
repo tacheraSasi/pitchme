@@ -440,20 +440,23 @@ export async function exportSongAsPDF(
     // Generate the HTML content
     const html = generatePDFHTML(song, branding);
 
-    // Generate PDF
+    // Generate PDF - this creates a temporary file
     const { uri } = await Print.printToFileAsync({ html });
     console.log("PDF generated at:", uri);
 
-    // Create a better filename
+    // Create a better filename and copy to cache directory
     const fileName = `${song.title.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
 
-    // Copy to a shareable location with proper name
+    // Create File objects for source and destination
+    const sourceFile = new FileSystem.File(uri);
     const cacheDir = FileSystem.Paths.cache;
-    const finalFile = new FileSystem.File(cacheDir, fileName);
-    await FileSystem.copyAsync({ from: uri, to: finalFile.uri });
+    const destinationFile = new FileSystem.File(cacheDir, fileName);
+
+    // Copy the PDF to the cache directory with the proper filename
+    await sourceFile.copy(destinationFile);
 
     // Share the PDF
-    await Sharing.shareAsync(finalFile.uri, {
+    await Sharing.shareAsync(destinationFile.uri, {
       mimeType: "application/pdf",
       dialogTitle: `Share "${song.title}"`,
     });
