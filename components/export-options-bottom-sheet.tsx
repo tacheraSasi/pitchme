@@ -26,7 +26,7 @@ interface ExportOption {
 }
 
 interface ExportOptionsBottomSheetProps {
-    bottomSheetRef: React.RefObject<BottomSheet>;
+    bottomSheetRef: React.RefObject<BottomSheet | null>;
     song: SongExportData | null;
     onChange?: (index: number) => void;
 }
