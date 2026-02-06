@@ -2,8 +2,13 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import {
+  RecordingQuality,
+  useRecordingQuality,
+  useSetRecordingQuality,
+} from "@/stores/settingsStore";
 import { useSongsStore } from "@/stores/songsStore";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import {
   RecordingPresets,
@@ -13,8 +18,29 @@ import {
   useAudioRecorderState,
 } from "expo-audio";
 import * as FileSystem from "expo-file-system";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
+import { toast } from "yooo-native";
+
+// Map quality settings to expo-audio presets
+// Custom high quality preset with higher bitrate
+const HIGH_QUALITY_CUSTOM = {
+  ...RecordingPresets.HIGH_QUALITY,
+  bitRate: 256000, // Higher bitrate for better quality
+  sampleRate: 48000, // 48kHz sample rate
+};
+
+const QUALITY_PRESETS = {
+  low: RecordingPresets.LOW_QUALITY,
+  medium: RecordingPresets.HIGH_QUALITY,
+  high: HIGH_QUALITY_CUSTOM,
+};
+
+const QUALITY_LABELS: Record<RecordingQuality, string> = {
+  low: "Low (smaller file)",
+  medium: "Medium (balanced)",
+  high: "High (best quality)",
+};
 
 interface SongRecordModalProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -29,16 +55,32 @@ const SongRecordModal = ({
 }: SongRecordModalProps) => {
   const colorScheme = useColorScheme();
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [showQualitySelector, setShowQualitySelector] = useState(false);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [waveformAnimations] = useState(() =>
     Array.from({ length: 20 }, () => new Animated.Value(0.3))
   );
 
   const { addRecordingToSong } = useSongsStore();
+  const recordingQuality = useRecordingQuality();
+  const setRecordingQuality = useSetRecordingQuality();
   const styles = getStyles(colorScheme ?? "light");
 
-  // Initialize audio recorder
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  // Initialize audio recorder with quality from settings
+  const audioRecorder = useAudioRecorder(QUALITY_PRESETS[recordingQuality]);
   const recorderState = useAudioRecorderState(audioRecorder);
+
+  // Get metering level for visualization (normalized 0-1)
+  const meteringLevel = useMemo(() => {
+    if (!recorderState?.metering) return 0;
+    // Metering is typically in dB, normalize to 0-1 range
+    // -160 dB is silence, 0 dB is max
+    const db = recorderState.metering;
+    const normalized = Math.max(0, Math.min(1, (db + 60) / 60));
+    return normalized;
+  }, [recorderState?.metering]);
 
   // variables
   const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
@@ -53,39 +95,49 @@ const SongRecordModal = ({
       try {
         const { granted } = await requestRecordingPermissionsAsync();
         if (!granted) {
-          console.error("Microphone access is required to record audio.");
+          toast.error("Microphone access is required to record audio.");
           return;
         }
 
-        // audio mode
+        // audio mode with background support
         await setAudioModeAsync({
           allowsRecording: true,
           playsInSilentMode: true,
-          shouldPlayInBackground: false,
+          shouldPlayInBackground: true,
         });
       } catch (error) {
         console.error("Error setting up audio:", error);
+        toast.error("Failed to setup audio recording.");
       }
     };
 
     setupAudio();
   }, []);
 
-  // Waveform animation
+  // Cleanup countdown on unmount
   useEffect(() => {
-    if (isRecording) {
+    return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
+    };
+  }, []);
+
+  // Waveform animation based on metering
+  useEffect(() => {
+    if (isRecording && !isPaused) {
       const animations = waveformAnimations.map((anim, index) =>
         Animated.loop(
           Animated.sequence([
             Animated.delay(index * 50),
             Animated.timing(anim, {
-              toValue: 0.8 + Math.random() * 0.2,
-              duration: 300,
+              toValue: 0.3 + meteringLevel * 0.7 + Math.random() * 0.2,
+              duration: 100,
               useNativeDriver: true,
             }),
             Animated.timing(anim, {
-              toValue: 0.3 + Math.random() * 0.3,
-              duration: 400,
+              toValue: 0.2 + meteringLevel * 0.4,
+              duration: 150,
               useNativeDriver: true,
             }),
           ])
@@ -97,18 +149,66 @@ const SongRecordModal = ({
       return () => {
         animations.forEach((anim) => anim.stop());
       };
+    } else if (isPaused) {
+      // When paused, show static waveform
+      waveformAnimations.forEach((anim) => anim.setValue(0.5));
     } else {
       waveformAnimations.forEach((anim) => anim.setValue(0.3));
     }
-  }, [isRecording, waveformAnimations]);
+  }, [isRecording, isPaused, meteringLevel, waveformAnimations]);
 
-  const startRecording = async () => {
+  // Start countdown before recording
+  const startCountdown = () => {
+    setCountdown(3);
+    countdownRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === null || prev <= 1) {
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
+          }
+          // Start actual recording when countdown ends
+          actuallyStartRecording();
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const actuallyStartRecording = async () => {
     try {
       await audioRecorder.prepareToRecordAsync();
       audioRecorder.record();
       setIsRecording(true);
+      setIsPaused(false);
     } catch (error) {
       console.error("Error starting recording:", error);
+      toast.error("Failed to start recording.");
+    }
+  };
+
+  const startRecording = async () => {
+    startCountdown();
+  };
+
+  const pauseRecording = async () => {
+    try {
+      audioRecorder.pause();
+      setIsPaused(true);
+    } catch (error) {
+      console.error("Error pausing recording:", error);
+      toast.error("Failed to pause recording.");
+    }
+  };
+
+  const resumeRecording = async () => {
+    try {
+      audioRecorder.record();
+      setIsPaused(false);
+    } catch (error) {
+      console.error("Error resuming recording:", error);
+      toast.error("Failed to resume recording.");
     }
   };
 
@@ -116,6 +216,7 @@ const SongRecordModal = ({
     try {
       await audioRecorder.stop();
       setIsRecording(false);
+      setIsPaused(false);
 
       if (audioRecorder.uri) {
         const timestamp = Date.now();
@@ -145,20 +246,41 @@ const SongRecordModal = ({
           durationMillis: recorderState?.durationMillis ?? 0,
         });
 
-        console.log("Recording saved to song!");
+        toast.success("Take recorded successfully!");
         closeModal();
       }
     } catch (error) {
       console.error("Error saving recording:", error);
+      toast.error("Failed to save recording.");
     }
   };
 
   const handleRecordIdea = () => {
-    if (isRecording) {
+    if (countdown !== null) {
+      // Cancel countdown
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+      setCountdown(null);
+    } else if (isRecording) {
       stopRecording();
     } else {
       startRecording();
     }
+  };
+
+  const handlePauseResume = () => {
+    if (isPaused) {
+      resumeRecording();
+    } else {
+      pauseRecording();
+    }
+  };
+
+  const handleQualityChange = (quality: RecordingQuality) => {
+    setRecordingQuality(quality);
+    setShowQualitySelector(false);
   };
 
   const closeModal = () => {
@@ -197,54 +319,195 @@ const SongRecordModal = ({
             layers, or ideas
           </ThemedText>
 
-          <View style={styles.waveformContainer}>
-            {waveformAnimations.map((anim, index) => (
-              <Animated.View
-                key={index}
-                style={[
-                  styles.waveformBar,
-                  {
-                    backgroundColor: isRecording
-                      ? Colors[colorScheme ?? "light"].waveformActive
-                      : Colors[colorScheme ?? "light"].waveformInactive,
-                    transform: [{ scaleY: anim }],
-                  },
-                ]}
-              />
-            ))}
-          </View>
+          {/* Recording Quality Selector */}
+          {!isRecording && countdown === null && (
+            <View style={styles.qualitySection}>
+              <Pressable
+                style={styles.qualityButton}
+                onPress={() => setShowQualitySelector(!showQualitySelector)}
+              >
+                <Ionicons
+                  name="settings-outline"
+                  size={16}
+                  color={Colors[colorScheme ?? "light"].text}
+                />
+                <ThemedText style={styles.qualityButtonText}>
+                  Quality: {recordingQuality.charAt(0).toUpperCase() + recordingQuality.slice(1)}
+                </ThemedText>
+                <Ionicons
+                  name={showQualitySelector ? "chevron-up" : "chevron-down"}
+                  size={16}
+                  color={Colors[colorScheme ?? "light"].text}
+                />
+              </Pressable>
 
-          <Pressable
-            style={[styles.recordButton, isRecording && styles.recordingButton]}
-            onPress={handleRecordIdea}
-          >
-            <View style={styles.buttonContent}>
-              <View style={isRecording ? styles.stopIcon : styles.micIcon}>
-                {isRecording ? (
-                  <View style={styles.stopSquare} />
-                ) : (
-                  <Entypo
-                    name="mic"
-                    size={32}
-                    color={colorScheme === "dark" ? "#000" : "#fff"}
-                  />
-                )}
+              {showQualitySelector && (
+                <View style={styles.qualityOptions}>
+                  {(Object.keys(QUALITY_LABELS) as RecordingQuality[]).map((quality) => (
+                    <Pressable
+                      key={quality}
+                      style={[
+                        styles.qualityOption,
+                        recordingQuality === quality && styles.qualityOptionSelected,
+                      ]}
+                      onPress={() => handleQualityChange(quality)}
+                    >
+                      <ThemedText
+                        style={[
+                          styles.qualityOptionText,
+                          recordingQuality === quality && styles.qualityOptionTextSelected,
+                        ]}
+                      >
+                        {QUALITY_LABELS[quality]}
+                      </ThemedText>
+                      {recordingQuality === quality && (
+                        <Ionicons
+                          name="checkmark"
+                          size={18}
+                          color={Colors[colorScheme ?? "light"].tint}
+                        />
+                      )}
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Countdown Display */}
+          {countdown !== null && (
+            <View style={styles.countdownContainer}>
+              <ThemedText style={styles.countdownText}>{countdown}</ThemedText>
+              <ThemedText style={styles.countdownLabel}>Get Ready!</ThemedText>
+            </View>
+          )}
+
+          {/* Level Meter */}
+          {isRecording && (
+            <View style={styles.levelMeterContainer}>
+              <ThemedText style={styles.levelMeterLabel}>Level</ThemedText>
+              <View style={styles.levelMeterTrack}>
+                <Animated.View
+                  style={[
+                    styles.levelMeterFill,
+                    {
+                      width: `${meteringLevel * 100}%`,
+                      backgroundColor:
+                        meteringLevel > 0.8
+                          ? "#FF4444"
+                          : meteringLevel > 0.6
+                            ? "#FFA500"
+                            : Colors[colorScheme ?? "light"].tint,
+                    },
+                  ]}
+                />
               </View>
-              <ThemedText style={styles.buttonText}>
-                {isRecording ? "Stop Recording" : "Record Take"}
-              </ThemedText>
-              <ThemedText style={styles.buttonSubtext}>
-                {isRecording
-                  ? "Tap to finish this take"
-                  : "Capture your musical idea for this song"}
+              <ThemedText style={styles.levelMeterDb}>
+                {recorderState?.metering?.toFixed(0) ?? "-∞"} dB
               </ThemedText>
             </View>
-          </Pressable>
+          )}
 
+          {/* Waveform Visualization */}
+          {countdown === null && (
+            <View style={styles.waveformContainer}>
+              {waveformAnimations.map((anim, index) => (
+                <Animated.View
+                  key={index}
+                  style={[
+                    styles.waveformBar,
+                    {
+                      backgroundColor: isRecording
+                        ? isPaused
+                          ? Colors[colorScheme ?? "light"].icon
+                          : Colors[colorScheme ?? "light"].waveformActive
+                        : Colors[colorScheme ?? "light"].waveformInactive,
+                      transform: [{ scaleY: anim }],
+                    },
+                  ]}
+                />
+              ))}
+            </View>
+          )}
+
+          {/* Recording Controls */}
+          <View style={styles.controlsContainer}>
+            {/* Pause/Resume Button (only visible when recording) */}
+            {isRecording && (
+              <Pressable style={styles.pauseButton} onPress={handlePauseResume}>
+                <Ionicons
+                  name={isPaused ? "play" : "pause"}
+                  size={28}
+                  color={Colors[colorScheme ?? "light"].text}
+                />
+              </Pressable>
+            )}
+
+            {/* Recording Button */}
+            <Pressable
+              style={[
+                styles.recordButton,
+                isRecording && styles.recordingButton,
+                countdown !== null && styles.countdownButton,
+              ]}
+              onPress={handleRecordIdea}
+            >
+              <View style={styles.buttonContent}>
+                {countdown !== null ? (
+                  <View style={styles.cancelIcon}>
+                    <Ionicons name="close" size={32} color="white" />
+                  </View>
+                ) : isRecording ? (
+                  <View style={styles.stopIcon}>
+                    <View style={styles.stopSquare} />
+                  </View>
+                ) : (
+                  <View style={styles.micIcon}>
+                    <Entypo
+                      name="mic"
+                      size={32}
+                      color={colorScheme === "dark" ? "#000" : "#fff"}
+                    />
+                  </View>
+                )}
+                <ThemedText style={styles.buttonText}>
+                  {countdown !== null
+                    ? "Cancel"
+                    : isRecording
+                      ? "Stop Recording"
+                      : "Record Take"}
+                </ThemedText>
+                <ThemedText style={styles.buttonSubtext}>
+                  {countdown !== null
+                    ? "Tap to cancel countdown"
+                    : isRecording
+                      ? isPaused
+                        ? "Paused - tap to save"
+                        : "Tap to finish this take"
+                      : "Capture your musical idea for this song"}
+                </ThemedText>
+              </View>
+            </Pressable>
+          </View>
+
+          {/* Recording Status */}
           {isRecording && (
             <View style={styles.statusContainer}>
-              <View style={styles.recordingIndicator} />
-              <ThemedText style={styles.recordingText}>Recording...</ThemedText>
+              <View
+                style={[
+                  styles.recordingIndicator,
+                  isPaused && styles.pausedIndicator,
+                ]}
+              />
+              <ThemedText
+                style={[
+                  styles.recordingText,
+                  isPaused && styles.pausedText,
+                ]}
+              >
+                {isPaused ? "Paused" : "Recording..."}{" "}
+                {Math.floor((recorderState?.durationMillis ?? 0) / 1000)}s
+              </ThemedText>
             </View>
           )}
         </ThemedView>
@@ -297,15 +560,113 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       fontSize: 16,
       opacity: 0.7,
       textAlign: "center",
-      marginBottom: 32,
+      marginBottom: 16,
       color: Colors[colorScheme].text,
+    },
+    // Quality Selector Styles
+    qualitySection: {
+      width: "100%",
+      marginBottom: 16,
+      alignItems: "center",
+    },
+    qualityButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 20,
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f0f0f0",
+    },
+    qualityButtonText: {
+      fontSize: 14,
+      color: Colors[colorScheme].text,
+    },
+    qualityOptions: {
+      marginTop: 8,
+      width: "100%",
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f8f9fa",
+      borderRadius: 12,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: Colors[colorScheme].borderColor,
+    },
+    qualityOption: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+    },
+    qualityOptionSelected: {
+      backgroundColor: colorScheme === "dark" ? "#3a3a3a" : "#e8e8e8",
+    },
+    qualityOptionText: {
+      fontSize: 14,
+      color: Colors[colorScheme].text,
+    },
+    qualityOptionTextSelected: {
+      fontWeight: "600",
+      color: Colors[colorScheme].tint,
+    },
+    // Countdown Styles
+    countdownContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 180,
+      marginBottom: 24,
+      paddingVertical: 20,
+    },
+    countdownText: {
+      fontSize: 96,
+      lineHeight: 110,
+      fontWeight: "bold",
+      color: Colors[colorScheme].tint,
+      textAlign: "center",
+      includeFontPadding: false,
+    },
+    countdownLabel: {
+      fontSize: 20,
+      color: Colors[colorScheme].text,
+      opacity: 0.7,
+      marginTop: 16,
+    },
+    // Level Meter Styles
+    levelMeterContainer: {
+      width: "100%",
+      marginBottom: 16,
+      paddingHorizontal: 16,
+    },
+    levelMeterLabel: {
+      fontSize: 12,
+      color: Colors[colorScheme].text,
+      opacity: 0.6,
+      marginBottom: 4,
+    },
+    levelMeterTrack: {
+      height: 8,
+      backgroundColor: colorScheme === "dark" ? "#333" : "#e0e0e0",
+      borderRadius: 4,
+      overflow: "hidden",
+    },
+    levelMeterFill: {
+      height: "100%",
+      borderRadius: 4,
+    },
+    levelMeterDb: {
+      fontSize: 10,
+      color: Colors[colorScheme].text,
+      opacity: 0.5,
+      marginTop: 2,
+      textAlign: "right",
     },
     waveformContainer: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
       height: 80,
-      marginBottom: 32,
+      marginBottom: 24,
       gap: 3,
     },
     waveformBar: {
@@ -313,6 +674,23 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       height: 40,
       borderRadius: 2,
       marginHorizontal: 1,
+    },
+    // Controls Container
+    controlsContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 16,
+    },
+    pauseButton: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f0f0f0",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: Colors[colorScheme].borderColor,
     },
     recordButton: {
       width: "100%",
@@ -334,6 +712,9 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       backgroundColor: Colors[colorScheme].isRecording,
       transform: [{ scale: 0.98 }],
     },
+    countdownButton: {
+      backgroundColor: Colors[colorScheme].icon,
+    },
     buttonContent: {
       alignItems: "center",
       gap: 12,
@@ -350,6 +731,14 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       justifyContent: "center",
     },
     stopIcon: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: Colors[colorScheme].buttonOverlay,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cancelIcon: {
       width: 64,
       height: 64,
       borderRadius: 32,
@@ -388,10 +777,16 @@ const getStyles = (colorScheme: "light" | "dark" = "light") =>
       borderRadius: 6,
       backgroundColor: Colors[colorScheme].isRecording,
     },
+    pausedIndicator: {
+      backgroundColor: Colors[colorScheme].icon,
+    },
     recordingText: {
       fontSize: 14,
       fontWeight: "500",
       color: Colors[colorScheme].isRecording,
+    },
+    pausedText: {
+      color: Colors[colorScheme].text,
     },
     tipsSection: {
       marginTop: "auto",
