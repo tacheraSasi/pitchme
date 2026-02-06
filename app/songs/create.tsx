@@ -1,5 +1,6 @@
-import ScreenLayout from "@/components/ScreenLayout";
+import LyricsEditor from "@/components/lyrics-editor";
 import MetronomeControls from "@/components/metronome-controls";
+import ScreenLayout from "@/components/ScreenLayout";
 import { TapTempo } from "@/components/tap-tempo";
 import { ThemedText } from "@/components/themed/themed-text";
 import { ThemedView } from "@/components/themed/themed-view";
@@ -7,7 +8,7 @@ import { Note, NOTES } from "@/constants/notes";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHaptics } from "@/hooks/useHaptics";
-import { useCreateSong } from "@/stores/songsStore";
+import { useCreateSong, useSongsStore } from "@/stores/songsStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
@@ -51,6 +52,132 @@ const TIME_SIGNATURES = [
   "7/8",
 ];
 
+// Song Templates with preset structures
+interface SongTemplate {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  genre?: string;
+  bpm: number;
+  timeSignature: string;
+  chordProgressions: { name: string; chords: string[]; bars: number }[];
+  lyricsTemplate: string;
+}
+
+const SONG_TEMPLATES: SongTemplate[] = [
+  {
+    id: "blank",
+    name: "Blank",
+    description: "Start from scratch",
+    icon: "document-outline",
+    bpm: 120,
+    timeSignature: "4/4",
+    chordProgressions: [],
+    lyricsTemplate: "",
+  },
+  {
+    id: "verse-chorus",
+    name: "Verse-Chorus",
+    description: "Classic pop structure",
+    icon: "musical-notes-outline",
+    genre: "Pop",
+    bpm: 120,
+    timeSignature: "4/4",
+    chordProgressions: [
+      { name: "Verse", chords: ["C", "Am", "F", "G"], bars: 8 },
+      { name: "Chorus", chords: ["F", "G", "C", "Am"], bars: 8 },
+    ],
+    lyricsTemplate: "[Verse 1]\n\n\n[Chorus]\n\n\n[Verse 2]\n\n\n[Chorus]\n\n\n[Outro]\n",
+  },
+  {
+    id: "verse-chorus-bridge",
+    name: "Verse-Chorus-Bridge",
+    description: "Full song structure",
+    icon: "git-branch-outline",
+    genre: "Pop",
+    bpm: 110,
+    timeSignature: "4/4",
+    chordProgressions: [
+      { name: "Verse", chords: ["G", "Em", "C", "D"], bars: 8 },
+      { name: "Chorus", chords: ["C", "D", "G", "Em"], bars: 8 },
+      { name: "Bridge", chords: ["Am", "D", "G", "C"], bars: 4 },
+    ],
+    lyricsTemplate: "[Verse 1]\n\n\n[Chorus]\n\n\n[Verse 2]\n\n\n[Chorus]\n\n\n[Bridge]\n\n\n[Chorus]\n\n\n[Outro]\n",
+  },
+  {
+    id: "ballad",
+    name: "Ballad",
+    description: "Slow emotional song",
+    icon: "heart-outline",
+    genre: "Pop",
+    bpm: 70,
+    timeSignature: "4/4",
+    chordProgressions: [
+      { name: "Intro", chords: ["Am", "F", "C", "G"], bars: 4 },
+      { name: "Verse", chords: ["Am", "F", "C", "G"], bars: 8 },
+      { name: "Chorus", chords: ["F", "Am", "G", "C"], bars: 8 },
+    ],
+    lyricsTemplate: "[Intro]\n\n[Verse 1]\n\n\n[Chorus]\n\n\n[Verse 2]\n\n\n[Chorus]\n\n\n[Bridge]\n\n\n[Chorus]\n",
+  },
+  {
+    id: "blues",
+    name: "12-Bar Blues",
+    description: "Classic blues progression",
+    icon: "radio-outline",
+    genre: "Blues",
+    bpm: 90,
+    timeSignature: "4/4",
+    chordProgressions: [
+      { name: "12-Bar Blues", chords: ["A7", "A7", "A7", "A7", "D7", "D7", "A7", "A7", "E7", "D7", "A7", "E7"], bars: 12 },
+    ],
+    lyricsTemplate: "[Verse 1]\n\n\n[Verse 2]\n\n\n[Verse 3]\n\n\n[Turnaround]\n",
+  },
+  {
+    id: "rock",
+    name: "Rock Anthem",
+    description: "High energy rock structure",
+    icon: "flash-outline",
+    genre: "Rock",
+    bpm: 140,
+    timeSignature: "4/4",
+    chordProgressions: [
+      { name: "Intro/Riff", chords: ["E5", "G5", "A5", "E5"], bars: 4 },
+      { name: "Verse", chords: ["E5", "G5", "D5", "A5"], bars: 8 },
+      { name: "Chorus", chords: ["A5", "D5", "E5", "G5"], bars: 8 },
+    ],
+    lyricsTemplate: "[Intro]\n\n[Verse 1]\n\n\n[Pre-Chorus]\n\n\n[Chorus]\n\n\n[Verse 2]\n\n\n[Pre-Chorus]\n\n\n[Chorus]\n\n\n[Solo/Bridge]\n\n\n[Chorus]\n\n\n[Outro]\n",
+  },
+  {
+    id: "folk",
+    name: "Folk Song",
+    description: "Acoustic storytelling",
+    icon: "leaf-outline",
+    genre: "Folk",
+    bpm: 100,
+    timeSignature: "4/4",
+    chordProgressions: [
+      { name: "Verse", chords: ["G", "C", "D", "G"], bars: 8 },
+      { name: "Chorus", chords: ["C", "G", "D", "G"], bars: 8 },
+    ],
+    lyricsTemplate: "[Verse 1]\n\n\n[Verse 2]\n\n\n[Chorus]\n\n\n[Verse 3]\n\n\n[Chorus]\n\n\n[Verse 4]\n\n\n[Outro]\n",
+  },
+  {
+    id: "waltz",
+    name: "Waltz",
+    description: "3/4 time signature",
+    icon: "time-outline",
+    genre: "Classical",
+    bpm: 90,
+    timeSignature: "3/4",
+    chordProgressions: [
+      { name: "A Section", chords: ["C", "G7", "C", "G7"], bars: 8 },
+      { name: "B Section", chords: ["F", "C", "G7", "C"], bars: 8 },
+    ],
+    lyricsTemplate: "[A Section]\n\n\n[B Section]\n\n\n[A Section]\n",
+  },
+];
+
 export default function CreateSong() {
   const colorScheme = useColorScheme();
   const createSong = useCreateSong();
@@ -58,6 +185,7 @@ export default function CreateSong() {
   const aboutBottomSheetRef = useRef(null);
   const { trigger: Haptics } = useHaptics();
 
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("blank");
   const [formData, setFormData] = useState({
     title: "",
     key: Note.C as Note,
@@ -71,7 +199,28 @@ export default function CreateSong() {
     isCompleted: false,
   });
 
+  const [pendingChordProgressions, setPendingChordProgressions] = useState<
+    { name: string; chords: string[]; bars: number }[]
+  >([]);
+
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleTemplateSelect = (template: SongTemplate) => {
+    setSelectedTemplate(template.id);
+    Haptics("selection");
+
+    // Apply template settings
+    setFormData((prev) => ({
+      ...prev,
+      bpm: template.bpm,
+      timeSignature: template.timeSignature,
+      genre: template.genre || prev.genre,
+      lyrics: template.lyricsTemplate || "",
+    }));
+
+    // Store chord progressions to add after song creation
+    setPendingChordProgressions(template.chordProgressions);
+  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -97,7 +246,7 @@ export default function CreateSong() {
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0);
 
-      await createSong({
+      const newSong = await createSong({
         title: formData.title.trim(),
         key: formData.key,
         bpm: formData.bpm,
@@ -111,6 +260,12 @@ export default function CreateSong() {
         isCompleted: formData.isCompleted,
         isFavorite: false,
       });
+
+      // Add chord progressions from template
+      const { addChordProgression } = useSongsStore.getState();
+      for (const progression of pendingChordProgressions) {
+        await addChordProgression(newSong.id, progression);
+      }
 
       Haptics("success");
       router.back();
@@ -158,6 +313,70 @@ export default function CreateSong() {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
+            {/* Song Template Selector */}
+            <View style={styles.section}>
+              <ThemedText style={styles.sectionLabel}>Start with a Template</ThemedText>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.templateScrollContent}
+              >
+                {SONG_TEMPLATES.map((template) => (
+                  <Pressable
+                    key={template.id}
+                    style={[
+                      styles.templateCard,
+                      selectedTemplate === template.id && styles.templateCardSelected,
+                    ]}
+                    onPress={() => handleTemplateSelect(template)}
+                  >
+                    <View
+                      style={[
+                        styles.templateIconContainer,
+                        selectedTemplate === template.id && styles.templateIconContainerSelected,
+                      ]}
+                    >
+                      <Ionicons
+                        name={template.icon as any}
+                        size={24}
+                        color={
+                          selectedTemplate === template.id
+                            ? colorScheme === "dark" ? "#000" : "#fff"
+                            : Colors[colorScheme ?? "light"].tint
+                        }
+                      />
+                    </View>
+                    <ThemedText style={styles.templateName}>{template.name}</ThemedText>
+                    <ThemedText style={styles.templateDescription} numberOfLines={2}>
+                      {template.description}
+                    </ThemedText>
+                    {selectedTemplate === template.id && (
+                      <View style={styles.templateCheckmark}>
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={18}
+                          color={Colors[colorScheme ?? "light"].tint}
+                        />
+                      </View>
+                    )}
+                  </Pressable>
+                ))}
+              </ScrollView>
+              {selectedTemplate !== "blank" && (
+                <View style={styles.templateInfo}>
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={16}
+                    color={Colors[colorScheme ?? "light"].tint}
+                  />
+                  <ThemedText style={styles.templateInfoText}>
+                    Template applied: {SONG_TEMPLATES.find(t => t.id === selectedTemplate)?.name}
+                    {pendingChordProgressions.length > 0 && ` (${pendingChordProgressions.length} chord progressions)`}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+
             {/* Song Title */}
             <View style={styles.section}>
               <ThemedText style={styles.sectionLabel}>Song Title *</ThemedText>
@@ -308,15 +527,11 @@ export default function CreateSong() {
             {/* Lyrics */}
             <View style={styles.section}>
               <ThemedText style={styles.sectionLabel}>Lyrics</ThemedText>
-              <TextInput
-                style={[styles.textInput, styles.textArea]}
+              <LyricsEditor
                 value={formData.lyrics}
                 onChangeText={(text) => handleInputChange("lyrics", text)}
                 placeholder="Write the song lyrics..."
-                placeholderTextColor={Colors[colorScheme ?? "light"].icon}
-                multiline
-                numberOfLines={6}
-                textAlignVertical="top"
+                maxLength={5000}
               />
             </View>
 
@@ -486,5 +701,68 @@ const getStyles = (colorScheme: "light" | "dark") =>
     checkboxLabel: {
       fontSize: 16,
       color: Colors[colorScheme].text,
+    },
+    // Template Selector Styles
+    templateScrollContent: {
+      paddingRight: 16,
+      gap: 12,
+    },
+    templateCard: {
+      width: 120,
+      padding: 12,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: Colors[colorScheme].borderColor,
+      backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f8f9fa",
+      alignItems: "center",
+    },
+    templateCardSelected: {
+      borderColor: Colors[colorScheme].tint,
+      backgroundColor: Colors[colorScheme].tint + "15",
+    },
+    templateIconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: Colors[colorScheme].tint + "20",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 8,
+    },
+    templateIconContainerSelected: {
+      backgroundColor: Colors[colorScheme].tint,
+    },
+    templateName: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: Colors[colorScheme].text,
+      textAlign: "center",
+      marginBottom: 4,
+    },
+    templateDescription: {
+      fontSize: 11,
+      color: Colors[colorScheme].icon,
+      textAlign: "center",
+      lineHeight: 14,
+    },
+    templateCheckmark: {
+      position: "absolute",
+      top: 6,
+      right: 6,
+    },
+    templateInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: Colors[colorScheme].tint + "10",
+      borderRadius: 8,
+    },
+    templateInfoText: {
+      fontSize: 13,
+      color: Colors[colorScheme].tint,
+      flex: 1,
     },
   });
