@@ -1,4 +1,5 @@
 import ChordProgressionManager from "@/components/chord-progression-manager";
+import ExportOptionsBottomSheet from "@/components/export-options-bottom-sheet";
 import MetronomeControls from "@/components/metronome-controls";
 import SongRecordModal from "@/components/song-record-modal";
 import SongTakeDetailsBottomSheet from "@/components/song-take-details-bottom-sheet";
@@ -16,7 +17,7 @@ import {
   useSetCurrentSong,
   useSongsStore,
 } from "@/stores/songsStore";
-import { exportSong } from "@/utils/exporter";
+import { SongExportData } from "@/utils/exporter";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
@@ -128,6 +129,7 @@ export default function SongScreen() {
   const [selectedRecording, setSelectedRecording] = useState<SongRecording | null>(null);
   const recordModalRef = useRef<BottomSheet>(null);
   const takeDetailsRef = useRef<BottomSheet>(null);
+  const exportOptionsRef = useRef<BottomSheet>(null);
   const voicePreset = useVoicePreset();
 
   // Get note assets based on selected voice preset
@@ -230,37 +232,35 @@ export default function SongScreen() {
     }
   }, [song, duplicateSong, haptics]);
 
-  const handleExportSong = useCallback(async () => {
+  const handleExportSong = useCallback(() => {
     if (!song) return;
-
-    try {
-      haptics("selection");
-      await exportSong({
-        title: song.title,
-        key: song.key,
-        bpm: song.bpm,
-        timeSignature: song.timeSignature,
-        description: song.description,
-        inspiration: song.inspiration,
-        genre: song.genre,
-        lyrics: song.lyrics,
-        tags: song.tags,
-        isCompleted: song.isCompleted,
-        chordProgressions: song.chordProgressions.map((p) => ({
-          name: p.name,
-          chords: p.chords,
-          bars: p.bars,
-        })),
-        dateCreated: song.dateCreated,
-        dateModified: song.dateModified,
-      });
-      haptics("success");
-    } catch (error) {
-      console.error("Error exporting song:", error);
-      haptics("error");
-      alert.dialog("Error", "Failed to export song. Please try again.");
-    }
+    haptics("selection");
+    exportOptionsRef.current?.expand();
   }, [song, haptics]);
+
+  // Prepare song data for export
+  const songExportData: SongExportData | null = useMemo(() => {
+    if (!song) return null;
+    return {
+      title: song.title,
+      key: song.key,
+      bpm: song.bpm,
+      timeSignature: song.timeSignature,
+      description: song.description,
+      inspiration: song.inspiration,
+      genre: song.genre,
+      lyrics: song.lyrics,
+      tags: song.tags,
+      isCompleted: song.isCompleted,
+      chordProgressions: song.chordProgressions.map((p) => ({
+        name: p.name,
+        chords: p.chords,
+        bars: p.bars,
+      })),
+      dateCreated: song.dateCreated,
+      dateModified: song.dateModified,
+    };
+  }, [song]);
 
   if (!song) {
     return (
@@ -544,6 +544,11 @@ export default function SongScreen() {
             setSelectedRecording(null);
           }
         }}
+      />
+
+      <ExportOptionsBottomSheet
+        bottomSheetRef={exportOptionsRef}
+        song={songExportData}
       />
     </ThemedView>
   );
