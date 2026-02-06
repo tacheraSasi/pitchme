@@ -28,23 +28,28 @@ export default function TabLayout() {
         }}
         tintColor={brandColor}
       >
-        {/* Home Tab */}
-        <NativeTabs.Trigger name="home">
+        {/* Home Tab - must match your actual file name */}
+        <NativeTabs.Trigger name="index">
           <Label>Home</Label>
           <Icon sf={{ default: "house", selected: "house.fill" }} />
         </NativeTabs.Trigger>
 
-        {/* Profile / Account Tab */}
-        <NativeTabs.Trigger name="profile">
-          <Label>Account</Label>
-          <Icon sf={{ default: "person", selected: "person.fill" }} />
+        {/* Studio/Record Tab */}
+        <NativeTabs.Trigger name="record">
+          <Label>Studio</Label>
+          <Icon sf={{ default: "mic", selected: "mic.fill" }} />
+        </NativeTabs.Trigger>
+
+        {/* Songs Tab */}
+        <NativeTabs.Trigger name="songs">
+          <Label>Songs</Label>
+          <Icon sf={{ default: "music.note", selected: "music.note" }} />
         </NativeTabs.Trigger>
       </NativeTabs>
     );
   }
 
   // Fallback to regular Tabs for non-iOS 26 devices
-
   return (
     <>
       <Tabs
@@ -69,7 +74,7 @@ export default function TabLayout() {
           options={{
             title: "Home",
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="folder-music" color={color} focused={focused} IconComponent={Entypo}/>
+              <TabBarIcon name="folder-music" color={color} focused={focused} IconComponent={Entypo} />
             ),
           }}
         />
@@ -78,7 +83,7 @@ export default function TabLayout() {
           options={{
             title: "Studio",
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="mic" color={color} focused={focused} IconComponent={Entypo}/>
+              <TabBarIcon name="mic" color={color} focused={focused} IconComponent={Entypo} />
             ),
           }}
         />
@@ -87,7 +92,7 @@ export default function TabLayout() {
           options={{
             title: "Songs",
             tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name="music" color={color} focused={focused} IconComponent={Entypo}/>
+              <TabBarIcon name="music" color={color} focused={focused} IconComponent={Entypo} />
             ),
           }}
         />

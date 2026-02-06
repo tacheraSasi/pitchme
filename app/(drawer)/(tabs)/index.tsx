@@ -1,5 +1,4 @@
 import NoteDetectorBottomSheet from "@/components/note-detector/bottom-sheet";
-import NoteDetectorButton from "@/components/note-detector/button";
 import { NotesList } from "@/components/NotesList";
 import { RecentlyViewed } from "@/components/recently-viewed";
 import ScreenLayout from "@/components/ScreenLayout";
