@@ -90,9 +90,9 @@ export default function RecordScreen() {
 
           <ThemedView style={styles.listContainer}>
             <ThemedView style={styles.listHeader}>
-            <ThemedText style={styles.listTitle}>
+              <ThemedText style={styles.listTitle}>
                 {showFavoritesOnly ? "Favorites" : "Your Recordings"} ({recordings.length})
-            </ThemedText>
+              </ThemedText>
               {allRecordings.some((r) => r.isFavorite) && (
                 <Pressable
                   onPress={() => {
