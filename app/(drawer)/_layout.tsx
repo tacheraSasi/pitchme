@@ -11,7 +11,6 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const { width } = Dimensions.get('window');
-const BRAND_COLOR = '#9559A8';
 
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const colorScheme = useColorScheme();
@@ -77,14 +76,51 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
         <View style={[styles.drawerContainer, { backgroundColor: theme.background }]}>
             {/* Header Section */}
             <View style={styles.headerContainer}>
-                <View style={[styles.headerGradient, { backgroundColor: BRAND_COLOR }]}>
-                    <View style={styles.header}>
-                        <View style={styles.appIconContainer}>
-                            <MaterialIcons name="music-note" size={36} color="#fff" />
-                        </View>
-                        <View style={styles.headerTextContainer}>
-                            <Text style={styles.appTitle}>PitchMe</Text>
-                            <Text style={styles.appSubtitle}>Record & Share Ideas</Text>
+                <View style={[
+                    styles.headerGradient,
+                    {
+                        backgroundColor: colorScheme === 'dark'
+                            ? 'rgba(150, 89, 151, 0.15)'
+                            : 'linear-gradient(135deg, #965997 0%, #9559A8 100%)',
+                    }
+                ]}>
+                    <View style={[
+                        styles.headerGradientFallback,
+                        {
+                            backgroundColor: colorScheme === 'dark'
+                                ? 'rgba(150, 89, 151, 0.15)'
+                                : '#965997',
+                        }
+                    ]}>
+                        <View style={styles.header}>
+                            <View style={[
+                                styles.appIconContainer,
+                                {
+                                    backgroundColor: colorScheme === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.1)'
+                                        : 'rgba(255, 255, 255, 0.2)',
+                                }
+                            ]}>
+                                <MaterialIcons
+                                    name="music-note"
+                                    size={36}
+                                    color={colorScheme === 'dark' ? '#fff' : '#fff'}
+                                />
+                            </View>
+                            <View style={styles.headerTextContainer}>
+                                <Text style={[
+                                    styles.appTitle,
+                                    { color: colorScheme === 'dark' ? '#fff' : '#fff' }
+                                ]}>
+                                    PitchMe
+                                </Text>
+                                <Text style={[
+                                    styles.appSubtitle,
+                                    { color: colorScheme === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.8)' }
+                                ]}>
+                                    Record & Share Ideas
+                                </Text>
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -99,7 +135,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             >
                 {menuSections.map((section) => (
                     <View key={section.title} style={styles.section}>
-                        <Text style={[styles.sectionTitle, { color: theme.text + '99' }]}>
+                        <Text style={[styles.sectionTitle, { color: theme.text, opacity: 0.6 }]}>
                             {section.title}
                         </Text>
                         <View style={styles.items}>
@@ -110,12 +146,17 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         styles.menuItem,
                                         {
                                             backgroundColor: item.highlight
-                                                ? BRAND_COLOR + '15'
-                                                : 'transparent',
+                                                ? colorScheme === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.05)'
+                                                    : 'rgba(150, 89, 151, 0.08)'
+                                                : theme.background,
                                             borderColor: item.highlight
-                                                ? BRAND_COLOR + '40'
-                                                : 'transparent',
-                                            borderWidth: item.highlight ? 1.5 : 0,
+                                                ? colorScheme === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.1)'
+                                                    : 'rgba(150, 89, 151, 0.2)'
+                                                : colorScheme === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.05)'
+                                                    : 'rgba(0, 0, 0, 0.05)',
                                         }
                                     ]}
                                     onPress={() => {
@@ -123,27 +164,29 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         props.navigation.closeDrawer();
                                         router.push(item.route as any);
                                     }}
-                                    activeOpacity={0.7}
+                                    activeOpacity={0.6}
                                 >
                                     <View style={[
                                         styles.iconContainer,
                                         {
                                             backgroundColor: item.highlight
-                                                ? BRAND_COLOR
-                                                : BRAND_COLOR + '20'
+                                                ? '#965997'
+                                                : colorScheme === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.08)'
+                                                    : 'rgba(150, 89, 151, 0.12)',
                                         }
                                     ]}>
                                         <MaterialIcons
                                             name={item.icon as any}
                                             size={20}
-                                            color={item.highlight ? '#fff' : BRAND_COLOR}
+                                            color={item.highlight ? '#fff' : '#965997'}
                                         />
                                     </View>
                                     <View style={styles.menuItemContent}>
                                         <Text style={[
                                             styles.menuItemText,
                                             {
-                                                color: item.highlight ? BRAND_COLOR : theme.text,
+                                                color: item.highlight ? '#965997' : theme.text,
                                                 fontWeight: item.highlight ? '600' : '500'
                                             }
                                         ]}>
@@ -154,7 +197,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         <Entypo
                                             name="chevron-right"
                                             size={16}
-                                            color={BRAND_COLOR}
+                                            color="#965997"
                                         />
                                     )}
                                 </TouchableOpacity>
@@ -166,7 +209,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
 
             {/* Footer Section */}
             <View style={[styles.footer, { backgroundColor: theme.background }]}>
-                <Text style={[styles.footerText, { color: theme.text + '80' }]}>
+                <Text style={[styles.footerText, { color: theme.text, opacity: 0.5 }]}>
                     Made with ♪ for music lovers
                 </Text>
             </View>
@@ -188,12 +231,16 @@ export default function Layout() {
                         {
                             backgroundColor: theme.background,
                             borderRightWidth: StyleSheet.hairlineWidth,
-                            borderRightColor: theme.text + '15'
+                            borderRightColor: colorScheme === 'dark'
+                                ? 'rgba(255, 255, 255, 0.1)'
+                                : 'rgba(0, 0, 0, 0.1)'
                         }
                     ],
-                    drawerActiveBackgroundColor: BRAND_COLOR + '15',
-                    drawerActiveTintColor: BRAND_COLOR,
-                    drawerInactiveTintColor: theme.text + '80',
+                    drawerActiveBackgroundColor: colorScheme === 'dark'
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : 'rgba(150, 89, 151, 0.1)',
+                    drawerActiveTintColor: '#965997',
+                    drawerInactiveTintColor: theme.text,
                     drawerLabelStyle: [styles.drawerLabelStyle, { color: theme.text }],
                     headerShown: false,
                     drawerType: 'slide',
@@ -215,6 +262,11 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         paddingBottom: 24,
     },
+    headerGradientFallback: {
+        paddingHorizontal: 20,
+        paddingTop: 0,
+        paddingBottom: 0,
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -222,8 +274,7 @@ const styles = StyleSheet.create({
     appIconContainer: {
         width: 56,
         height: 56,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -232,50 +283,49 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     appTitle: {
-        fontSize: 28,
+        fontSize: 32,
         fontWeight: '800',
-        color: '#fff',
-        marginBottom: 2,
+        marginBottom: 4,
     },
     appSubtitle: {
-        fontSize: 12,
-        color: 'rgba(255,255,255,0.8)',
+        fontSize: 13,
         fontWeight: '500',
     },
     drawerLinks: {
         flex: 1,
     },
     drawerLinksContent: {
-        paddingTop: 8,
+        paddingTop: 12,
         paddingBottom: 20,
     },
     section: {
-        marginTop: 20,
-        marginBottom: 8,
+        marginTop: 24,
+        marginBottom: 12,
     },
     sectionTitle: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.8,
         paddingHorizontal: 16,
-        marginBottom: 8,
+        marginBottom: 10,
     },
     items: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
     },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 12,
+        paddingVertical: 13,
         paddingHorizontal: 12,
-        marginVertical: 3,
-        borderRadius: 10,
+        marginVertical: 4,
+        borderRadius: 12,
+        borderWidth: 1,
     },
     iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 10,
+        width: 44,
+        height: 44,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -289,14 +339,15 @@ const styles = StyleSheet.create({
     },
     footer: {
         paddingHorizontal: 16,
-        paddingBottom: 24,
-        paddingTop: 12,
+        paddingBottom: 28,
+        paddingTop: 16,
         alignItems: 'center',
     },
     footerText: {
         fontSize: 12,
         fontStyle: 'italic',
         fontWeight: '500',
+        lineHeight: 18,
     },
     drawerStyle: {
         width: width * 0.82,
