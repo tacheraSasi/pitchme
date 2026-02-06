@@ -16,7 +16,15 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const colorScheme = useColorScheme();
     const theme = useMemo(() => Colors[colorScheme ?? 'light'], [colorScheme]);
 
-    const menuSections = [
+    type DrawerMenuItem = {
+        id: string;
+        label: string;
+        icon: string;
+        route: string;
+        highlight?: boolean;
+    };
+
+    const menuSections: { title: string; items: DrawerMenuItem[] }[] = [
         {
             title: 'Main',
             items: [
@@ -25,7 +33,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                     label: 'Home',
                     icon: 'home',
                     route: '/(tabs)',
-                    highlight: true,
+                    // highlight: true,
                 },
                 {
                     id: 'tools',
@@ -43,7 +51,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
         },
     ];
 
-    const bottomSections = [
+    const bottomSections: { title: string; items: DrawerMenuItem[] }[] = [
         {
             title: 'About & Support',
             items: [
@@ -71,14 +79,16 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                     styles.headerGradient,
                     {
                         backgroundColor: colorScheme === 'dark'
-                            ? theme.tint + '18'
+                            ? '#1a1a1a'
                             : theme.tint,
                     }
                 ]}>
                     <View style={[
                         styles.headerGradientFallback,
                         {
-                            backgroundColor: theme.tint,
+                            backgroundColor: colorScheme === 'dark'
+                                ? '#1a1a1a'
+                                : theme.tint,
                         }
                     ]}>
                         <View style={styles.header}>
@@ -86,8 +96,8 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                 styles.appIconContainer,
                                 {
                                     backgroundColor: colorScheme === 'dark'
-                                        ? theme.tint + '14'
-                                        : theme.tint + '20',
+                                        ? 'rgba(255, 255, 255, 0.15)'
+                                        : 'rgba(255, 255, 255, 0.25)',
                                 }
                             ]}>
                                 <MaterialIcons
@@ -136,12 +146,12 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         {
                                             backgroundColor: item.highlight
                                                 ? colorScheme === 'dark'
-                                                    ? theme.tint + '0D'
+                                                    ? 'rgba(255, 255, 255, 0.08)'
                                                     : theme.tint + '14'
                                                 : theme.background,
                                             borderColor: item.highlight
                                                 ? colorScheme === 'dark'
-                                                    ? theme.tint + '1A'
+                                                    ? 'rgba(255, 255, 255, 0.15)'
                                                     : theme.tint + '33'
                                                 : colorScheme === 'dark'
                                                     ? 'rgba(255, 255, 255, 0.05)'
@@ -161,14 +171,14 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                             backgroundColor: item.highlight
                                                 ? theme.tint
                                                 : colorScheme === 'dark'
-                                                    ? theme.tint + '14'
+                                                    ? 'rgba(255, 255, 255, 0.1)'
                                                     : theme.tint + '1F',
                                         }
                                     ]}>
                                         <MaterialIcons
                                             name={item.icon as any}
                                             size={20}
-                                            color={item.highlight ? (colorScheme === 'dark' ? theme.tint : '#fff') : theme.tint}
+                                            color={item.highlight ? (colorScheme === 'dark' ? theme.text : '#fff') : theme.tint}
                                         />
                                     </View>
                                     <View style={styles.menuItemContent}>
@@ -212,12 +222,12 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         {
                                             backgroundColor: item.highlight
                                                 ? colorScheme === 'dark'
-                                                    ? theme.tint + '0D'
+                                                    ? 'rgba(255, 255, 255, 0.08)'
                                                     : theme.tint + '14'
                                                 : theme.background,
                                             borderColor: item.highlight
                                                 ? colorScheme === 'dark'
-                                                    ? theme.tint + '1A'
+                                                    ? 'rgba(255, 255, 255, 0.15)'
                                                     : theme.tint + '33'
                                                 : colorScheme === 'dark'
                                                     ? 'rgba(255, 255, 255, 0.05)'
@@ -237,14 +247,14 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                             backgroundColor: item.highlight
                                                 ? theme.tint
                                                 : colorScheme === 'dark'
-                                                    ? theme.tint + '14'
+                                                    ? 'rgba(255, 255, 255, 0.1)'
                                                     : theme.tint + '1F',
                                         }
                                     ]}>
                                         <MaterialIcons
                                             name={item.icon as any}
                                             size={20}
-                                            color={item.highlight ? (colorScheme === 'dark' ? theme.tint : '#fff') : theme.tint}
+                                            color={item.highlight ? (colorScheme === 'dark' ? theme.text : '#fff') : theme.tint}
                                         />
                                     </View>
                                     <View style={styles.menuItemContent}>
@@ -275,7 +285,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             {/* Footer Section */}
             <View style={[styles.footer, { backgroundColor: theme.background }]}>
                 <Text style={[styles.footerText, { color: theme.text, opacity: 0.5 }]}>
-                    Make sure you hit that note ♪
+                    Made with ♪ for music lovers
                 </Text>
             </View>
         </View>
