@@ -45,9 +45,8 @@ export default function Step3() {
       });
 
       haptics("success");
-HasCompletedOnboarding(true);
+      setHasCompletedOnboarding(true);
 
-      set
       setTimeout(() => {
     router.replace("/(tabs)");
       }, 300);
