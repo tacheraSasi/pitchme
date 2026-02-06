@@ -21,35 +21,19 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             title: 'Main',
             items: [
                 {
-                    id: 'home',
-                    label: 'Home',
-                    icon: 'home',
-                    route: '/(tabs)',
-                    highlight: true,
-                },
-                {
-                    id: 'record',
-                    label: 'Record',
-                    icon: 'fiber-manual-record',
-                    route: '/(tabs)/record',
-                },
-                {
-                    id: 'songs',
-                    label: 'Songs',
-                    icon: 'library-music',
-                    route: '/(tabs)/songs',
-                },
-                {
-                    id: 'recordings',
-                    label: 'My Recordings',
-                    icon: 'storage',
-                    route: '/(tabs)/recordings',
-                },
-                {
                     id: 'tools',
                     label: 'Tools',
                     icon: 'build',
                     route: '/(tabs)/tools',
+                    // highlight: true
+                },
+
+                {
+                    id: 'search',
+                    label: 'Search',
+                    icon: 'search',
+                    route: '/(tabs)/search',
+                    // highlight: true
                 },
             ]
         },
@@ -80,16 +64,14 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                     styles.headerGradient,
                     {
                         backgroundColor: colorScheme === 'dark'
-                            ? 'rgba(150, 89, 151, 0.15)'
-                            : 'linear-gradient(135deg, #965997 0%, #9559A8 100%)',
+                            ? theme.tint + '18'
+                            : theme.tint,
                     }
                 ]}>
                     <View style={[
                         styles.headerGradientFallback,
                         {
-                            backgroundColor: colorScheme === 'dark'
-                                ? 'rgba(150, 89, 151, 0.15)'
-                                : '#965997',
+                            backgroundColor: theme.tint,
                         }
                     ]}>
                         <View style={styles.header}>
@@ -147,13 +129,13 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         {
                                             backgroundColor: item.highlight
                                                 ? colorScheme === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.05)'
-                                                    : 'rgba(150, 89, 151, 0.08)'
+                                                    ? theme.tint + '0D'
+                                                    : theme.tint + '14'
                                                 : theme.background,
                                             borderColor: item.highlight
                                                 ? colorScheme === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.1)'
-                                                    : 'rgba(150, 89, 151, 0.2)'
+                                                    ? theme.tint + '1A'
+                                                    : theme.tint + '33'
                                                 : colorScheme === 'dark'
                                                     ? 'rgba(255, 255, 255, 0.05)'
                                                     : 'rgba(0, 0, 0, 0.05)',
@@ -170,23 +152,23 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         styles.iconContainer,
                                         {
                                             backgroundColor: item.highlight
-                                                ? '#965997'
+                                                ? theme.tint
                                                 : colorScheme === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.08)'
-                                                    : 'rgba(150, 89, 151, 0.12)',
+                                                    ? theme.tint + '14'
+                                                    : theme.tint + '1F',
                                         }
                                     ]}>
                                         <MaterialIcons
                                             name={item.icon as any}
                                             size={20}
-                                            color={item.highlight ? '#fff' : '#965997'}
+                                            color={item.highlight ? (colorScheme === 'dark' ? theme.tint : '#fff') : theme.tint}
                                         />
                                     </View>
                                     <View style={styles.menuItemContent}>
                                         <Text style={[
                                             styles.menuItemText,
                                             {
-                                                color: item.highlight ? '#965997' : theme.text,
+                                                color: item.highlight ? theme.tint : theme.text,
                                                 fontWeight: item.highlight ? '600' : '500'
                                             }
                                         ]}>
@@ -197,7 +179,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                         <Entypo
                                             name="chevron-right"
                                             size={16}
-                                            color="#965997"
+                                            color={theme.tint}
                                         />
                                     )}
                                 </TouchableOpacity>
@@ -232,14 +214,14 @@ export default function Layout() {
                             backgroundColor: theme.background,
                             borderRightWidth: StyleSheet.hairlineWidth,
                             borderRightColor: colorScheme === 'dark'
-                                ? 'rgba(255, 255, 255, 0.1)'
-                                : 'rgba(0, 0, 0, 0.1)'
+                                ? theme.text + '1A'
+                                : theme.text + '1A'
                         }
                     ],
                     drawerActiveBackgroundColor: colorScheme === 'dark'
-                        ? 'rgba(255, 255, 255, 0.08)'
-                        : 'rgba(150, 89, 151, 0.1)',
-                    drawerActiveTintColor: '#965997',
+                        ? theme.tint + '14'
+                        : theme.tint + '1A',
+                    drawerActiveTintColor: theme.tint,
                     drawerInactiveTintColor: theme.text,
                     drawerLabelStyle: [styles.drawerLabelStyle, { color: theme.text }],
                     headerShown: false,
