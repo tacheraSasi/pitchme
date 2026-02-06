@@ -1,24 +1,5 @@
 ## Current Implementation Status & Enhancement Opportunities
 
-### 1. Audio Recording ✅ Implemented - Needs Enhancements
-
-**Already Working:**
-- Basic recording with `expo-audio` in record-modal.tsx and song-record-modal.tsx
-- Waveform animation during recording
-- File storage to device filesystem
-- Recording quality settings (low/medium/high) in settings store
-
-**Enhancements to Add:**
-| Enhancement | Implementation Approach |
-|-------------|------------------------|
-| **Pause/Resume Recording** | Add pause state to recorder, use `audioRecorder.pause()` API |
-| **Recording Level Meter** | Use `recorderState.metering` to display real-time audio levels |
-| **Countdown Timer Before Recording** | Add 3-2-1 countdown modal before `recorder.record()` starts |
-| **Trim/Edit Recordings** | Add waveform display with selection handles for trim |
-| **Recording Quality Selector in Modal** | Use existing `RecordingQuality` from settings store |
-| **Background Recording Support** | Set `shouldPlayInBackground: true` in audio mode |
-
----
 
 ### 2. Pitch Detection ✅ Implemented - Needs Enhancements
 
@@ -39,27 +20,6 @@
 
 ---
 
-### 3. Song Management ✅ Well Implemented - Minor Enhancements
-
-**Already Working:**
-- Full CRUD operations in songsStore.ts
-- Rich metadata: key, BPM, time signature, genre, lyrics, tags
-- Song recordings (takes) with versioning
-- Recently viewed tracking
-- Favorites system
-- Chord progressions per song
-
-**Enhancements to Add:**
-| Enhancement | Implementation Approach |
-|-------------|------------------------|
-| **Song Templates** | Add preset song structures (verse-chorus-verse, etc.) |
-| **Export/Share Songs** | Use `expo-sharing` to share song data + recordings |
-| **Duplicate Song** | Already have `duplicateSong` method - add UI button |
-| **Bulk Actions** | Multi-select for delete/archive/export |
-| **Song Completion Status** | Already have `isCompleted` field - add filter/view |
-| **Lyrics Editor Improvements** | Add verse/chorus sections, chord notation inline |
-
----
 
 ### 4. Music Tools ✅ Partially Implemented - Expand
 
