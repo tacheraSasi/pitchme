@@ -445,7 +445,9 @@ export async function exportSongAsPDF(
     console.log("PDF generated at:", uri);
 
     // Create a better filename and copy to cache directory
-    const fileName = `${song.title.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+    const randomHash = Math.random().toString(36).substring(2, 8);
+    const currentDate = new Date().toISOString().split("T")[0];
+    const fileName = `${song.title.replace(/[^a-zA-Z0-9]/g, "_")}_${currentDate}_${randomHash}.pdf`;
 
     // Create File objects for source and destination
     const sourceFile = new FileSystem.File(uri);
@@ -453,7 +455,7 @@ export async function exportSongAsPDF(
     const destinationFile = new FileSystem.File(cacheDir, fileName);
 
     // Copy the PDF to the cache directory with the proper filename
-    await sourceFile.copy(destinationFile);
+    sourceFile.copy(destinationFile);
 
     // Share the PDF
     await Sharing.shareAsync(destinationFile.uri, {
