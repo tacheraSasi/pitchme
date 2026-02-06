@@ -29,9 +29,9 @@ const TabsHeader = ({
   const styles = getStyles(colorScheme ?? "light");
   const navigation = useNavigation();
 
-  const openAboutBottomSheet = () => {
+  const openDrawer = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    aboutBottomSheetRef.current?.expand();
+    navigation.dispatch(DrawerActions.toggleDrawer());
   };
 
   return (
@@ -39,7 +39,7 @@ const TabsHeader = ({
       <View style={styles.leftSection}>
         <Pressable
           style={styles.iconWrapper}
-          onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+          onPress={() => openDrawer()}
         >
           <Entypo name="menu" size={24} color={Colors[colorScheme ?? "light"].text} />
           {/* <AppIcon backgroundColor={styles.iconWrapper.backgroundColor} /> */}
