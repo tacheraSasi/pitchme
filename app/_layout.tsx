@@ -11,7 +11,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useHasCompletedOnboarding } from "@/stores/settingsStore";
 
 export const unstable_settings = {
-  anchor: "(tabs)",
+  anchor: "(drawer)",
 };
 
 export default function RootLayout() {
@@ -25,9 +25,10 @@ export default function RootLayout() {
         <Stack.Protected guard={hasCompletedOnboarding}>
           <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         </Stack.Protected>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
         <Stack.Screen name="songs" options={{ headerShown: false }} />
         <Stack.Screen name="tools" options={{ headerShown: false }} />
+        <Stack.Screen name="about" options={{ headerShown: false }} />
         <Stack.Screen name="recordings" options={{ headerShown: false }} />
         <Stack.Screen name="webview/[url]" options={{ headerShown: true, headerTitle: "PitchMe" }} />
         <Stack.Screen

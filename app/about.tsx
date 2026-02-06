@@ -18,7 +18,7 @@ import {
     View,
 } from "react-native";
 
-export function AboutScreen() {
+export default function AboutScreen() {
     const colorScheme = useColorScheme();
     const styles = getStyles(colorScheme ?? "light");
 
