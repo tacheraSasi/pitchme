@@ -21,22 +21,29 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             title: 'Main',
             items: [
                 {
+                    id: 'home',
+                    label: 'Home',
+                    icon: 'home',
+                    route: '/(tabs)',
+                    highlight: true,
+                },
+                {
                     id: 'tools',
                     label: 'Tools',
                     icon: 'build',
                     route: '/(tabs)/tools',
-                    // highlight: true
                 },
-
                 {
                     id: 'search',
                     label: 'Search',
                     icon: 'search',
-                    route: '/(tabs)/search',
-                    // highlight: true
+                    route: '/songs/search',
                 },
             ]
         },
+    ];
+
+    const bottomSections = [
         {
             title: 'About & Support',
             items: [
@@ -79,26 +86,26 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                                 styles.appIconContainer,
                                 {
                                     backgroundColor: colorScheme === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.1)'
-                                        : 'rgba(255, 255, 255, 0.2)',
+                                        ? theme.tint + '14'
+                                        : theme.tint + '20',
                                 }
                             ]}>
                                 <MaterialIcons
                                     name="music-note"
                                     size={36}
-                                    color={colorScheme === 'dark' ? '#fff' : '#fff'}
+                                    color="#fff"
                                 />
                             </View>
                             <View style={styles.headerTextContainer}>
                                 <Text style={[
                                     styles.appTitle,
-                                    { color: colorScheme === 'dark' ? '#fff' : '#fff' }
+                                    { color: '#fff' }
                                 ]}>
                                     PitchMe
                                 </Text>
                                 <Text style={[
                                     styles.appSubtitle,
-                                    { color: colorScheme === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.8)' }
+                                    { color: 'rgba(255,255,255,0.8)' }
                                 ]}>
                                     Record & Share Ideas
                                 </Text>
@@ -189,10 +196,86 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                 ))}
             </DrawerContentScrollView>
 
+            {/* Bottom Fixed Section */}
+            <View style={[styles.bottomSection, { backgroundColor: theme.background }]}>
+                {bottomSections.map((section) => (
+                    <View key={section.title}>
+                        <Text style={[styles.sectionTitle, { color: theme.text, opacity: 0.6 }]}>
+                            {section.title}
+                        </Text>
+                        <View style={styles.items}>
+                            {section.items.map((item) => (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={[
+                                        styles.menuItem,
+                                        {
+                                            backgroundColor: item.highlight
+                                                ? colorScheme === 'dark'
+                                                    ? theme.tint + '0D'
+                                                    : theme.tint + '14'
+                                                : theme.background,
+                                            borderColor: item.highlight
+                                                ? colorScheme === 'dark'
+                                                    ? theme.tint + '1A'
+                                                    : theme.tint + '33'
+                                                : colorScheme === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.05)'
+                                                    : 'rgba(0, 0, 0, 0.05)',
+                                        }
+                                    ]}
+                                    onPress={() => {
+                                        HapticFeedback('selection');
+                                        props.navigation.closeDrawer();
+                                        router.push(item.route as any);
+                                    }}
+                                    activeOpacity={0.6}
+                                >
+                                    <View style={[
+                                        styles.iconContainer,
+                                        {
+                                            backgroundColor: item.highlight
+                                                ? theme.tint
+                                                : colorScheme === 'dark'
+                                                    ? theme.tint + '14'
+                                                    : theme.tint + '1F',
+                                        }
+                                    ]}>
+                                        <MaterialIcons
+                                            name={item.icon as any}
+                                            size={20}
+                                            color={item.highlight ? (colorScheme === 'dark' ? theme.tint : '#fff') : theme.tint}
+                                        />
+                                    </View>
+                                    <View style={styles.menuItemContent}>
+                                        <Text style={[
+                                            styles.menuItemText,
+                                            {
+                                                color: item.highlight ? theme.tint : theme.text,
+                                                fontWeight: item.highlight ? '600' : '500'
+                                            }
+                                        ]}>
+                                            {item.label}
+                                        </Text>
+                                    </View>
+                                    {item.highlight && (
+                                        <Entypo
+                                            name="chevron-right"
+                                            size={16}
+                                            color={theme.tint}
+                                        />
+                                    )}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+                ))}
+            </View>
+
             {/* Footer Section */}
             <View style={[styles.footer, { backgroundColor: theme.background }]}>
                 <Text style={[styles.footerText, { color: theme.text, opacity: 0.5 }]}>
-                    Made with ♪ for music lovers
+                    Make sure you hit that note ♪
                 </Text>
             </View>
         </View>
@@ -324,6 +407,11 @@ const styles = StyleSheet.create({
         paddingBottom: 28,
         paddingTop: 16,
         alignItems: 'center',
+    },
+    bottomSection: {
+        paddingHorizontal: 12,
+        paddingVertical: 12,
+        paddingBottom: 24,
     },
     footerText: {
         fontSize: 12,
